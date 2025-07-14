@@ -1,5 +1,5 @@
 use super::state::State;
-use crate::event::FPS;
+use crate::{event::FPS, num::big};
 use rand::seq::IndexedRandom;
 use std::ops::Range;
 
@@ -30,7 +30,7 @@ impl Pred {
 
 static ENTRIES: &[Entry] = &[
     (
-        "You feel like making cookies. But nobody wants to eat your cookies. ",
+        "You feel like making cookies. But nobody wants to eat your cookies.",
         Pred::CLe(5),
     ),
     (
@@ -38,12 +38,104 @@ static ENTRIES: &[Entry] = &[
         Pred::CIn(5..50),
     ),
     (
-        "Your family accepts to try some of your cookies. ",
+        "Your family accepts to try some of your cookies.",
         Pred::CIn(50..100),
     ),
     (
-        "Your cookies are popular in the neighborhood. ",
+        "Your cookies are popular in the neighborhood.",
         Pred::CIn(100..500),
+    ),
+    (
+        "People are starting to talk about your cookies.",
+        Pred::CIn(500..big!(1 K)),
+    ),
+    (
+        "Your cookies are talked about for miles around.",
+        Pred::CIn(big!(1 K)..big!(5 K)),
+    ),
+    (
+        "Your cookies are renowned in the whole town!",
+        Pred::CIn(big!(5 K)..big!(10 K)),
+    ),
+    (
+        "Your cookies bring all the boys to the yard.",
+        Pred::CIn(big!(10 K)..big!(50 K)),
+    ),
+    (
+        "Your cookies now have their own website!",
+        Pred::CIn(big!(50 K)..big!(100 K)),
+    ),
+    (
+        "Your cookies are worth a lot of money.",
+        Pred::CIn(big!(100 K)..big!(500 K)),
+    ),
+    (
+        "Your cookies sell very well in distant countries.",
+        Pred::CIn(big!(500 K)..big!(1 M)),
+    ),
+    (
+        "People come from very far away to get a taste of your cookies.",
+        Pred::CIn(big!(1 M)..big!(5 M)),
+    ),
+    (
+        "Kings and queens from all over the world are enjoying your cookies.",
+        Pred::CIn(big!(5 M)..big!(10 M)),
+    ),
+    (
+        "There are now museums dedicated to your cookies.",
+        Pred::CIn(big!(10 M)..big!(50 M)),
+    ),
+    (
+        "A national day has been created in honor of your cookies.",
+        Pred::CIn(big!(50 M)..big!(100 M)),
+    ),
+    (
+        "Your cookies have been named a part of the world wonders.",
+        Pred::CIn(big!(100 M)..big!(500 M)),
+    ),
+    (
+        "History books now include a whole chapter about your cookies.",
+        Pred::CIn(big!(500 M)..big!(1 B)),
+    ),
+    (
+        "Your cookies have been placed under government surveillance.",
+        Pred::CIn(big!(1 B)..big!(5 B)),
+    ),
+    (
+        "The whole planet is enjoying your cookies!",
+        Pred::CIn(big!(5 B)..big!(10 B)),
+    ),
+    (
+        "Strange creatures from neighboring planets wish to try your cookies.",
+        Pred::CIn(big!(10 B)..big!(50 B)),
+    ),
+    (
+        "Elder gods from the whole cosmos have awoken to taste your cookies.",
+        Pred::CIn(big!(50 B)..big!(100 B)),
+    ),
+    (
+        "Beings from other dimensions lapse into existence just to get a taste of your cookies.",
+        Pred::CIn(big!(100 B)..big!(500 B)),
+    ),
+    (
+        "Your cookies have achieved sentience.",
+        Pred::CIn(big!(500 B)..big!(1 T)),
+    ),
+    (
+        "The universe has now turned into cookie dough, to the molecular level.",
+        Pred::CIn(big!(1 T)..big!(5 T)),
+    ),
+    (
+        "Your cookies are rewriting the fundamental laws of the universe.",
+        Pred::CIn(big!(5 T)..big!(10 T)),
+    ),
+    (
+        "it's time to stop playing",
+        Pred::CIn(big!(10 T)..big!(100 T)),
+    ),
+    (
+        "A local news station runs a 10-minute segment about your cookies. Success!",
+        Pred::CGe(big!(100 T)),
     ),
 ];
 

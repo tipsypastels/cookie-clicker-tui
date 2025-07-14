@@ -1,5 +1,5 @@
 use enum_assoc::Assoc;
-use std::{collections::HashMap, fmt};
+use std::collections::HashMap;
 
 macro_rules! names {
     ($s:literal) => {
