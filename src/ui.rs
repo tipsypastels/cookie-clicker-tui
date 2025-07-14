@@ -61,7 +61,10 @@ fn cookies_block(app: &mut App, area: Rect, buf: &mut Buffer) {
             },
         ),
         Line::styled(
-            format!("(per second: {:.1})", app.buildings().cps()),
+            format!(
+                "(per second: {:.1})",
+                app.buildings().cps().as_big_count_fmt()
+            ),
             Modifier::ITALIC,
         ),
         Line::default(),
