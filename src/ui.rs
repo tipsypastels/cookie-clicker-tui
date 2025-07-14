@@ -1,4 +1,7 @@
-use crate::app::{App, ListStatePane};
+use crate::{
+    app::{App, ListStatePane},
+    num::AsBigCountFmt,
+};
 use ratatui::{
     prelude::*,
     widgets::{Block, List, Padding, Paragraph},
@@ -50,7 +53,7 @@ fn cookies_block(app: &mut App, area: Rect, buf: &mut Buffer) {
 
     Paragraph::new(Text::from(vec![
         Line::styled(
-            format!("{}", app.cookies()),
+            format!("{}", app.cookies().as_big_count_fmt()),
             Style {
                 fg: app.error_insufficient_cookies().then_some(Color::Red),
                 add_modifier: Modifier::BOLD,
@@ -100,7 +103,7 @@ fn buildings_block(app: &mut App, area: Rect, buf: &mut Buffer) {
             "{} {} ({} cookies)",
             count,
             building.name_pluralized(count as _),
-            app.buildings().cost(building).floor(),
+            app.buildings().cost(building).as_big_count_fmt(),
         )
     }))
     .highlight_style(SELECTED_STYLE)
