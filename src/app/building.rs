@@ -46,7 +46,7 @@ impl Building {
 
 #[derive(Debug)]
 pub struct Buildings {
-    counts: HashMap<Building, u32>,
+    counts: HashMap<Building, u16>,
 }
 
 impl Buildings {
@@ -69,11 +69,15 @@ impl Buildings {
             .sum()
     }
 
-    pub fn count(&self, building: Building) -> u32 {
+    pub fn count(&self, building: Building) -> u16 {
         self.counts.get(&building).copied().unwrap_or_default()
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = (Building, u32)> {
+    pub fn cost(&self, building: Building) -> f64 {
+        building.base_cost() * 1.15f64.powi(self.count(building).into())
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = (Building, u16)> {
         Building::ALL.iter().map(|&b| (b, self.count(b)))
     }
 }

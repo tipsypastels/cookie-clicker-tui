@@ -15,6 +15,7 @@ pub struct App {
     pub ticker: Ticker,
     pub list_state: ListState,
     pub list_state_pane: ListStatePane,
+    just_pressed_cookie_countdown: Countdown<3>,
     error_insufficient_cookies_countdown: Countdown<10>,
     events: Events,
     quit: bool,
@@ -36,6 +37,7 @@ impl App {
             ticker,
             list_state: ListState::default(),
             list_state_pane: ListStatePane::default(),
+            just_pressed_cookie_countdown: Countdown::new(),
             error_insufficient_cookies_countdown: Countdown::new(),
             events: Events::new(),
             quit: false,
@@ -48,6 +50,10 @@ impl App {
         } else {
             None
         }
+    }
+
+    pub fn just_pressed_cookie(&self) -> bool {
+        self.just_pressed_cookie_countdown.is_running()
     }
 
     pub fn error_insufficient_cookies(&self) -> bool {
@@ -77,10 +83,22 @@ impl App {
                             let Some(building) = Building::index(i) else {
                                 continue;
                             };
+
+                            let cost = self.state.buildings.cost(building);
+                            if self.state.cookies < cost {
+                                self.error_insufficient_cookies_countdown.run();
+                                continue;
+                            }
+
+                            self.state.cookies.sub(cost);
                             self.state.buildings.buy(building);
                         }
                         _ => {}
                     },
+                    KeyCode::Char(' ') => {
+                        self.state.cookies.add(1.0);
+                        self.just_pressed_cookie_countdown.run();
+                    }
                     KeyCode::Char('q') => {
                         self.quit();
                     }
@@ -104,6 +122,7 @@ impl App {
         self.state.cookies.tick(self.state.buildings.cps());
         self.ticker.tick(&self.state);
         self.error_insufficient_cookies_countdown.tick();
+        self.just_pressed_cookie_countdown.tick();
     }
 
     fn quit(&mut self) {

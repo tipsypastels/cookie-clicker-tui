@@ -15,7 +15,7 @@ impl<const MAX: u16> Countdown<MAX> {
     }
 
     pub fn run(&mut self) {
-        self.0 = Some(MAX)
+        self.0 = Some(MAX);
     }
 
     pub fn tick(&mut self) {

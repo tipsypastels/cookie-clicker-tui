@@ -13,12 +13,12 @@ impl Cookies {
         self.0 += cps / FPS;
     }
 
-    pub fn add(&mut self, cookies: u32) {
-        self.0 += cookies as f64;
+    pub fn add(&mut self, cookies: f64) {
+        self.0 += cookies;
     }
 
-    pub fn sub(&mut self, cookies: u32) {
-        self.0 -= cookies as f64;
+    pub fn sub(&mut self, cookies: f64) {
+        self.0 -= cookies;
     }
 
     pub fn value(self) -> u128 {
@@ -43,6 +43,18 @@ impl PartialEq<u128> for Cookies {
 impl PartialOrd<u128> for Cookies {
     fn partial_cmp(&self, other: &u128) -> Option<Ordering> {
         self.value().partial_cmp(other)
+    }
+}
+
+impl PartialEq<f64> for Cookies {
+    fn eq(&self, other: &f64) -> bool {
+        self.0.eq(other)
+    }
+}
+
+impl PartialOrd<f64> for Cookies {
+    fn partial_cmp(&self, other: &f64) -> Option<Ordering> {
+        self.0.partial_cmp(other)
     }
 }
 
