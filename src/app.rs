@@ -3,7 +3,7 @@ mod cookies;
 mod state;
 mod ticker;
 
-use self::{state::State, ticker::Ticker};
+use self::{building::Building, state::State, ticker::Ticker};
 use crate::event::{Event, Events};
 use anyhow::{Context, Result};
 use ratatui::{DefaultTerminal, widgets::ListState};
@@ -12,9 +12,16 @@ use ratatui::{DefaultTerminal, widgets::ListState};
 pub struct App {
     pub state: State,
     pub ticker: Ticker,
-    pub building_list_state: ListState,
+    pub list_state: ListState,
+    pub list_state_pane: ListStatePane,
     events: Events,
     quit: bool,
+}
+
+#[derive(Default, Debug, Copy, Clone, PartialEq)]
+pub enum ListStatePane {
+    #[default]
+    Buildings,
 }
 
 impl App {
@@ -25,9 +32,18 @@ impl App {
         Self {
             state,
             ticker,
-            building_list_state: ListState::default(),
+            list_state: ListState::default(),
+            list_state_pane: ListStatePane::default(),
             events: Events::new(),
             quit: false,
+        }
+    }
+
+    pub fn list_state_for_pane(&mut self, pane: ListStatePane) -> Option<&mut ListState> {
+        if self.list_state_pane == pane {
+            Some(&mut self.list_state)
+        } else {
+            None
         }
     }
 
@@ -43,14 +59,21 @@ impl App {
                 }
                 Event::Term(Key(event)) if event.is_press() => match event.code {
                     KeyCode::Up => {
-                        self.building_list_state.select_previous();
+                        self.list_state.select_previous();
                     }
                     KeyCode::Down => {
-                        self.building_list_state.select_next();
+                        self.list_state.select_next();
                     }
-                    KeyCode::Char('b') => {
-                        self.state.buildings.buy(building::Building::Farm);
-                    }
+                    #[allow(clippy::single_match)] // for now
+                    KeyCode::Enter => match (self.list_state.selected(), self.list_state_pane) {
+                        (Some(i), ListStatePane::Buildings) => {
+                            let Some(building) = Building::index(i) else {
+                                continue;
+                            };
+                            self.state.buildings.buy(building);
+                        }
+                        _ => {}
+                    },
                     KeyCode::Char('q') => {
                         self.quit();
                     }

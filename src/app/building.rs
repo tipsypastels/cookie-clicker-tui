@@ -1,21 +1,47 @@
 use enum_assoc::Assoc;
 use std::{collections::HashMap, fmt};
 
+macro_rules! names {
+    ($s:literal) => {
+        ($s, concat!($s, "s"))
+    };
+}
+
 #[derive(Assoc, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[func(pub const fn name(self) -> &'static str)]
+#[func(const fn names(self) -> (&'static str, &'static str))]
 #[func(pub const fn base_cost(self) -> f64)]
 #[func(pub const fn base_cps(self) -> f64)]
 pub enum Building {
-    #[assoc(name = "Cursor", base_cost = 15.0, base_cps = 0.1)]
+    #[assoc(names = names!("Cursor"), base_cost = 15.0, base_cps = 0.1)]
     Cursor,
-    #[assoc(name = "Grandma", base_cost = 100.0, base_cps = 1.0)]
+    #[assoc(names = names!("Grandma"), base_cost = 100.0, base_cps = 1.0)]
     Grandma,
-    #[assoc(name = "Farm", base_cost = 1000.0, base_cps = 10.0)]
+    #[assoc(names = names!("Farm"), base_cost = 1000.0, base_cps = 10.0)]
     Farm,
 }
 
 impl Building {
     const ALL: [Self; 3] = [Self::Cursor, Self::Grandma, Self::Farm];
+
+    pub fn index(i: usize) -> Option<Self> {
+        Self::ALL.get(i).copied()
+    }
+
+    pub const fn name(self) -> &'static str {
+        self.names().0
+    }
+
+    pub const fn name_plural(self) -> &'static str {
+        self.names().1
+    }
+
+    pub const fn name_pluralized(self, count: usize) -> &'static str {
+        if count == 1 {
+            self.name()
+        } else {
+            self.name_plural()
+        }
+    }
 }
 
 #[derive(Debug)]

@@ -1,8 +1,13 @@
-use crate::app::App;
+use crate::app::{App, ListStatePane};
 use ratatui::{
     prelude::*,
-    widgets::{Block, List, Paragraph},
+    widgets::{Block, List, Padding, Paragraph},
 };
+
+const SELECTED_STYLE: Style = Style::new()
+    .bg(Color::White)
+    .fg(Color::Black)
+    .add_modifier(Modifier::BOLD);
 
 pub fn ui(app: &mut App, f: &mut Frame) {
     let area = f.area();
@@ -79,11 +84,15 @@ fn buildings_block(app: &mut App, area: Rect, buf: &mut Buffer) {
         app.state
             .buildings
             .iter()
-            .map(|(building, count)| format!("{} ({})", building.name(), count)),
+            .map(|(building, count)| format!("{} {}", count, building.name_pluralized(count as _))),
     )
-    .highlight_symbol(">")
-    .block(Block::bordered().title(Line::styled(" Buildings ", Modifier::BOLD).centered()))
-    .render_stateful(area, buf, &mut app.building_list_state);
+    .highlight_style(SELECTED_STYLE)
+    .block(
+        Block::bordered()
+            .title(Line::styled(" Buildings ", Modifier::BOLD).centered())
+            .padding(Padding::uniform(1)),
+    )
+    .render_maybe_stateful(area, buf, app.list_state_for_pane(ListStatePane::Buildings));
 }
 
 fn upgrades_block(app: &mut App, area: Rect, buf: &mut Buffer) {
@@ -92,12 +101,28 @@ fn upgrades_block(app: &mut App, area: Rect, buf: &mut Buffer) {
         .render(area, buf);
 }
 
-// hack to make it possible to call the method
-// without needing to disambiguate with `Widget::render`
+trait WidgetExt: Widget + Sized {
+    fn render_stateless(self, area: Rect, buf: &mut Buffer) {
+        Self::render(self, area, buf);
+    }
+}
+
 trait StatefulWidgetExt: StatefulWidget + Sized {
     fn render_stateful(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
         Self::render(self, area, buf, state);
     }
 }
 
+trait MaybeStatefulWidgetExt: Widget + StatefulWidget + Sized {
+    fn render_maybe_stateful(self, area: Rect, buf: &mut Buffer, state: Option<&mut Self::State>) {
+        if let Some(state) = state {
+            self.render_stateful(area, buf, state);
+        } else {
+            self.render_stateless(area, buf);
+        }
+    }
+}
+
+impl<W: Widget> WidgetExt for W {}
 impl<W: StatefulWidget> StatefulWidgetExt for W {}
+impl<W: Widget + StatefulWidget> MaybeStatefulWidgetExt for W {}
