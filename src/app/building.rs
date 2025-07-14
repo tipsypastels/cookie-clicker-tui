@@ -56,7 +56,7 @@ pub enum Building {
 }
 
 impl Building {
-    const ALL: [Self; 20] = [
+    pub const ALL: [Self; 20] = [
         Self::Cursor,
         Self::Grandma,
         Self::Farm,
@@ -79,7 +79,7 @@ impl Building {
         Self::You,
     ];
 
-    pub fn index(i: usize) -> Option<Self> {
+    pub fn get(i: usize) -> Option<Self> {
         Self::ALL.get(i).copied()
     }
 
