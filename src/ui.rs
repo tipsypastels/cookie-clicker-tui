@@ -10,18 +10,24 @@ pub fn ui(app: &mut App, f: &mut Frame) {
 
     let cols = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+        .constraints([
+            Constraint::Percentage(50),
+            Constraint::Percentage(25),
+            Constraint::Percentage(25),
+        ])
         .spacing(1)
         .split(area);
 
     cookies_and_ticker_col(app, cols[0], buf);
     buildings_block(app, cols[1], buf);
+    upgrades_block(app, cols[2], buf);
 }
 
 fn cookies_and_ticker_col(app: &mut App, area: Rect, buf: &mut Buffer) {
+    // TODO: Why the extra spacing?
     let rows = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([Constraint::Percentage(100), Constraint::Min(3)])
+        .constraints([Constraint::Percentage(100), Constraint::Length(3)])
         .split(area);
 
     cookies_block(app, rows[0], buf);
@@ -78,6 +84,12 @@ fn buildings_block(app: &mut App, area: Rect, buf: &mut Buffer) {
     .highlight_symbol(">")
     .block(Block::bordered().title(Line::styled(" Buildings ", Modifier::BOLD).centered()))
     .render_stateful(area, buf, &mut app.building_list_state);
+}
+
+fn upgrades_block(app: &mut App, area: Rect, buf: &mut Buffer) {
+    Block::bordered()
+        .title(Line::styled(" Upgrades ", Modifier::BOLD).centered())
+        .render(area, buf);
 }
 
 // hack to make it possible to call the method
