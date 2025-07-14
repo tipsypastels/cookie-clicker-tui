@@ -4,17 +4,22 @@ mod state;
 mod ticker;
 mod util;
 
-use self::{building::Building, state::State, ticker::Ticker, util::countdown::Countdown};
+pub use self::{
+    building::{Building, Buildings},
+    cookies::Cookies,
+};
+
+use self::{state::State, ticker::Ticker, util::countdown::Countdown};
 use crate::event::{Event, Events};
 use anyhow::{Context, Result};
 use ratatui::{DefaultTerminal, widgets::ListState};
 
 #[derive(Debug)]
 pub struct App {
-    pub state: State,
-    pub ticker: Ticker,
-    pub list_state: ListState,
-    pub list_state_pane: ListStatePane,
+    state: State,
+    ticker: Ticker,
+    list_state: ListState,
+    list_state_pane: ListStatePane,
     just_pressed_cookie_countdown: Countdown<3>,
     error_insufficient_cookies_countdown: Countdown<10>,
     events: Events,
@@ -42,6 +47,18 @@ impl App {
             events: Events::new(),
             quit: false,
         }
+    }
+
+    pub fn buildings(&self) -> &Buildings {
+        &self.state.buildings
+    }
+
+    pub fn cookies(&self) -> &Cookies {
+        &self.state.cookies
+    }
+
+    pub fn ticker(&self) -> Option<&'static str> {
+        self.ticker.text()
     }
 
     pub fn list_state_for_pane(&mut self, pane: ListStatePane) -> Option<&mut ListState> {

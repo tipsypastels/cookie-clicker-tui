@@ -50,7 +50,7 @@ fn cookies_block(app: &mut App, area: Rect, buf: &mut Buffer) {
 
     Paragraph::new(Text::from(vec![
         Line::styled(
-            format!("{}", app.state.cookies),
+            format!("{}", app.cookies()),
             Style {
                 fg: app.error_insufficient_cookies().then_some(Color::Red),
                 add_modifier: Modifier::BOLD,
@@ -58,7 +58,7 @@ fn cookies_block(app: &mut App, area: Rect, buf: &mut Buffer) {
             },
         ),
         Line::styled(
-            format!("(per second: {:.1})", app.state.buildings.cps()),
+            format!("(per second: {:.1})", app.buildings().cps()),
             Modifier::ITALIC,
         ),
         Line::default(),
@@ -84,7 +84,7 @@ fn cookies_block(app: &mut App, area: Rect, buf: &mut Buffer) {
 }
 
 fn ticker_block(app: &mut App, area: Rect, buf: &mut Buffer) {
-    if let Some(text) = app.ticker.text() {
+    if let Some(text) = app.ticker() {
         Paragraph::new(Text::from(text))
             .centered()
             .block(Block::bordered())
@@ -95,12 +95,12 @@ fn ticker_block(app: &mut App, area: Rect, buf: &mut Buffer) {
 }
 
 fn buildings_block(app: &mut App, area: Rect, buf: &mut Buffer) {
-    List::new(app.state.buildings.iter().map(|(building, count)| {
+    List::new(app.buildings().iter().map(|(building, count)| {
         format!(
             "{} {} ({} cookies)",
             count,
             building.name_pluralized(count as _),
-            app.state.buildings.cost(building).floor(),
+            app.buildings().cost(building).floor(),
         )
     }))
     .highlight_style(SELECTED_STYLE)
