@@ -2,8 +2,9 @@ mod building;
 mod cookies;
 mod state;
 mod ticker;
+mod util;
 
-use self::{building::Building, state::State, ticker::Ticker};
+use self::{building::Building, state::State, ticker::Ticker, util::countdown::Countdown};
 use crate::event::{Event, Events};
 use anyhow::{Context, Result};
 use ratatui::{DefaultTerminal, widgets::ListState};
@@ -14,6 +15,7 @@ pub struct App {
     pub ticker: Ticker,
     pub list_state: ListState,
     pub list_state_pane: ListStatePane,
+    error_insufficient_cookies_countdown: Countdown<10>,
     events: Events,
     quit: bool,
 }
@@ -34,6 +36,7 @@ impl App {
             ticker,
             list_state: ListState::default(),
             list_state_pane: ListStatePane::default(),
+            error_insufficient_cookies_countdown: Countdown::new(),
             events: Events::new(),
             quit: false,
         }
@@ -45,6 +48,10 @@ impl App {
         } else {
             None
         }
+    }
+
+    pub fn error_insufficient_cookies(&self) -> bool {
+        self.error_insufficient_cookies_countdown.is_running()
     }
 
     pub async fn run(mut self, term: &mut DefaultTerminal) -> Result<()> {
@@ -96,6 +103,7 @@ impl App {
     fn tick(&mut self) {
         self.state.cookies.tick(self.state.buildings.cps());
         self.ticker.tick(&self.state);
+        self.error_insufficient_cookies_countdown.tick();
     }
 
     fn quit(&mut self) {

@@ -41,7 +41,14 @@ fn cookies_and_ticker_col(app: &mut App, area: Rect, buf: &mut Buffer) {
 
 fn cookies_block(app: &mut App, area: Rect, buf: &mut Buffer) {
     Paragraph::new(Text::from(vec![
-        Line::styled(format!("{}", app.state.cookies), Modifier::BOLD),
+        Line::styled(
+            format!("{}", app.state.cookies),
+            Style {
+                fg: app.error_insufficient_cookies().then_some(Color::Red),
+                add_modifier: Modifier::BOLD,
+                ..Default::default()
+            },
+        ),
         Line::styled(
             format!("(per second: {:.1})", app.state.buildings.cps()),
             Modifier::ITALIC,
