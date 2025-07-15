@@ -32,13 +32,12 @@ pub struct AppList {
     pane: ListStatePane,
 }
 
-#[derive(Debug)] // pre-borrows all of the disjoint fields so they can be accessed independantly
+#[derive(Debug)]
 pub struct AppDeconstructedForRendering<'a> {
     pub buildings: &'a Buildings,
     pub cookies: &'a Cookies,
     pub ticker: Option<&'static str>,
     pub list: &'a mut AppList,
-    _priv: (),
 }
 
 #[derive(Default, Debug, Copy, Clone, PartialEq)]
@@ -81,7 +80,6 @@ impl App {
             cookies: &self.state.cookies,
             ticker: self.ticker.text(),
             list: &mut self.list,
-            _priv: (),
         }
     }
 

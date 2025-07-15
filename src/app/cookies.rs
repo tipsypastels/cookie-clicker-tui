@@ -1,4 +1,4 @@
-use crate::{event::FPS, num::AsBigCountFmt};
+use crate::event::FPS;
 use std::{cmp::Ordering, ops::RangeBounds};
 
 #[derive(Debug, Copy, Clone)]
@@ -55,11 +55,5 @@ impl PartialEq<f64> for Cookies {
 impl PartialOrd<f64> for Cookies {
     fn partial_cmp(&self, other: &f64) -> Option<Ordering> {
         self.0.partial_cmp(other)
-    }
-}
-
-impl AsBigCountFmt for Cookies {
-    fn as_big_count_fmt(&self) -> crate::num::BigCountFmt {
-        self.value_f64().as_big_count_fmt()
     }
 }

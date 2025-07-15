@@ -47,95 +47,95 @@ static ENTRIES: &[Entry] = &[
     ),
     (
         "People are starting to talk about your cookies.",
-        Pred::CIn(500..big!(1 thousand)),
+        Pred::CIn(500..(1 * big::THOUSAND)),
     ),
     (
         "Your cookies are talked about for miles around.",
-        Pred::CIn(big!(1 thousand)..big!(5 thousand)),
+        Pred::CIn((1 * big::THOUSAND)..(5 * big::THOUSAND)),
     ),
     (
         "Your cookies are renowned in the whole town!",
-        Pred::CIn(big!(5 thousand)..big!(10 thousand)),
+        Pred::CIn((5 * big::THOUSAND)..(10 * big::THOUSAND)),
     ),
     (
         "Your cookies bring all the boys to the yard.",
-        Pred::CIn(big!(10 thousand)..big!(50 thousand)),
+        Pred::CIn((10 * big::THOUSAND)..(50 * big::THOUSAND)),
     ),
     (
         "Your cookies now have their own website!",
-        Pred::CIn(big!(50 thousand)..big!(100 thousand)),
+        Pred::CIn((50 * big::THOUSAND)..(100 * big::THOUSAND)),
     ),
     (
         "Your cookies are worth a lot of money.",
-        Pred::CIn(big!(100 thousand)..big!(500 thousand)),
+        Pred::CIn((100 * big::THOUSAND)..(500 * big::THOUSAND)),
     ),
     (
         "Your cookies sell very well in distant countries.",
-        Pred::CIn(big!(500 thousand)..big!(1 million)),
+        Pred::CIn((500 * big::THOUSAND)..(1 * big::MILLION)),
     ),
     (
         "People come from very far away to get a taste of your cookies.",
-        Pred::CIn(big!(1 million)..big!(5 million)),
+        Pred::CIn((1 * big::MILLION)..(5 * big::MILLION)),
     ),
     (
         "Kings and queens from all over the world are enjoying your cookies.",
-        Pred::CIn(big!(5 million)..big!(10 million)),
+        Pred::CIn((5 * big::MILLION)..(10 * big::MILLION)),
     ),
     (
         "There are now museums dedicated to your cookies.",
-        Pred::CIn(big!(10 million)..big!(50 million)),
+        Pred::CIn((10 * big::MILLION)..(50 * big::MILLION)),
     ),
     (
         "A national day has been created in honor of your cookies.",
-        Pred::CIn(big!(50 million)..big!(100 million)),
+        Pred::CIn((50 * big::MILLION)..(100 * big::MILLION)),
     ),
     (
         "Your cookies have been named a part of the world wonders.",
-        Pred::CIn(big!(100 million)..big!(500 million)),
+        Pred::CIn((100 * big::MILLION)..(500 * big::MILLION)),
     ),
     (
         "History books now include a whole chapter about your cookies.",
-        Pred::CIn(big!(500 million)..big!(1 billion)),
+        Pred::CIn((500 * big::MILLION)..(1 * big::BILLION)),
     ),
     (
         "Your cookies have been placed under government surveillance.",
-        Pred::CIn(big!(1 billion)..big!(5 billion)),
+        Pred::CIn((1 * big::BILLION)..(5 * big::BILLION)),
     ),
     (
         "The whole planet is enjoying your cookies!",
-        Pred::CIn(big!(5 billion)..big!(10 billion)),
+        Pred::CIn((5 * big::BILLION)..(10 * big::BILLION)),
     ),
     (
         "Strange creatures from neighboring planets wish to try your cookies.",
-        Pred::CIn(big!(10 billion)..big!(50 billion)),
+        Pred::CIn((10 * big::BILLION)..(50 * big::BILLION)),
     ),
     (
         "Elder gods from the whole cosmos have awoken to taste your cookies.",
-        Pred::CIn(big!(50 billion)..big!(100 billion)),
+        Pred::CIn((50 * big::BILLION)..(100 * big::BILLION)),
     ),
     (
         "Beings from other dimensions lapse into existence just to get a taste of your cookies.",
-        Pred::CIn(big!(100 billion)..big!(500 billion)),
+        Pred::CIn((100 * big::BILLION)..(500 * big::BILLION)),
     ),
     (
         "Your cookies have achieved sentience.",
-        Pred::CIn(big!(500 billion)..big!(1 trillion)),
+        Pred::CIn((500 * big::BILLION)..(1 * big::TRILLION)),
     ),
     (
         "The universe has now turned into cookie dough, to the molecular level.",
-        Pred::CIn(big!(1 trillion)..big!(5 trillion)),
+        Pred::CIn((1 * big::TRILLION)..(5 * big::TRILLION)),
     ),
     (
         "Your cookies are rewriting the fundamental laws of the universe.",
-        Pred::CIn(big!(5 trillion)..big!(10 trillion)),
+        Pred::CIn((5 * big::TRILLION)..(10 * big::TRILLION)),
     ),
     (
         "it's time to stop playing",
-        Pred::CIn(big!(10 trillion)..big!(100 trillion)),
+        Pred::CIn((10 * big::TRILLION)..(100 * big::TRILLION)),
     ),
     (
         "A local news station runs a 10-minute segment about your cookies. Success!",
-        Pred::CGe(big!(100 trillion)),
+        Pred::CGe(100 * big::TRILLION),
     ),
 ];
 
