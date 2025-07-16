@@ -79,7 +79,7 @@ impl BuildingWidget {
 
     fn cost_line(&self) -> Line {
         Line::styled(
-            format!("costs {}", self.cost.print_float(0, 0)),
+            format!("{} cookies", self.cost.print_float(0, 0)),
             Modifier::ITALIC,
         )
         .right_aligned()
@@ -87,7 +87,7 @@ impl BuildingWidget {
 
     fn cps_line(&self) -> Line {
         Line::styled(
-            format!("gives {}", self.cps.print_float(1, 0)),
+            format!("{} cps", self.cps.print_float(1, 0)),
             Modifier::ITALIC,
         )
         .right_aligned()
