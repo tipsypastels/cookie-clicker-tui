@@ -10,7 +10,7 @@ pub fn debug(app: &mut App, area: Rect, buf: &mut Buffer) {
         return;
     };
 
-    let area = modal(ModalSize::Small, area);
+    let area = Modal::Small.split(area);
 
     Clear.render(area, buf);
     Paragraph::new(Text::raw(message))

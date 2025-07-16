@@ -23,7 +23,7 @@ pub struct App {
     list: AppList,
     just_pressed_cookie_countdown: Countdown<3>,
     error_insufficient_cookies_countdown: Countdown<10>,
-    debug_message_countdown: CountdownOf<String, 10>,
+    debug_message_countdown: CountdownOf<String, 25>,
     events: Events,
     quit: bool,
 }
@@ -148,6 +148,9 @@ impl App {
                     }
                     KeyCode::Char('q') => {
                         self.quit();
+                    }
+                    KeyCode::Char('/') => {
+                        self.set_debug_message("Hello, debug!");
                     }
                     _ => {}
                 },
