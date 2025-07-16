@@ -1,5 +1,6 @@
 mod buildings;
 mod cookies;
+mod debug;
 mod ticker;
 mod upgrades;
 mod util;
@@ -29,6 +30,8 @@ pub fn ui(app: &mut App, f: &mut Frame) {
     main_column(app, cols[0], buf);
     buildings::buildings(app, cols[1], buf);
     upgrades::upgrades(app, cols[2], buf);
+
+    debug::debug(app, area, buf);
 }
 
 fn main_column(app: &mut App, area: Rect, buf: &mut Buffer) {

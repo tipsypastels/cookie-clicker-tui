@@ -14,6 +14,7 @@ use crate::event::{Event, Events};
 use anyhow::{Context, Result};
 use ratatui::DefaultTerminal;
 use tui_widget_list::ListState;
+use util::countdown::CountdownOf;
 
 #[derive(Debug)]
 pub struct App {
@@ -22,6 +23,7 @@ pub struct App {
     list: AppList,
     just_pressed_cookie_countdown: Countdown<3>,
     error_insufficient_cookies_countdown: Countdown<10>,
+    debug_message_countdown: CountdownOf<String, 10>,
     events: Events,
     quit: bool,
 }
@@ -57,6 +59,7 @@ impl App {
             list: AppList::default(),
             just_pressed_cookie_countdown: Countdown::new(),
             error_insufficient_cookies_countdown: Countdown::new(),
+            debug_message_countdown: CountdownOf::new(),
             events: Events::new(),
             quit: false,
         }
@@ -93,6 +96,15 @@ impl App {
 
     pub fn error_insufficient_cookies(&self) -> bool {
         self.error_insufficient_cookies_countdown.is_running()
+    }
+
+    pub fn debug_message(&self) -> Option<&str> {
+        self.debug_message_countdown.value().map(|s| s.as_str())
+    }
+
+    #[allow(unused)]
+    pub fn set_debug_message(&mut self, message: impl ToString) {
+        self.debug_message_countdown.run(message.to_string());
     }
 
     pub async fn run(mut self, term: &mut DefaultTerminal) -> Result<()> {
@@ -158,6 +170,7 @@ impl App {
         self.ticker.tick(&self.state);
         self.error_insufficient_cookies_countdown.tick();
         self.just_pressed_cookie_countdown.tick();
+        self.debug_message_countdown.tick();
     }
 
     fn quit(&mut self) {
