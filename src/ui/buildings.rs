@@ -1,7 +1,4 @@
-use super::util::{
-    num::{PrintFloat, PrintNum},
-    widget::*,
-};
+use super::util::{num::PrintFloat, widget::*};
 use crate::app::{App, Building, ListStatePane};
 use ratatui::{
     prelude::*,
@@ -73,7 +70,7 @@ impl BuildingWidget {
 
     fn cost_line(&self) -> Line {
         Line::styled(
-            format!("{} cookies", self.cost.print_num_with(PrintFloat::Floor)),
+            format!("costs {}", self.cost.print_float(0, 0)),
             Modifier::ITALIC,
         )
         .right_aligned()

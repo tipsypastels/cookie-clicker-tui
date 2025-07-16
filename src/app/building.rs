@@ -1,4 +1,4 @@
-use crate::num::bigf;
+use crate::num;
 use enum_assoc::Assoc;
 use std::collections::HashMap;
 
@@ -21,37 +21,37 @@ pub enum Building {
     Farm,
     #[assoc(names = names!("Mine"), base_cost = 1_100.0, base_cps = 47.0)]
     Mine,
-    #[assoc(names = names!("Factory"), base_cost = 130.0 * bigf::THOUSAND, base_cps = 260.0)]
+    #[assoc(names = names!("Factory"), base_cost = 130.0 * num::THOUSAND, base_cps = 260.0)]
     Factory,
-    #[assoc(names = names!("Bank"), base_cost = 1.4 * bigf::MILLION, base_cps = 1_400.0)]
+    #[assoc(names = names!("Bank"), base_cost = 1.4 * num::MILLION, base_cps = 1_400.0)]
     Bank,
-    #[assoc(names = names!("Temple"), base_cost = 20.0 * bigf::MILLION, base_cps = 7_800.0)]
+    #[assoc(names = names!("Temple"), base_cost = 20.0 * num::MILLION, base_cps = 7_800.0)]
     Temple,
-    #[assoc(names = names!("Wizard Tower"), base_cost = 330.0 * bigf::MILLION, base_cps = 44.0 * bigf::THOUSAND)]
+    #[assoc(names = names!("Wizard Tower"), base_cost = 330.0 * num::MILLION, base_cps = 44.0 * num::THOUSAND)]
     WizardTower,
-    #[assoc(names = names!("Shipment"), base_cost = 5.1 * bigf::BILLION, base_cps = 260.0 * bigf::THOUSAND)]
+    #[assoc(names = names!("Shipment"), base_cost = 5.1 * num::BILLION, base_cps = 260.0 * num::THOUSAND)]
     Shipment,
-    #[assoc(names = names!("Alchemy Lab"), base_cost = 75.0 * bigf::BILLION, base_cps = 1.6 * bigf::MILLION)]
+    #[assoc(names = names!("Alchemy Lab"), base_cost = 75.0 * num::BILLION, base_cps = 1.6 * num::MILLION)]
     AlchemyLab,
-    #[assoc(names = names!("Portal"), base_cost = 1.0 * bigf::TRILLION, base_cps = 10.0 * bigf::MILLION)]
+    #[assoc(names = names!("Portal"), base_cost = 1.0 * num::TRILLION, base_cps = 10.0 * num::MILLION)]
     Portal,
-    #[assoc(names = names!("Time Machine"), base_cost = 14.0 * bigf::TRILLION, base_cps = 64.0 * bigf::MILLION)]
+    #[assoc(names = names!("Time Machine"), base_cost = 14.0 * num::TRILLION, base_cps = 64.0 * num::MILLION)]
     TimeMachine,
-    #[assoc(names = names!("Antimatter Condenser"), base_cost = 170.0 * bigf::TRILLION, base_cps = 430.0 * bigf::MILLION)]
+    #[assoc(names = names!("Antimatter Condenser"), base_cost = 170.0 * num::TRILLION, base_cps = 430.0 * num::MILLION)]
     AntimatterCondenser,
-    #[assoc(names = names!("Prism"), base_cost = 2.1 * bigf::QUADRILLION, base_cps = 2.9 * bigf::BILLION)]
+    #[assoc(names = names!("Prism"), base_cost = 2.1 * num::QUADRILLION, base_cps = 2.9 * num::BILLION)]
     Prism,
-    #[assoc(names = names!("Chancemaker"), base_cost = 26.0 * bigf::QUADRILLION, base_cps = 21.0 * bigf::BILLION)]
+    #[assoc(names = names!("Chancemaker"), base_cost = 26.0 * num::QUADRILLION, base_cps = 21.0 * num::BILLION)]
     Chancemaker,
-    #[assoc(names = names!("Fractal Engine"), base_cost = 310.0 * bigf::QUADRILLION, base_cps = 150.0 * bigf::BILLION)]
+    #[assoc(names = names!("Fractal Engine"), base_cost = 310.0 * num::QUADRILLION, base_cps = 150.0 * num::BILLION)]
     FractalEngine,
-    #[assoc(names = names!("Rust Playground"), base_cost = 71.0 * bigf::QUINTILLION, base_cps = 1.1 * bigf::TRILLION)]
+    #[assoc(names = names!("Rust Playground"), base_cost = 71.0 * num::QUINTILLION, base_cps = 1.1 * num::TRILLION)]
     RustPlayground,
-    #[assoc(names = names!("Idleverse"), base_cost = 12.0 * bigf::SEXTILLION, base_cps = 8.3 * bigf::TRILLION)]
+    #[assoc(names = names!("Idleverse"), base_cost = 12.0 * num::SEXTILLION, base_cps = 8.3 * num::TRILLION)]
     Idleverse,
-    #[assoc(names = names!("Cortex Baker"), base_cost = 1.9 * bigf::SEPTILLION, base_cps = 64.0 * bigf::TRILLION)]
+    #[assoc(names = names!("Cortex Baker"), base_cost = 1.9 * num::SEPTILLION, base_cps = 64.0 * num::TRILLION)]
     CortexBaker,
-    #[assoc(names = ("You", "of You"), base_cost = 540.0 * bigf::SEPTILLION, base_cps = 510.0 * bigf::TRILLION)]
+    #[assoc(names = ("You", "of You"), base_cost = 0.0 * num::SEPTILLION, base_cps = 510.0 * num::TRILLION)]
     You,
 }
 
