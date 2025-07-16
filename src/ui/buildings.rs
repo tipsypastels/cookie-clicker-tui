@@ -1,8 +1,5 @@
-use super::util::*;
-use crate::{
-    app::{App, Building, ListStatePane},
-    num::AsBigCountFmt,
-};
+use super::util::{num::PrintFloat, widget::*};
+use crate::app::{App, Building, ListStatePane};
 use ratatui::{
     prelude::*,
     widgets::{Block, Padding, Paragraph},
@@ -73,7 +70,7 @@ impl BuildingWidget {
 
     fn cost_line(&self) -> Line {
         Line::styled(
-            format!("{} cookies", self.cost.as_big_count_fmt()),
+            format!("costs {}", self.cost.print_float(0, 0)),
             Modifier::ITALIC,
         )
         .right_aligned()

@@ -1,4 +1,4 @@
-use crate::{event::FPS, num::AsBigCountFmt};
+use crate::event::FPS;
 use std::{cmp::Ordering, ops::RangeBounds};
 
 #[derive(Debug, Copy, Clone)]
@@ -21,28 +21,12 @@ impl Cookies {
         self.0 -= cookies;
     }
 
-    pub fn value(self) -> u128 {
-        self.0.floor() as _
-    }
-
-    pub fn value_f64(self) -> f64 {
+    pub fn value(self) -> f64 {
         self.0
     }
 
-    pub fn in_range(self, range: &impl RangeBounds<u128>) -> bool {
-        range.contains(&self.value())
-    }
-}
-
-impl PartialEq<u128> for Cookies {
-    fn eq(&self, other: &u128) -> bool {
-        self.value().eq(other)
-    }
-}
-
-impl PartialOrd<u128> for Cookies {
-    fn partial_cmp(&self, other: &u128) -> Option<Ordering> {
-        self.value().partial_cmp(other)
+    pub fn in_range(self, range: &impl RangeBounds<f64>) -> bool {
+        range.contains(&self.0)
     }
 }
 
@@ -55,11 +39,5 @@ impl PartialEq<f64> for Cookies {
 impl PartialOrd<f64> for Cookies {
     fn partial_cmp(&self, other: &f64) -> Option<Ordering> {
         self.0.partial_cmp(other)
-    }
-}
-
-impl AsBigCountFmt for Cookies {
-    fn as_big_count_fmt(&self) -> crate::num::BigCountFmt {
-        self.value_f64().as_big_count_fmt()
     }
 }

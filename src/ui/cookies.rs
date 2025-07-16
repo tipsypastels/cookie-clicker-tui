@@ -1,4 +1,5 @@
-use crate::{app::App, num::AsBigCountFmt};
+use super::util::num::PrintFloat;
+use crate::app::App;
 use ratatui::{
     prelude::*,
     widgets::{Block, Paragraph},
@@ -43,16 +44,14 @@ fn cookie_count(app: &mut App, lines: &mut Vec<Line>) {
     }
 
     lines.push(Line::styled(
-        format!("{}", app.cookies().as_big_count_fmt()),
+        format!("{}", app.cookies().value().print_float(1, 2)),
         cookie_count_style,
     ));
 }
 
 fn cps_count(app: &mut App, lines: &mut Vec<Line>) {
     lines.push(Line::styled(
-        // TODO: This doesn't show fractional cps.
-        // Add an option to big_count_fmt?
-        format!("(per second: {})", app.buildings().cps().as_big_count_fmt()),
+        format!("(per second: {})", app.buildings().cps().print_float(1, 2)),
         Modifier::ITALIC,
     ));
 }
