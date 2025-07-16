@@ -15,15 +15,18 @@ pub fn buildings(app: &mut App, area: Rect, buf: &mut Buffer) {
         let building = Building::ALL[ctx.index];
         let count = buildings.count(building);
         let cost = buildings.cost(building);
+        // TODO: Get this off buildings to take account of upgrades.
+        let cps = building.base_cps();
 
         let widget = BuildingWidget {
             selected,
             building,
             count,
             cost,
+            cps,
         };
 
-        const HEIGHT: u16 = 2;
+        const HEIGHT: u16 = 3;
 
         (widget, HEIGHT)
     });
@@ -45,11 +48,17 @@ struct BuildingWidget {
     building: Building,
     count: u16,
     cost: f64,
+    cps: f64,
 }
 
 impl Widget for BuildingWidget {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        Paragraph::new(Text::from(vec![self.label_line(), self.cost_line()])).render(area, buf);
+        Paragraph::new(Text::from(vec![
+            self.label_line(),
+            self.cost_line(),
+            self.cps_line(),
+        ]))
+        .render(area, buf);
     }
 }
 
@@ -71,6 +80,14 @@ impl BuildingWidget {
     fn cost_line(&self) -> Line {
         Line::styled(
             format!("costs {}", self.cost.print_float(0, 0)),
+            Modifier::ITALIC,
+        )
+        .right_aligned()
+    }
+
+    fn cps_line(&self) -> Line {
+        Line::styled(
+            format!("gives {}", self.cps.print_float(1, 0)),
             Modifier::ITALIC,
         )
         .right_aligned()
