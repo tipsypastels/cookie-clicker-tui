@@ -12,7 +12,7 @@ pub enum Building {
     Grandma,
     #[assoc(base_cost = 1100.0, base_cps = 8.0)]
     Farm,
-    #[assoc(base_cost = 1_100.0, base_cps = 47.0)]
+    #[assoc(base_cost = 12.0 * num::THOUSAND, base_cps = 47.0)]
     Mine,
     #[assoc(base_cost = 130.0 * num::THOUSAND, base_cps = 260.0)]
     Factory,
