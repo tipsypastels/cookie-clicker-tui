@@ -8,23 +8,27 @@ pub struct SimpleTieredUpgrade {
 }
 
 impl SimpleTieredUpgrade {
-    pub fn new(building: Building, index: usize) -> Self {
+    pub const fn new(building: Building, index: usize) -> Self {
         Self {
             building,
             template: SimpleTieredUpgradeTemplate::variants_array(building)[index],
         }
     }
 
-    pub fn building(&self) -> Building {
+    pub const fn building(&self) -> Building {
         self.building
     }
 
-    pub fn building_req(&self) -> u16 {
+    pub const fn building_req(&self) -> u16 {
         self.template.building_req
     }
 
-    pub fn cost(&self) -> f64 {
+    pub const fn cost(&self) -> f64 {
         self.building.base_cost() * self.template.cost_mult
+    }
+
+    pub const fn label(&self) -> &'static str {
+        labels::get(self.building)[self.template.index]
     }
 }
 
@@ -91,6 +95,63 @@ impl SimpleTieredUpgradeTemplate {
     }
 }
 
+#[rustfmt::skip]
+#[allow(non_upper_case_globals)]
+mod labels {
+    type Labels = [&'static str; super::SimpleTieredUpgradeTemplate::VARIANT_COUNT];
+
+    pub const fn get(building: super::Building) -> Labels {
+        macro_rules! arms {
+            ($($building:ident),*$(,)?) => {
+                match building {
+                    $(super::Building::$building => $building),*
+                }
+            };
+        }
+        crate::building::all_the_buildings!(arms)
+    }
+
+    const Cursor: Labels = ["Reinforced index finger", "Carpal tunnel prevention cream", "Ambidexterous", "Thousand fingers", "Million fingers", "Billion fingers", "Trillion fingers", "Quadrillion fingers", "Quintillion fingers", "Sextillion fingers", "Septillion fingers", "Octillion fingers", "Nonillion fingers", "Decillion fingers", "Undecillion fingers"];
+   
+    const Grandma: Labels = ["Forwards from grandma", "Steel-plated rolling pins", "Lubricated dentures", "Prune juce", "Double-thick glasses", "Aging agents", "Xtreme walkers", "The Unbrindling", "Reverse demetia", "Timeproof hair dyes", "Good manners", "Generation degeneration", "Visits", "Kitchen cabinets", "Foam-tipped-canes"];
+ 
+    const Farm: Labels = ["Cheap hoes", "Fertilizer", "Cookie trees", "Genetically-modified cookies", "Gingerbread scarecrows", "Pulsar sprinklers", "Fudge fungus", "Wheat triffids", "Humane pesticides", "Barnstars", "Lindworms", "Global seed vault", "Reverse-veganism", "Cookie mulch", "Self-driving tractors"];
+  
+    const Mine: Labels = ["Sugar gas", "Megadril", "Ultradrill", "Ultimadrill", "H-bomb mining", "Coreforge", "Planetsplitters", "Canola oil wells", "Mole people", "Mine canaries", "Bore again", "Air mining", "Caramel alloys", "Delicious mineralogy", "Multishaft supports"];
+   
+    const Factory: Labels = ["Sturdier conveyor belts", "Child labour", "Sweatshop", "Radium reactors", "Recombobulators", "Deep-bake process", "Cyborg workforce", "78-hour days", "Machine learning", "Brownie point system", "\"Volunteer\" interns", "Behavioural reframing", "The infinity engine", "N-dimensional assembly lines", "Universal automation"];
+   
+    const Bank: Labels = ["Taller tellers", "Scissor-resistant credit cards", "Acid-proof vaults", "Chocolate coins", "Exponential interest rates", "Financial zen", "Way of the wallet", "The stuff rationale", "Edible money", "Grand supercycle", "Rules of acquisition", "Altruistic loop", "Diminishing tax returns", "Cookie Points", "The big shortcake"];
+    
+    const Temple: Labels = ["Golden idols", "Sacrifices", "Delicious blessing", "Sun festival", "Enlarged pantheon", "Great Baker in the sky", "Creation myth", "Theocracy", "Sick rap prayers", "Psalm-reading", "War of the gods", "A novel idea", "Apparitions", "Negatheism", "Temple traps"];
+
+    const WizardTower: Labels = ["Pointier hats", "Beardlier beards", "Ancient grimoires", "Kitchen curses", "School of sorcery", "Dark formulas", "Cookiemancy", "Rabbit trick", "Deluxe tailored wands", "Immobile spellcasting", "Electricity", "Spelling bees", "Wizard basements", "Magical realism", "Polymorphism"];
+    
+    const Shipment: Labels = ["Vanilla nebulae", "Wormholes", "Frequent flyer", "Warp drive", "Chocolate monoliths", "Generation ship", "Dyson sphere", "The final frontier", "Autopilot", "Restaurants at the end of the universe", "Universal alphabet", "Toroid universe", "Prime directive", "Cosmic foreground radiation", "At your doorstep in 30 minutes or your money back"];
+   
+    const AlchemyLab: Labels = ["Antimony", "Essence of dough", "True chocolate", "Ambrosia", "Aqua crustulae", "Origin crucible", "Theory of atomic fluidity", "Beige goo", "The advent of chemistry", "On second thought", "Public betterment", "Hermetic reconciliation", "Chromatic cycling", "Arcanized glassware", "The dose makes the poison"];
+   
+    const Portal: Labels = ["Ancient tablet", "Insane oatling workers", "Soul bond", "Sanity dance", "Brane transplant", "Deity-sized portals", "End of times back-up plan", "Maddening chants", "The real world", "Dimensional garbage gulper", "Embedded microportals", "His advent", "Domestic rifts", "Portal guns", "A way home"];
+    
+    const TimeMachine: Labels = ["Flux capacitors", "Time paradox resolver", "Quantum conundrum", "Causality enforcer", "Yestermorrow comparators", "Far future enactment", "Great loop hypothesis", "Cookietopian moments of maybe", "Second seconds", "Additional clock hands", "Nostalgia", "Split seconds", "Patience abolished", "Timeproof upholstery", "Rectifying a mistake"];
+    
+    const AntimatterCondenser: Labels = ["Sugar bosons", "String theory", "Large macaron collider", "Big bang bake", "Reverse cyclotrons", "Nanocosmics", "The Pulse", "Some other super-tiny fundamental particle? Probably?", "Quantum comb", "Baking Nobel prize", "The definite molecule", "Flavor itself", "Delicious pull", "Employee minification", "Candied atoms"];
+  
+    const Prism: Labels = ["Gem polish", "9th color", "Chocolate light", "Grainbow", "Pure cosmic light", "Glow-in-the-dark", "Lux sanctorum", "Reverse shadows", "Crystal mirrors", "Reverse theory of light", "Light capture measures", "Light speed limit", "Occam's laser", "Hyperblack paint", "Lab goggles but like cool shades"];
+    
+    const Chancemaker: Labels = ["Your lucky cookie", "\"All Bets Are Off\" magic coin", "Winning lottery ticket", "Four-leaf clover field", "A recipe book about books", "Leprechaun village", "Improbability drive", "Antisuperstistronics", "Bunnypedes", "Revised probabilistics", "0-sided dice", "A touch of determinism", "On a streak", "Silver lining maximization", "Gambler's fallacy fallacy"];
+  
+    const FractalEngine: Labels = ["Metabakeries", "Mandelbrown sugar", "Fractoids", "Nested universe theory", "Menger sponge cake", "One particularly good-humored cow", "Chocolate ouroboros", "Nested", "Space-filling fibers", "Endless book of prose", "The set of all sets", "This upgrade", "A box", "Multiscale profiling", "The more they stay the same"];
+    
+    const RustPlayground: Labels = ["The Rust playground for dummies", "References", "Borrow checker", "Turbofish", "Syntactic sugar", "Become crab", "Compile-time baking", "cookies+=1", "Rust nightly", "Infinite loops", "Unsafe pointers", "Your biggest fans", "Hacker shades", "Unsafe containment vats", "Compiler intrinsics"];
+ 
+    const Idleverse: Labels = ["Manifest destiny", "The multiverse in a nutshell", "All-conversion", "Multiverse agents", "Escape plan", "Game design", "Sandbox universes", "Multiverse wars", "Mobile ports", "Encapsulated realities", "Extrinsic clicking", "Universal idling", "Break the fifth wall", "Opposite universe", "The other routes to Rome"];
+   
+    const CortexBaker: Labels = ["Principled neural shackles", "Obey", "A sprinkle of irrationality", "Front and back hemispheres", "Neural networking", "Cosmic brainstorms", "Megatherapy", "Synaptic lubricant", "Psychokinesis", "Spines", "Neuraforming", "Epistemological trickery", "Every possible idea", "The land of dreams", "Intellectual property theft"];
+  
+    const You: Labels = ["Cloning vats", "Energized nutrients", "Stunt doubles", "Clone recycling plant", "Free-range clones", "Genetic tailoring", "Power in diversity", "Self-betterment", "Source control", "United workforce", "Safety patrols", "Clone rights", "One big family", "Fine-tuned body plans", "Reading your clones bedtime stories"];
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -98,14 +159,14 @@ mod tests {
     use approx_eq_trait::assert_approx_eq_slice;
     use cookie_clicker_tui_utils::num::*;
 
-    fn prices_for(b: Building) -> [f64; 15] {
-        std::array::from_fn(|i| SimpleTieredUpgrade::new(b, i).cost())
+    fn upgrades_for(b: Building) -> [SimpleTieredUpgrade; 15] {
+        std::array::from_fn(|i| SimpleTieredUpgrade::new(b, i))
     }
 
     #[test]
-    fn cursors() {
+    fn cursor_prices() {
         assert_approx_eq_slice!(
-            prices_for(Building::Cursor),
+            upgrades_for(Building::Cursor).map(|s| s.cost()),
             [
                 100.0,
                 500.0,
@@ -127,9 +188,9 @@ mod tests {
     }
 
     #[test]
-    fn farms() {
+    fn farm_prices() {
         assert_approx_eq_slice!(
-            prices_for(Building::Farm),
+            upgrades_for(Building::Farm).map(|s| s.cost()),
             [
                 11.0 * THOUSAND,
                 55.0 * THOUSAND,
@@ -151,9 +212,9 @@ mod tests {
     }
 
     #[test]
-    fn factories() {
+    fn factory_prices() {
         assert_approx_eq_slice!(
-            prices_for(Building::Factory),
+            upgrades_for(Building::Factory).map(|s| s.cost()),
             [
                 1.3 * MILLION,
                 6.5 * MILLION,
@@ -171,6 +232,14 @@ mod tests {
                 650.0 * DUODECILLION,
                 6.5 * QUATTORDECILLION,
             ]
+        );
+    }
+
+    #[test]
+    fn cursor_labels() {
+        assert_eq!(
+            upgrades_for(Building::Cursor).map(|s| s.label()),
+            labels::get(Building::Cursor),
         );
     }
 }

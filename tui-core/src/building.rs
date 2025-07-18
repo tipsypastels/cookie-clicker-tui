@@ -72,7 +72,7 @@ macro_rules! all_the_buildings {
             Idleverse,
             CortexBaker,
             You,
-        );
+        )
     };
 }
 
