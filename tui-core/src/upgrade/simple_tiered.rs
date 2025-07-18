@@ -183,7 +183,7 @@ mod tests {
                 10.0 * SEPTILLION,
                 10.0 * OCTILLION,
                 10.0 * NONILLION,
-            ]
+            ],
         )
     }
 
@@ -207,7 +207,7 @@ mod tests {
                 550.0 * DECILLION,
                 5.5 * DUODECILLION,
                 55.0 * TREDECILLION
-            ]
+            ],
         );
     }
 
@@ -231,7 +231,7 @@ mod tests {
                 65.0 * UNDECILLION,
                 650.0 * DUODECILLION,
                 6.5 * QUATTORDECILLION,
-            ]
+            ],
         );
     }
 

@@ -4,7 +4,7 @@ members = ["tui", "tui-core", "tui-utils"]
 
 [workspace.dependencies]
 anyhow = "1.0.98"
-approx-eq-trait = "0.1.1"
+approx-eq-trait = "0.1.2"
 clap = { version = "4.5.41", features = ["derive"] }
 cookie-clicker-tui-core = { path = "./tui-core" }
 cookie-clicker-tui-utils = { path = "./tui-utils" }

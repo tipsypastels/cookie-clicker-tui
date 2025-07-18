@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "approx-eq-trait"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9fc3dba7c91a979ea2b6dd9f497148d9311e7d7c2f79ae10d06bb636d75da0d2"
+checksum = "7c0e4209b730a024a54d5b42996c075a31ce29509ea62325c6c6c4c854bd519b"
 
 [[package]]
 name = "cookie-clicker-tui"

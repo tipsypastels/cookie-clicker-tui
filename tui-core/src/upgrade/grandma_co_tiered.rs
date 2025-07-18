@@ -79,7 +79,7 @@ mod tests {
                 600.0 * SEXTILLION,
                 95.0 * SEPTILLION,
                 27.0 * OCTILLION,
-            ]
+            ],
         );
     }
 
