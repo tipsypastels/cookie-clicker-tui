@@ -50,7 +50,7 @@ pub enum BuildingKind {
     Idleverse,
     #[assoc(base_cost = 1.9 * num::SEPTILLION, base_cps = 64.0 * num::TRILLION)]
     CortexBaker,
-    #[assoc(base_cost = 0.0 * num::SEPTILLION, base_cps = 510.0 * num::TRILLION)]
+    #[assoc(base_cost = 540.0 * num::SEPTILLION, base_cps = 510.0 * num::TRILLION)]
     #[name(plural = "of You")]
     You,
 }
