@@ -1,21 +1,40 @@
-pub const THOUSAND: f64 = 1e3;
-pub const MILLION: f64 = 1e6;
-pub const BILLION: f64 = 1e9;
-pub const TRILLION: f64 = 1e12;
-pub const QUADRILLION: f64 = 1e15;
-pub const QUINTILLION: f64 = 1e18;
-pub const SEXTILLION: f64 = 1e21;
-pub const SEPTILLION: f64 = 1e24;
-pub const OCTILLION: f64 = 1e27;
-pub const NONILLION: f64 = 1e30;
-pub const DECILLION: f64 = 1e33;
-pub const UNDECILLION: f64 = 1e36;
-pub const DUODECILLION: f64 = 1e39;
-pub const TREDECILLION: f64 = 1e42;
-pub const QUATTORDECILLION: f64 = 1e45;
-pub const QUINDECILLION: f64 = 1e48;
-pub const SEXDECILLION: f64 = 1e51;
-pub const SEPTENDECILLION: f64 = 1e54;
-pub const OCTODECILLION: f64 = 1e57;
-pub const NOVEMDECILLION: f64 = 1e60;
-pub const VIGINTILLION: f64 = 1e63;
+macro_rules! floats {
+    ($($const:ident = $value:expr;)*) => {
+        $(pub const $const: f64 = $value;)*
+    };
+}
+
+floats! {
+    THOUSAND = 1e3;
+    MILLION = 1e6;
+    BILLION = 1e9;
+    TRILLION = 1e12;
+    QUADRILLION = 1e15;
+    QUINTILLION = 1e18;
+    SEXTILLION = 1e21;
+    SEPTILLION = 1e24;
+    OCTILLION = 1e27;
+    NONILLION = 1e30;
+    DECILLION = 1e33;
+    UNDECILLION = 1e36;
+    DUODECILLION = 1e39;
+    TREDECILLION = 1e42;
+    QUATTORDECILLION = 1e45;
+    QUINDECILLION = 1e48;
+    SEXDECILLION = 1e51;
+    SEPTENDECILLION = 1e54;
+    OCTODECILLION = 1e57;
+    NOVEMDECILLION = 1e60;
+    VIGINTILLION = 1e63;
+
+    ONE_THIRD = 1.0 / 3.0;
+    TWO_THIRDS = 2.0 / 3.0;
+
+    THREE_REPEATING = ONE_THIRD * 10.0;
+    THREE_THREE_REPEATING = ONE_THIRD * 100.0;
+    THREE_THREE_THREE_REPEATING = ONE_THIRD * THOUSAND;
+
+    SIX_REPEATING = TWO_THIRDS * 10.0;
+    SIX_SIX_REPEATING = TWO_THIRDS * 100.0;
+    SIX_SIX_SIX_REPEATING = TWO_THIRDS * THOUSAND;
+}

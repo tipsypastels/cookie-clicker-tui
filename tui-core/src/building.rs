@@ -2,16 +2,10 @@ use cookie_clicker_tui_utils::num;
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 
-#[derive(Debug)]
-pub struct Building {
-    kind: BuildingKind,
-    count: u16,
-}
-
 #[derive(Assoc, Name, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[func(pub(crate) const fn base_cost(self) -> f64)]
 #[func(pub(crate) const fn base_cps(self) -> f64)]
-pub enum BuildingKind {
+pub enum Building {
     #[assoc(base_cost = 15.0, base_cps = 0.1)]
     Cursor,
     #[assoc(base_cost = 100.0, base_cps = 1.0)]
@@ -54,3 +48,32 @@ pub enum BuildingKind {
     #[name(plural = "of You")]
     You,
 }
+
+macro_rules! all_the_buildings {
+    ($macro:ident) => {
+        $macro!(
+            Cursor,
+            Grandma,
+            Farm,
+            Mine,
+            Factory,
+            Bank,
+            Temple,
+            WizardTower,
+            Shipment,
+            AlchemyLab,
+            Portal,
+            TimeMachine,
+            AntimatterCondenser,
+            Prism,
+            Chancemaker,
+            FractalEngine,
+            RustPlayground,
+            Idleverse,
+            CortexBaker,
+            You,
+        );
+    };
+}
+
+pub(crate) use all_the_buildings;
