@@ -3,7 +3,6 @@ resolver = "3"
 members = [
   "cookie-clicker-tui",
   "cookie-clicker-tui-core",
-  "cookie-clicker-tui-macros",
   "cookie-clicker-tui-utils",
 ]
 
@@ -11,11 +10,11 @@ members = [
 anyhow = "1.0.98"
 clap = { version = "4.5.41", features = ["derive"] }
 cookie-clicker-tui-core = { path = "./cookie-clicker-tui-core" }
-cookie-clicker-tui-macros = { path = "./cookie-clicker-tui-macros" }
 cookie-clicker-tui-utils = { path = "./cookie-clicker-tui-utils" }
 crossterm = { version = "0.29.0", features = ["event-stream"] }
 dirs = "6.0.0"
 enum-assoc = "1.2.4"
+enum-fun = { version = "0.1.5", features = ["name-includes-plural"] }
 futures = "0.3.31"
 rand = "0.9.1"
 ratatui = "0.29.0"

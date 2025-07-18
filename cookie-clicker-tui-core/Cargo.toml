@@ -5,4 +5,4 @@ edition = "2024"
 
 [dependencies]
 enum-assoc.workspace = true
-cookie-clicker-tui-macros.workspace = true
+enum-fun.workspace = true
