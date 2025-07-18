@@ -17,6 +17,7 @@ name = "cookie-clicker-tui-core"
 version = "0.1.0"
 dependencies = [
  "approx-eq-trait",
+ "cookie-clicker-tui-utils",
  "enum-assoc",
  "enum-fun",
 ]

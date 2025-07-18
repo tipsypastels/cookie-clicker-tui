@@ -1,4 +1,4 @@
-use crate::num;
+use cookie_clicker_tui_utils::num;
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 

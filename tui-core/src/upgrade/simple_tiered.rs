@@ -1,4 +1,4 @@
-use crate::num;
+use cookie_clicker_tui_utils::num;
 
 #[derive(Debug)]
 pub struct SimpleTieredUpgrade {
@@ -39,8 +39,9 @@ impl SimpleTieredUpgrade {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{BuildingKind, num::*};
+    use crate::BuildingKind;
     use approx_eq_trait::assert_approx_eq_slice;
+    use cookie_clicker_tui_utils::num::*;
 
     fn prices_for(b: BuildingKind) -> [f64; 15] {
         SimpleTieredUpgrade::VARIANTS.map(|v| b.base_cost() * v.cost_mult)
