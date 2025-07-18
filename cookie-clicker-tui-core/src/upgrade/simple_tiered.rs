@@ -39,10 +39,8 @@ impl SimpleTieredUpgrade {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        BuildingKind::{self, *},
-        num::*,
-    };
+    use crate::{BuildingKind, num::*};
+    use approx_eq_trait::assert_approx_eq_slice;
 
     fn prices_for(b: BuildingKind) -> [f64; 15] {
         SimpleTieredUpgrade::VARIANTS.map(|v| b.base_cost() * v.cost_mult)
@@ -50,9 +48,9 @@ mod tests {
 
     #[test]
     fn farms() {
-        assert_approx_eq!(
-            &prices_for(Farm),
-            &[
+        assert_approx_eq_slice!(
+            prices_for(BuildingKind::Farm),
+            [
                 11. * THOUSAND,
                 55. * THOUSAND,
                 550. * THOUSAND,
@@ -74,9 +72,9 @@ mod tests {
 
     #[test]
     fn factories() {
-        assert_approx_eq!(
-            &prices_for(Factory),
-            &[
+        assert_approx_eq_slice!(
+            prices_for(BuildingKind::Factory),
+            [
                 1.3 * MILLION,
                 6.5 * MILLION,
                 65. * MILLION,

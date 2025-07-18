@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+approx-eq-trait.workspace = true
 enum-assoc.workspace = true
 enum-fun.workspace = true

@@ -3,6 +3,12 @@
 version = 4
 
 [[package]]
+name = "approx-eq-trait"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9fc3dba7c91a979ea2b6dd9f497148d9311e7d7c2f79ae10d06bb636d75da0d2"
+
+[[package]]
 name = "cookie-clicker-tui"
 version = "0.1.0"
 
@@ -10,6 +16,7 @@ version = "0.1.0"
 name = "cookie-clicker-tui-core"
 version = "0.1.0"
 dependencies = [
+ "approx-eq-trait",
  "enum-assoc",
  "enum-fun",
 ]
