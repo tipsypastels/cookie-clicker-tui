@@ -50,6 +50,12 @@ pub enum Building {
     You,
 }
 
+impl Building {
+    pub fn nth(index: usize) -> Option<Self> {
+        Self::VARIANTS.get(index).copied()
+    }
+}
+
 #[derive(Debug)]
 pub struct Buildings {
     map: HashMap<Building, BuildingState>,
@@ -77,6 +83,10 @@ impl Buildings {
             cost,
             cps,
         }
+    }
+
+    pub fn info_nth(&self, index: usize) -> BuildingInfo {
+        self.info(Building::VARIANTS[index])
     }
 
     pub fn get(&self, building: Building) -> BuildingState {

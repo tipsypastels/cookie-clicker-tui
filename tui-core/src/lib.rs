@@ -46,12 +46,20 @@ impl Core {
         self.state.buildings.info(building)
     }
 
+    pub fn building_info_nth(&self, index: usize) -> BuildingInfo {
+        self.state.buildings.info_nth(index)
+    }
+
     pub fn unlocked_upgrades(&self) -> &[Upgrade] {
         &self.computed.upgrades
     }
 
     pub fn ticker(&self) -> Option<&'static str> {
         self.computed.ticker.text()
+    }
+
+    pub fn give_cookies(&mut self, amount: f64) {
+        self.state.cookies += amount;
     }
 
     pub fn buy_building(&mut self, building: Building) -> bool {
