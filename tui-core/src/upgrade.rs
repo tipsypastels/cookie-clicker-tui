@@ -87,6 +87,13 @@ impl Upgrade {
         }
     }
 
+    pub fn description(&self) -> String {
+        match &self.0 {
+            Inner::SimpleTiered(u) => u.description(),
+            Inner::GrandmaCoTiered(u) => u.description(),
+        }
+    }
+
     pub(crate) fn buy(&self, state: &mut State) {
         match &self.0 {
             Inner::SimpleTiered(u) => u.buy(state),

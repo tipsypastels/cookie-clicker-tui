@@ -17,7 +17,7 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         let upgrade = &app.core.upgrades()[ctx.index];
         let widget = UpgradeWidget { selected, upgrade };
 
-        const HEIGHT: u16 = 2;
+        const HEIGHT: u16 = 3;
 
         (widget, HEIGHT)
     });
@@ -41,7 +41,12 @@ struct UpgradeWidget<'a> {
 
 impl Widget for UpgradeWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        Paragraph::new(Text::from(vec![self.label_line(), self.cost_line()])).render(area, buf);
+        Paragraph::new(Text::from(vec![
+            self.label_line(),
+            self.desc_line(),
+            self.cost_line(),
+        ]))
+        .render(area, buf);
     }
 }
 
@@ -52,6 +57,10 @@ impl UpgradeWidget<'_> {
         } else {
             Line::raw(self.upgrade.label())
         }
+    }
+
+    fn desc_line(&self) -> Line {
+        Line::styled(self.upgrade.description(), Modifier::ITALIC).right_aligned()
     }
 
     fn cost_line(&self) -> Line {

@@ -60,6 +60,10 @@ impl SimpleTieredUpgrade {
         all_the_buildings!(arms)[self.index]
     }
 
+    pub fn description(&self) -> String {
+        format!("2x {} cps", self.building.name())
+    }
+
     pub fn buy(&self, state: &mut State) {
         state
             .buildings

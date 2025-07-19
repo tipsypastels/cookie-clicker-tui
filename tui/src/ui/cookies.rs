@@ -43,7 +43,7 @@ fn cookie_count(app: &mut UiApp, lines: &mut Vec<Line>) {
     }
 
     lines.push(Line::styled(
-        format!("{}", app.core.cookies().print_float(1, 2)),
+        format!("{}", app.core.cookies().print_float(0, 2)),
         cookie_count_style,
     ));
 }
