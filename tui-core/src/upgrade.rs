@@ -86,6 +86,13 @@ impl Upgrade {
             Inner::GrandmaCoTiered(u) => u.label(),
         }
     }
+
+    pub(crate) fn buy(&self, state: &mut State) {
+        match &self.0 {
+            Inner::SimpleTiered(u) => u.buy(state),
+            Inner::GrandmaCoTiered(u) => u.buy(state),
+        }
+    }
 }
 
 impl From<SimpleTieredUpgrade> for Inner {

@@ -59,6 +59,12 @@ impl SimpleTieredUpgrade {
         }
         all_the_buildings!(arms)[self.index]
     }
+
+    pub fn buy(&self, state: &mut State) {
+        state
+            .buildings
+            .modify(self.building, |b| b.simple_tiered_upgrade_count += 1);
+    }
 }
 
 const TEMPLATES_COUNT: usize = 15;

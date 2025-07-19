@@ -41,6 +41,12 @@ impl GrandmaCoTieredUpgrade {
     pub fn label(&self) -> &'static str {
         LABELS[self.building as usize - SKIP]
     }
+
+    pub fn buy(&self, state: &mut State) {
+        state
+            .buildings
+            .modify(self.building, |b| b.has_grandma_co_tiered_upgrade = true);
+    }
 }
 
 #[cfg(test)]

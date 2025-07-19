@@ -68,16 +68,30 @@ impl Buildings {
 
     pub fn info(&self, building: Building) -> BuildingInfo {
         let state = self.get(building);
+        let cost = building.base_cost() * 1.15f64.powi(state.count as _);
         let cps = crate::calc::building_cps(self, building, state);
+
         BuildingInfo {
             building,
             state,
+            cost,
             cps,
         }
     }
 
     pub fn get(&self, building: Building) -> BuildingState {
         self.map.get(&building).copied().unwrap_or_default()
+    }
+
+    pub fn modify(&mut self, building: Building, f: impl Fn(&mut BuildingState) + Clone) {
+        self.map
+            .entry(building)
+            .and_modify(f.clone())
+            .or_insert_with(|| {
+                let mut state = BuildingState::default();
+                f(&mut state);
+                state
+            });
     }
 
     pub fn grandma_co_tiered_upgrade_count(&self) -> u16 {
@@ -92,6 +106,7 @@ impl Buildings {
 pub struct BuildingInfo {
     building: Building,
     state: BuildingState,
+    cost: f64,
     cps: f64,
 }
 
@@ -110,6 +125,10 @@ impl BuildingInfo {
 
     pub fn has_grandma_co_tiered_upgrade(&self) -> bool {
         self.state.has_grandma_co_tiered_upgrade
+    }
+
+    pub fn cost(&self) -> f64 {
+        self.cost
     }
 
     pub fn cps(&self) -> f64 {

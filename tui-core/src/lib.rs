@@ -54,6 +54,38 @@ impl Core {
         self.computed.ticker.text()
     }
 
+    pub fn buy_building(&mut self, building: Building) -> bool {
+        let cost = self.building_info(building).cost();
+
+        if cost > self.state.cookies {
+            return false;
+        }
+
+        self.state.cookies -= cost;
+        self.state.buildings.modify(building, |b| b.count += 1);
+        self.computed.recalc_cps(&self.state);
+
+        true
+    }
+
+    pub fn buy_upgrade(&mut self, index: usize) -> bool {
+        let Some(upgrade) = self.computed.upgrades.get(index) else {
+            return false;
+        };
+
+        let cost = upgrade.cost();
+
+        if cost > self.state.cookies {
+            return false;
+        }
+
+        self.state.cookies -= cost;
+        upgrade.buy(&mut self.state);
+        self.computed.recalc_cps(&self.state);
+
+        true
+    }
+
     pub fn tick(&mut self) {
         self.state.cookies += self.computed.cps / self.fps;
         self.computed.upgrades.tick(self.fps, &self.state);
@@ -94,5 +126,9 @@ impl Computed {
             ticker,
             upgrades,
         }
+    }
+
+    fn recalc_cps(&mut self, state: &State) {
+        self.cps = self::calc::cps(state);
     }
 }
