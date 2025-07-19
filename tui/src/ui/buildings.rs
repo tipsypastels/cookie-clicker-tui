@@ -1,30 +1,20 @@
-use super::util::{num::PrintFloat, widget::*};
-use crate::app::{App, Building, ListStatePane};
+use super::{
+    UiApp,
+    utils::{num::PrintFloat, widget::*},
+};
+use crate::app::AppListPane;
+use cookie_clicker_tui_core::{Building, BuildingInfo};
 use ratatui::{
     prelude::*,
     widgets::{Block, Padding, Paragraph},
 };
 use tui_widget_list::{ListBuilder, ListView};
 
-pub fn buildings(app: &mut App, area: Rect, buf: &mut Buffer) {
-    let app_parts = app.deconstruct_for_rendering();
-    let buildings = app_parts.buildings;
-
+pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let builder = ListBuilder::new(|ctx| {
         let selected = ctx.is_selected;
-        let building = Building::ALL[ctx.index];
-        let count = buildings.count(building);
-        let cost = buildings.cost(building);
-        // TODO: Get this off buildings to take account of upgrades.
-        let cps = building.base_cps();
-
-        let widget = BuildingWidget {
-            selected,
-            building,
-            count,
-            cost,
-            cps,
-        };
+        let info = app.core.building_info_nth(ctx.index);
+        let widget = BuildingWidget { selected, info };
 
         const HEIGHT: u16 = 3;
 
@@ -35,8 +25,8 @@ pub fn buildings(app: &mut App, area: Rect, buf: &mut Buffer) {
         .title(Line::styled(" Buildings ", Modifier::BOLD).centered())
         .padding(Padding::uniform(1));
 
-    let list_view = ListView::new(builder, Building::ALL.len());
-    let list_state = app_parts.list.state_for_pane(ListStatePane::Buildings);
+    let list_view = ListView::new(builder, Building::VARIANT_COUNT);
+    let list_state = app.list.pane(AppListPane::Buildings);
 
     list_view
         .block(block)
@@ -45,10 +35,7 @@ pub fn buildings(app: &mut App, area: Rect, buf: &mut Buffer) {
 
 struct BuildingWidget {
     selected: bool,
-    building: Building,
-    count: u16,
-    cost: f64,
-    cps: f64,
+    info: BuildingInfo,
 }
 
 impl Widget for BuildingWidget {
@@ -66,8 +53,8 @@ impl BuildingWidget {
     fn label_line(&self) -> Line {
         let label = format!(
             "{} {}",
-            self.count,
-            self.building.name_pluralized(self.count as _)
+            self.info.count(),
+            self.info.building().name_pluralized(self.info.count() as _)
         );
 
         if self.selected {
@@ -79,7 +66,7 @@ impl BuildingWidget {
 
     fn cost_line(&self) -> Line {
         Line::styled(
-            format!("{} cookies", self.cost.print_float(0, 0)),
+            format!("{} cookies", self.info.cost().print_float(0, 0)),
             Modifier::ITALIC,
         )
         .right_aligned()
@@ -87,7 +74,7 @@ impl BuildingWidget {
 
     fn cps_line(&self) -> Line {
         Line::styled(
-            format!("{} cps", self.cps.print_float(1, 0)),
+            format!("{} cps", self.info.cps().print_float(1, 0)),
             Modifier::ITALIC,
         )
         .right_aligned()

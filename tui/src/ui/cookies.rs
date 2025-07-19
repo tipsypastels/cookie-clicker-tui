@@ -1,5 +1,4 @@
-use super::util::num::PrintFloat;
-use crate::app::App;
+use super::{UiApp, utils::num::PrintFloat};
 use ratatui::{
     prelude::*,
     widgets::{Block, Paragraph},
@@ -22,7 +21,7 @@ const LOGO: &str = r#"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡴⠚⣉⡙⠲⠦⠤⠤�
 ⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⣧⣄⡄⠴⣿⣶⣿⢀⣤⠶⣞⣋⣩⣵⠏⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⣿⢯⣭⣭⣯⣯⣥⡵⠿⠟⠛⠉⠉⠀⠀⠀⠀⠀⠀⠀"#;
 
-pub fn cookies(app: &mut App, area: Rect, buf: &mut Buffer) {
+pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let mut lines = Vec::with_capacity(LOGO_HEIGHT + 3);
 
     cookie_count(app, &mut lines);
@@ -36,29 +35,29 @@ pub fn cookies(app: &mut App, area: Rect, buf: &mut Buffer) {
         .render(area, buf);
 }
 
-fn cookie_count(app: &mut App, lines: &mut Vec<Line>) {
+fn cookie_count(app: &mut UiApp, lines: &mut Vec<Line>) {
     let mut cookie_count_style = Style::new().add_modifier(Modifier::BOLD);
 
-    if app.error_insufficient_cookies() {
+    if app.countdown.error_insufficient_cookies() {
         cookie_count_style = cookie_count_style.fg(Color::Red);
     }
 
     lines.push(Line::styled(
-        format!("{}", app.cookies().value().print_float(1, 2)),
+        format!("{}", app.core.cookies().print_float(1, 2)),
         cookie_count_style,
     ));
 }
 
-fn cps_count(app: &mut App, lines: &mut Vec<Line>) {
+fn cps_count(app: &mut UiApp, lines: &mut Vec<Line>) {
     lines.push(Line::styled(
-        format!("(per second: {})", app.buildings().cps().print_float(1, 2)),
+        format!("(per second: {})", app.core.cps().print_float(1, 2)),
         Modifier::ITALIC,
     ));
 }
 
-fn logo(app: &mut App, lines: &mut Vec<Line>) {
+fn logo(app: &mut UiApp, lines: &mut Vec<Line>) {
     for line_text in LOGO.lines() {
-        lines.push(if app.just_pressed_cookie() {
+        lines.push(if app.countdown.just_pressed_cookie() {
             Line::styled(line_text, Color::Green)
         } else {
             Line::raw(line_text)

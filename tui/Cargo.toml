@@ -1,0 +1,16 @@
+[package]
+name = "cookie-clicker-tui"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+cookie-clicker-tui-core.workspace = true
+cookie-clicker-tui-utils.workspace = true
+crossterm.workspace = true
+enum-assoc.workspace = true
+futures.workspace = true
+ratatui.workspace = true
+tokio.workspace = true
+tui-widget-list.workspace = true

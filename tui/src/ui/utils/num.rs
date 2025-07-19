@@ -1,4 +1,4 @@
-use crate::num;
+use cookie_clicker_tui_utils::num;
 use std::fmt;
 
 pub trait PrintFloat {
@@ -28,6 +28,7 @@ impl fmt::Display for Display {
 
         macro_rules! all_the_bases {
             ($macro:ident) => {
+                $macro!(NONILLION, " N");
                 $macro!(OCTILLION, " Oc");
                 $macro!(SEPTILLION, " Sp");
                 $macro!(SEXTILLION, " Sx");

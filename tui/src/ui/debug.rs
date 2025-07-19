@@ -1,12 +1,11 @@
-use super::util::modal::*;
-use crate::app::App;
+use super::{UiApp, utils::modal::*};
 use ratatui::{
     prelude::*,
     widgets::{Block, Clear, Paragraph, Wrap},
 };
 
-pub fn debug(app: &mut App, area: Rect, buf: &mut Buffer) {
-    let Some(message) = app.debug_message() else {
+pub fn debug(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
+    let Some(message) = app.countdown.debug_message() else {
         return;
     };
 

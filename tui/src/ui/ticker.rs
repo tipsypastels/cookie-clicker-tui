@@ -1,11 +1,11 @@
-use crate::app::App;
+use super::UiApp;
 use ratatui::{
     prelude::*,
     widgets::{Block, Paragraph},
 };
 
-pub fn ticker(app: &mut App, area: Rect, buf: &mut Buffer) {
-    let Some(text) = app.ticker() else {
+pub fn ticker(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
+    let Some(text) = app.core.ticker() else {
         return Block::bordered().render(area, buf);
     };
 

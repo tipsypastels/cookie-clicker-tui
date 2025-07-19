@@ -1,0 +1,40 @@
+macro_rules! floats {
+    ($($const:ident = $value:expr;)*) => {
+        $(pub const $const: f64 = $value;)*
+    };
+}
+
+floats! {
+    THOUSAND = 1e3;
+    MILLION = 1e6;
+    BILLION = 1e9;
+    TRILLION = 1e12;
+    QUADRILLION = 1e15;
+    QUINTILLION = 1e18;
+    SEXTILLION = 1e21;
+    SEPTILLION = 1e24;
+    OCTILLION = 1e27;
+    NONILLION = 1e30;
+    DECILLION = 1e33;
+    UNDECILLION = 1e36;
+    DUODECILLION = 1e39;
+    TREDECILLION = 1e42;
+    QUATTORDECILLION = 1e45;
+    QUINDECILLION = 1e48;
+    SEXDECILLION = 1e51;
+    SEPTENDECILLION = 1e54;
+    OCTODECILLION = 1e57;
+    NOVEMDECILLION = 1e60;
+    VIGINTILLION = 1e63;
+
+    ONE_THIRD = 1.0 / 3.0;
+    TWO_THIRDS = 2.0 / 3.0;
+
+    THREE_REPEATING = ONE_THIRD * 10.0;
+    THREE_THREE_REPEATING = ONE_THIRD * 100.0;
+    THREE_THREE_THREE_REPEATING = ONE_THIRD * THOUSAND;
+
+    SIX_REPEATING = TWO_THIRDS * 10.0;
+    SIX_SIX_REPEATING = TWO_THIRDS * 100.0;
+    SIX_SIX_SIX_REPEATING = TWO_THIRDS * THOUSAND;
+}
