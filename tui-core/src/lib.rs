@@ -9,27 +9,24 @@ pub use self::{
     upgrade::Upgrade,
 };
 
-use self::{building::Buildings, ticker::Ticker};
+use self::{building::Buildings, ticker::Ticker, upgrade::Upgrades};
 
 #[derive(Debug)]
 pub struct Core {
     fps: f64,
     state: State,
     computed: Computed,
-    ticker: Ticker,
 }
 
 impl Core {
     pub fn new(fps: f64) -> Self {
         let state = State::new();
-        let computed = Computed::new(&state);
-        let ticker = Ticker::new(fps, &state);
+        let computed = Computed::new(fps, &state);
 
         Self {
             fps,
             state,
             computed,
-            ticker,
         }
     }
 
@@ -50,16 +47,17 @@ impl Core {
     }
 
     pub fn unlocked_upgrades(&self) -> &[Upgrade] {
-        &self.computed.unlocked_upgrades
+        &self.computed.upgrades
     }
 
     pub fn ticker(&self) -> Option<&'static str> {
-        self.ticker.text()
+        self.computed.ticker.text()
     }
 
     pub fn tick(&mut self) {
         self.state.cookies += self.computed.cps / self.fps;
-        self.ticker.tick(self.fps, &self.state);
+        self.computed.upgrades.tick(self.fps, &self.state);
+        self.computed.ticker.tick(self.fps, &self.state);
     }
 }
 
@@ -81,17 +79,20 @@ impl State {
 #[derive(Debug)]
 struct Computed {
     cps: f64,
-    unlocked_upgrades: Vec<Upgrade>,
+    ticker: Ticker,
+    upgrades: Upgrades,
 }
 
 impl Computed {
-    fn new(state: &State) -> Self {
+    fn new(fps: f64, state: &State) -> Self {
         let cps = self::calc::cps(state);
-        let unlocked_upgrades = Upgrade::unlocked(state);
+        let ticker = Ticker::new(fps, state);
+        let upgrades = Upgrades::new(fps, state);
 
         Self {
             cps,
-            unlocked_upgrades,
+            ticker,
+            upgrades,
         }
     }
 }

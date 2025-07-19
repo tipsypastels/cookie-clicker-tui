@@ -3,6 +3,43 @@ mod simple_tiered;
 
 use self::{grandma_co_tiered::GrandmaCoTieredUpgrade, simple_tiered::SimpleTieredUpgrade};
 use crate::State;
+use std::ops::Deref;
+
+const SECONDS_UNTIL_REFRESH: f64 = 5.0;
+
+#[derive(Debug)]
+pub struct Upgrades {
+    list: Box<[Upgrade]>,
+    ticks_until_refresh: u16,
+}
+
+impl Upgrades {
+    pub fn new(fps: f64, state: &State) -> Self {
+        let list = Upgrade::unlocked(state);
+        let ticks_until_refresh = (SECONDS_UNTIL_REFRESH * fps) as u16;
+
+        Self {
+            list,
+            ticks_until_refresh,
+        }
+    }
+
+    pub fn tick(&mut self, fps: f64, state: &State) {
+        if let Some(ticks_until_refresh) = self.ticks_until_refresh.checked_sub(1) {
+            self.ticks_until_refresh = ticks_until_refresh;
+        } else {
+            *self = Self::new(fps, state)
+        }
+    }
+}
+
+impl Deref for Upgrades {
+    type Target = [Upgrade];
+
+    fn deref(&self) -> &Self::Target {
+        &self.list
+    }
+}
 
 #[derive(Debug)]
 pub struct Upgrade(Inner);
@@ -14,7 +51,7 @@ enum Inner {
 }
 
 impl Upgrade {
-    pub(crate) fn unlocked(state: &State) -> Vec<Self> {
+    fn unlocked(state: &State) -> Box<[Self]> {
         let mut out = Vec::new();
 
         macro_rules! extend {
@@ -33,7 +70,7 @@ impl Upgrade {
         }
 
         out.sort_by(|a, b| f64::total_cmp(&a.cost(), &b.cost()));
-        out
+        out.into()
     }
 
     pub fn cost(&self) -> f64 {
