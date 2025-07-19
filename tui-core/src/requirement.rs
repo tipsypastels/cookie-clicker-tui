@@ -72,7 +72,7 @@ impl Inner {
             Self::CookiesBound(v, false, false) => state.cookies < *v,
             Self::CookiesBound(v, false, true) => state.cookies <= *v,
             Self::CookiesRange(a, b) => (*a..*b).contains(&state.cookies),
-            Self::BuildingCountMin(b, c) => state.buildings.state(*b).count >= *c,
+            Self::BuildingCountMin(b, c) => state.buildings.get(*b).count >= *c,
             Self::Custom(f) => f(state),
             Self::Any(list) => list.iter().any(|r| r.0.check(state)),
             Self::All(list) => list.iter().all(|r| r.0.check(state)),

@@ -1,9 +1,7 @@
-use std::borrow::Cow;
+use crate::{State, building::Building, requirement::Requirement};
 
-use crate::{building::Building, requirement::Requirement};
-
-const COST_MULT: f64 = 50.0;
 const SKIP: usize = 2; // cursors and grandmas
+const COST_MULT: f64 = 50.0;
 
 #[rustfmt::skip]
 const LABELS: [&str; Building::VARIANT_COUNT - SKIP] = ["Farmer grandmas", "Miner grandmas", "Worker grandmas", "Banker grandmas", "Priestess grandmas", "Witch grandmas", "Cosmic grandmas", "Transmuted grandmas", "Altered grandmas", "Grandmas' grandmas", "Antigrandmas", "Rainbow grandmas", "Lucky grandmas", "Metagrandmas", "Binary grandmas", "Alternate grandmas", "Brainy grandmas", "Clone grandmas"];
@@ -14,14 +12,19 @@ pub struct GrandmaCoTieredUpgrade {
 }
 
 impl GrandmaCoTieredUpgrade {
-    pub fn new(building: Building) -> Self {
-        debug_assert!(!matches!(building, Building::Cursor | Building::Grandma));
-
-        Self { building }
+    pub fn all() -> impl Iterator<Item = Self> {
+        Building::variants()
+            .skip(SKIP)
+            .map(|building| Self { building })
     }
 
-    pub fn building(&self) -> Building {
-        self.building
+    pub fn without_taken(state: &State) -> impl Iterator<Item = Self> {
+        Self::all().filter(|u| {
+            !state
+                .buildings
+                .get(u.building)
+                .has_grandma_co_tiered_upgrade
+        })
     }
 
     pub fn requirement(&self) -> Requirement {
@@ -47,23 +50,10 @@ mod tests {
     use cookie_clicker_tui_utils::num::*;
 
     #[test]
-    #[should_panic]
-    fn panic_cursor() {
-        GrandmaCoTieredUpgrade::new(Building::Cursor);
-    }
-
-    #[test]
-    #[should_panic]
-    fn panic_grandma() {
-        GrandmaCoTieredUpgrade::new(Building::Grandma);
-    }
-
-    #[test]
     fn building_prices() {
         assert_approx_eq_slice!(
-            Building::variants()
-                .skip(SKIP)
-                .map(|b| GrandmaCoTieredUpgrade::new(b).cost())
+            GrandmaCoTieredUpgrade::all()
+                .map(|u| u.cost())
                 .collect::<Vec<_>>(),
             [
                 55.0 * THOUSAND,
@@ -91,9 +81,8 @@ mod tests {
     #[test]
     fn building_labels() {
         assert_eq!(
-            Building::variants()
-                .skip(SKIP)
-                .map(|b| GrandmaCoTieredUpgrade::new(b).label())
+            GrandmaCoTieredUpgrade::all()
+                .map(|u| u.label())
                 .collect::<Vec<_>>(),
             LABELS,
         )

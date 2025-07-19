@@ -4,7 +4,10 @@ mod requirement;
 mod ticker;
 mod upgrade;
 
-pub use self::building::{Building, BuildingInfo};
+pub use self::{
+    building::{Building, BuildingInfo},
+    upgrade::Upgrade,
+};
 
 use self::{building::Buildings, ticker::Ticker};
 
@@ -46,6 +49,10 @@ impl Core {
         self.state.buildings.info(building)
     }
 
+    pub fn unlocked_upgrades(&self) -> &[Upgrade] {
+        &self.computed.unlocked_upgrades
+    }
+
     pub fn ticker(&self) -> Option<&'static str> {
         self.ticker.text()
     }
@@ -74,11 +81,17 @@ impl State {
 #[derive(Debug)]
 struct Computed {
     cps: f64,
+    unlocked_upgrades: Vec<Upgrade>,
 }
 
 impl Computed {
     fn new(state: &State) -> Self {
         let cps = self::calc::cps(state);
-        Self { cps }
+        let unlocked_upgrades = Upgrade::unlocked(state);
+
+        Self {
+            cps,
+            unlocked_upgrades,
+        }
     }
 }

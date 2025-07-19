@@ -20,7 +20,7 @@ pub fn building_cps(buildings: &Buildings, building: Building, state: BuildingSt
         _ if !state.has_grandma_co_tiered_upgrade => cps,
         _ => {
             let num_req_for_1p_increase = building as u16 - 2;
-            let grandma_count = buildings.state(Building::Grandma).count;
+            let grandma_count = buildings.get(Building::Grandma).count;
 
             if grandma_count > num_req_for_1p_increase {
                 let ratio = grandma_count / num_req_for_1p_increase;

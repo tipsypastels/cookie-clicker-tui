@@ -1,4 +1,4 @@
-use crate::{Computed, State, requirement::Requirement};
+use crate::{State, requirement::Requirement};
 use cookie_clicker_tui_utils::num;
 use rand::seq::IndexedRandom;
 

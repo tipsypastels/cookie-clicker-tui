@@ -67,7 +67,7 @@ impl Buildings {
     }
 
     pub fn info(&self, building: Building) -> BuildingInfo {
-        let state = self.state(building);
+        let state = self.get(building);
         let cps = crate::calc::building_cps(self, building, state);
         BuildingInfo {
             building,
@@ -76,7 +76,7 @@ impl Buildings {
         }
     }
 
-    pub fn state(&self, building: Building) -> BuildingState {
+    pub fn get(&self, building: Building) -> BuildingState {
         self.map.get(&building).copied().unwrap_or_default()
     }
 
