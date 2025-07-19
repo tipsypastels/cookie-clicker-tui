@@ -7,111 +7,111 @@ const SECONDS_UNTIL_CHANGE: f64 = 30.0;
 static ENTRIES: &[(&str, Requirement)] = &[
     (
         "You feel like making cookies. But nobody wants to eat your cookies.",
-        Requirement::CookieUnder(5.0),
+        Requirement::CookiesBelow(5.0),
     ),
     (
         "Your first batch goes in the trash. The neighborhood raccoon barely touches it.",
-        Requirement::CookieRange(5.0, 50.0),
+        Requirement::CookiesRange(5.0, 50.0),
     ),
     (
         "Your family accepts to try some of your cookies.",
-        Requirement::CookieRange(50.0, 100.0),
+        Requirement::CookiesRange(50.0, 100.0),
     ),
     (
         "Your cookies are popular in the neighborhood.",
-        Requirement::CookieRange(100.0, 500.0),
+        Requirement::CookiesRange(100.0, 500.0),
     ),
     (
         "People are starting to talk about your cookies.",
-        Requirement::CookieRange(500.0, 1.0 * num::THOUSAND),
+        Requirement::CookiesRange(500.0, 1.0 * num::THOUSAND),
     ),
     (
         "Your cookies are talked about for miles around.",
-        Requirement::CookieRange(1.0 * num::THOUSAND, 5.0 * num::THOUSAND),
+        Requirement::CookiesRange(1.0 * num::THOUSAND, 5.0 * num::THOUSAND),
     ),
     (
         "Your cookies are renowned in the whole town!",
-        Requirement::CookieRange(5.0 * num::THOUSAND, 10.0 * num::THOUSAND),
+        Requirement::CookiesRange(5.0 * num::THOUSAND, 10.0 * num::THOUSAND),
     ),
     (
         "Your cookies bring all the boys to the yard.",
-        Requirement::CookieRange(10.0 * num::THOUSAND, 50.0 * num::THOUSAND),
+        Requirement::CookiesRange(10.0 * num::THOUSAND, 50.0 * num::THOUSAND),
     ),
     (
         "Your cookies now have their own website!",
-        Requirement::CookieRange(50.0 * num::THOUSAND, 100.0 * num::THOUSAND),
+        Requirement::CookiesRange(50.0 * num::THOUSAND, 100.0 * num::THOUSAND),
     ),
     (
         "Your cookies are worth a lot of money.",
-        Requirement::CookieRange(100.0 * num::THOUSAND, 500.0 * num::THOUSAND),
+        Requirement::CookiesRange(100.0 * num::THOUSAND, 500.0 * num::THOUSAND),
     ),
     (
         "Your cookies sell very well in distant countries.",
-        Requirement::CookieRange(500.0 * num::THOUSAND, 1.0 * num::MILLION),
+        Requirement::CookiesRange(500.0 * num::THOUSAND, 1.0 * num::MILLION),
     ),
     (
         "People come from very far away to get a taste of your cookies.",
-        Requirement::CookieRange(1.0 * num::MILLION, 5.0 * num::MILLION),
+        Requirement::CookiesRange(1.0 * num::MILLION, 5.0 * num::MILLION),
     ),
     (
         "Kings and queens from all over the world are enjoying your cookies.",
-        Requirement::CookieRange(5.0 * num::MILLION, 10.0 * num::MILLION),
+        Requirement::CookiesRange(5.0 * num::MILLION, 10.0 * num::MILLION),
     ),
     (
         "There are now museums dedicated to your cookies.",
-        Requirement::CookieRange(10.0 * num::MILLION, 50.0 * num::MILLION),
+        Requirement::CookiesRange(10.0 * num::MILLION, 50.0 * num::MILLION),
     ),
     (
         "A national day has been created in honor of your cookies.",
-        Requirement::CookieRange(50.0 * num::MILLION, 100.0 * num::MILLION),
+        Requirement::CookiesRange(50.0 * num::MILLION, 100.0 * num::MILLION),
     ),
     (
         "Your cookies have been named a part of the world wonders.",
-        Requirement::CookieRange(100.0 * num::MILLION, 500.0 * num::MILLION),
+        Requirement::CookiesRange(100.0 * num::MILLION, 500.0 * num::MILLION),
     ),
     (
         "History books now include a whole chapter about your cookies.",
-        Requirement::CookieRange(500.0 * num::MILLION, 1.0 * num::BILLION),
+        Requirement::CookiesRange(500.0 * num::MILLION, 1.0 * num::BILLION),
     ),
     (
         "Your cookies have been placed under government surveillance.",
-        Requirement::CookieRange(1.0 * num::BILLION, 5.0 * num::BILLION),
+        Requirement::CookiesRange(1.0 * num::BILLION, 5.0 * num::BILLION),
     ),
     (
         "The whole planet is enjoying your cookies!",
-        Requirement::CookieRange(5.0 * num::BILLION, 10.0 * num::BILLION),
+        Requirement::CookiesRange(5.0 * num::BILLION, 10.0 * num::BILLION),
     ),
     (
         "Strange creatures from neighboring planets wish to try your cookies.",
-        Requirement::CookieRange(10.0 * num::BILLION, 50.0 * num::BILLION),
+        Requirement::CookiesRange(10.0 * num::BILLION, 50.0 * num::BILLION),
     ),
     (
         "Elder gods from the whole cosmos have awoken to taste your cookies.",
-        Requirement::CookieRange(50.0 * num::BILLION, 100.0 * num::BILLION),
+        Requirement::CookiesRange(50.0 * num::BILLION, 100.0 * num::BILLION),
     ),
     (
         "Beings from other dimensions lapse into existence just to get a taste of your cookies.",
-        Requirement::CookieRange(100.0 * num::BILLION, 500.0 * num::BILLION),
+        Requirement::CookiesRange(100.0 * num::BILLION, 500.0 * num::BILLION),
     ),
     (
         "Your cookies have achieved sentience.",
-        Requirement::CookieRange(500.0 * num::BILLION, 1.0 * num::TRILLION),
+        Requirement::CookiesRange(500.0 * num::BILLION, 1.0 * num::TRILLION),
     ),
     (
         "The universe has now turned into cookie dough, to the molecular level.",
-        Requirement::CookieRange(1.0 * num::TRILLION, 5.0 * num::TRILLION),
+        Requirement::CookiesRange(1.0 * num::TRILLION, 5.0 * num::TRILLION),
     ),
     (
         "Your cookies are rewriting the fundamental laws of the universe.",
-        Requirement::CookieRange(5.0 * num::TRILLION, 10.0 * num::TRILLION),
+        Requirement::CookiesRange(5.0 * num::TRILLION, 10.0 * num::TRILLION),
     ),
     (
         "it's time to stop playing",
-        Requirement::CookieRange(10.0 * num::TRILLION, 100.0 * num::TRILLION),
+        Requirement::CookiesRange(10.0 * num::TRILLION, 100.0 * num::TRILLION),
     ),
     (
         "A local news station runs a 10-minute segment about your cookies. Success!",
-        Requirement::CookieAbove(100.0 * num::TRILLION),
+        Requirement::CookiesAbove(100.0 * num::TRILLION),
     ),
 ];
 

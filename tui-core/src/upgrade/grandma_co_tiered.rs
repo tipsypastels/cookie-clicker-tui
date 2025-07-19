@@ -1,4 +1,6 @@
-use crate::building::Building;
+use std::borrow::Cow;
+
+use crate::{building::Building, requirement::Requirement};
 
 const COST_MULT: f64 = 50.0;
 const SKIP: usize = 2; // cursors and grandmas
@@ -22,8 +24,11 @@ impl GrandmaCoTieredUpgrade {
         self.building
     }
 
-    pub const fn building_req(&self) -> (u16, u16) {
-        (15, 1) // TODO: Make a consistent builder API for this.
+    pub fn requirement(&self) -> Requirement {
+        Requirement::All(Cow::Owned(vec![
+            Requirement::BuildingCountMin(self.building, 15),
+            Requirement::BuildingCountMin(Building::Grandma, 1),
+        ]))
     }
 
     pub const fn cost(&self) -> f64 {

@@ -1,4 +1,4 @@
-use crate::building::Building;
+use crate::{building::Building, requirement::Requirement};
 use cookie_clicker_tui_utils::num;
 
 #[derive(Debug)]
@@ -19,8 +19,8 @@ impl SimpleTieredUpgrade {
         self.building
     }
 
-    pub const fn building_req(&self) -> u16 {
-        self.template.building_req
+    pub const fn requirement(&self) -> Requirement {
+        Requirement::BuildingCountMin(self.building, self.template.building_req)
     }
 
     pub const fn cost(&self) -> f64 {
