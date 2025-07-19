@@ -24,6 +24,7 @@ pub struct AppListState {
 pub enum AppListPane {
     #[default]
     Buildings,
+    Upgrades,
 }
 
 #[derive(Debug)]
@@ -63,18 +64,28 @@ impl App {
                 }
                 Event::Term(Key(event)) if event.is_press() => match event.code {
                     KeyCode::Up => {
-                        self.list.state.previous();
+                        self.list.up();
                     }
                     KeyCode::Down => {
-                        self.list.state.next();
+                        self.list.down();
                     }
-                    #[allow(clippy::single_match)]
+                    KeyCode::Left => {
+                        self.list.left(&self.core);
+                    }
+                    KeyCode::Right => {
+                        self.list.right(&self.core);
+                    }
                     KeyCode::Enter => match (self.list.state.selected, self.list.pane) {
                         (Some(i), AppListPane::Buildings) => {
                             let Some(building) = Building::nth(i) else {
                                 continue;
                             };
                             if !self.core.buy_building(building) {
+                                self.countdown.error_insufficient_cookies.run();
+                            }
+                        }
+                        (Some(i), AppListPane::Upgrades) => {
+                            if !self.core.buy_upgrade(i) {
                                 self.countdown.error_insufficient_cookies.run();
                             }
                         }
@@ -118,8 +129,71 @@ impl App {
 }
 
 impl AppListState {
+    fn up(&mut self) {
+        self.state.previous();
+    }
+
+    fn down(&mut self) {
+        self.state.next();
+    }
+
+    fn left(&mut self, core: &Core) {
+        self.switch(core, AppListPane::prev);
+    }
+
+    fn right(&mut self, core: &Core) {
+        self.switch(core, AppListPane::next);
+    }
+
+    fn switch(&mut self, core: &Core, change: fn(AppListPane) -> AppListPane) {
+        let mut new_pane = change(self.pane);
+        loop {
+            if new_pane.available(core) {
+                break;
+            }
+            new_pane = change(new_pane);
+        }
+
+        if let Some(cur) = self.state.selected {
+            let max = new_pane.max(core);
+            self.state.select(Some(std::cmp::min(cur, max)));
+        }
+
+        self.pane = new_pane;
+    }
+
     pub fn pane(&mut self, pane: AppListPane) -> Option<&mut ListState> {
         (self.pane == pane).then_some(&mut self.state)
+    }
+}
+
+impl AppListPane {
+    fn available(self, core: &Core) -> bool {
+        match self {
+            Self::Buildings => true,
+            Self::Upgrades => !core.upgrades().is_empty(),
+        }
+    }
+
+    fn max(self, core: &Core) -> usize {
+        match self {
+            Self::Buildings => Building::VARIANT_COUNT - 1,
+            Self::Upgrades => core.upgrades().len() - 1,
+        }
+    }
+
+    fn prev(self) -> Self {
+        match self {
+            Self::Buildings => Self::Upgrades,
+            Self::Upgrades => Self::Buildings,
+        }
+    }
+
+    fn next(self) -> Self {
+        match self {
+            Self::Buildings => Self::Upgrades,
+            Self::Upgrades => Self::Buildings,
+        }
     }
 }
 

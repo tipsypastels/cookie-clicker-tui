@@ -21,12 +21,12 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         (widget, HEIGHT)
     });
 
+    let list_view = ListView::new(builder, Building::VARIANT_COUNT);
+    let list_state = app.list.pane(AppListPane::Buildings);
+
     let block = Block::bordered()
         .title(Line::styled(" Buildings ", Modifier::BOLD).centered())
         .padding(Padding::uniform(1));
-
-    let list_view = ListView::new(builder, Building::VARIANT_COUNT);
-    let list_state = app.list.pane(AppListPane::Buildings);
 
     list_view
         .block(block)

@@ -50,7 +50,7 @@ impl Core {
         self.state.buildings.info_nth(index)
     }
 
-    pub fn unlocked_upgrades(&self) -> &[Upgrade] {
+    pub fn upgrades(&self) -> &[Upgrade] {
         &self.computed.upgrades
     }
 
@@ -71,7 +71,9 @@ impl Core {
 
         self.state.cookies -= cost;
         self.state.buildings.modify(building, |b| b.count += 1);
+
         self.computed.recalc_cps(&self.state);
+        self.computed.recalc_upgrades(self.fps, &self.state);
 
         true
     }
@@ -89,15 +91,16 @@ impl Core {
 
         self.state.cookies -= cost;
         upgrade.buy(&mut self.state);
+
         self.computed.recalc_cps(&self.state);
+        self.computed.recalc_upgrades(self.fps, &self.state);
 
         true
     }
 
     pub fn tick(&mut self) {
         self.state.cookies += self.computed.cps / self.fps;
-        self.computed.upgrades.tick(self.fps, &self.state);
-        self.computed.ticker.tick(self.fps, &self.state);
+        self.computed.tick(self.fps, &self.state);
     }
 }
 
@@ -136,7 +139,16 @@ impl Computed {
         }
     }
 
+    fn tick(&mut self, fps: f64, state: &State) {
+        self.ticker.tick(fps, state);
+        self.upgrades.tick(fps, state);
+    }
+
     fn recalc_cps(&mut self, state: &State) {
         self.cps = self::calc::cps(state);
+    }
+
+    fn recalc_upgrades(&mut self, fps: f64, state: &State) {
+        self.upgrades = Upgrades::new(fps, state);
     }
 }
