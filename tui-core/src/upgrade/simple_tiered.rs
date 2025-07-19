@@ -8,26 +8,26 @@ pub struct SimpleTieredUpgrade {
 }
 
 impl SimpleTieredUpgrade {
-    pub const fn new(building: Building, index: usize) -> Self {
+    pub fn new(building: Building, index: usize) -> Self {
         Self {
             building,
             template: SimpleTieredUpgradeTemplate::variants_array(building)[index],
         }
     }
 
-    pub const fn building(&self) -> Building {
+    pub fn building(&self) -> Building {
         self.building
     }
 
-    pub const fn requirement(&self) -> Requirement {
+    pub fn requirement(&self) -> Requirement {
         Requirement::BuildingCountMin(self.building, self.template.building_req)
     }
 
-    pub const fn cost(&self) -> f64 {
+    pub fn cost(&self) -> f64 {
         self.building.base_cost() * self.template.cost_mult
     }
 
-    pub const fn label(&self) -> &'static str {
+    pub fn label(&self) -> &'static str {
         labels::get(self.building)[self.template.index]
     }
 }
@@ -100,7 +100,7 @@ impl SimpleTieredUpgradeTemplate {
 mod labels {
     type Labels = [&'static str; super::SimpleTieredUpgradeTemplate::VARIANT_COUNT];
 
-    pub const fn get(building: super::Building) -> Labels {
+    pub fn get(building: super::Building) -> Labels {
         macro_rules! arms {
             ($($building:ident),*$(,)?) => {
                 match building {

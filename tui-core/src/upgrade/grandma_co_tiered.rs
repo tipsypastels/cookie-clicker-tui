@@ -14,13 +14,13 @@ pub struct GrandmaCoTieredUpgrade {
 }
 
 impl GrandmaCoTieredUpgrade {
-    pub const fn new(building: Building) -> Self {
+    pub fn new(building: Building) -> Self {
         debug_assert!(!matches!(building, Building::Cursor | Building::Grandma));
 
         Self { building }
     }
 
-    pub const fn building(&self) -> Building {
+    pub fn building(&self) -> Building {
         self.building
     }
 
@@ -31,11 +31,11 @@ impl GrandmaCoTieredUpgrade {
         ]))
     }
 
-    pub const fn cost(&self) -> f64 {
+    pub fn cost(&self) -> f64 {
         self.building.base_cost() * COST_MULT
     }
 
-    pub const fn label(&self) -> &'static str {
+    pub fn label(&self) -> &'static str {
         LABELS[self.building as usize - SKIP]
     }
 }

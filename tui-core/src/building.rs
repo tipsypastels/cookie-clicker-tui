@@ -96,23 +96,23 @@ pub struct BuildingInfo {
 }
 
 impl BuildingInfo {
-    pub const fn building(&self) -> Building {
+    pub fn building(&self) -> Building {
         self.building
     }
 
-    pub const fn count(&self) -> u16 {
+    pub fn count(&self) -> u16 {
         self.state.count
     }
 
-    pub const fn simple_tiered_upgrade_count(&self) -> u16 {
+    pub fn simple_tiered_upgrade_count(&self) -> u16 {
         self.state.simple_tiered_upgrade_count
     }
 
-    pub const fn has_grandma_co_tiered_upgrade(&self) -> bool {
+    pub fn has_grandma_co_tiered_upgrade(&self) -> bool {
         self.state.has_grandma_co_tiered_upgrade
     }
 
-    pub const fn cps(&self) -> f64 {
+    pub fn cps(&self) -> f64 {
         self.cps
     }
 }
