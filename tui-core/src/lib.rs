@@ -1,28 +1,40 @@
 mod building;
+mod requirement;
+mod ticker;
 mod upgrade;
+
+use self::ticker::Ticker;
 
 #[derive(Debug)]
 pub struct Core {
+    fps: f64,
     state: State,
-    cached: Cached,
+    computed: Computed,
+    ticker: Ticker,
 }
 
 #[derive(Debug)]
 struct State {}
 
 #[derive(Debug)]
-struct Cached {
+struct Computed {
     cps: f64,
 }
 
 impl Core {
-    pub fn new() -> Self {
+    pub fn new(fps: f64) -> Self {
         todo!()
     }
 
     pub fn cps(&self) -> f64 {
-        self.cached.cps
+        self.computed.cps
     }
 
-    pub fn tick(&mut self, fps: f64) {}
+    pub fn ticker(&self) -> Option<&'static str> {
+        self.ticker.text()
+    }
+
+    pub fn tick(&mut self) {
+        self.ticker.tick(self.fps, &self.state, &self.computed);
+    }
 }

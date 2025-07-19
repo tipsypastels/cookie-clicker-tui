@@ -8,3 +8,4 @@ approx-eq-trait.workspace = true
 cookie-clicker-tui-utils.workspace = true
 enum-assoc.workspace = true
 enum-fun.workspace = true
+rand.workspace = true

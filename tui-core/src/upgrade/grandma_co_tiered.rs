@@ -1,4 +1,4 @@
-use crate::Building;
+use crate::building::Building;
 
 const COST_MULT: f64 = 50.0;
 const SKIP: usize = 2; // cursors and grandmas

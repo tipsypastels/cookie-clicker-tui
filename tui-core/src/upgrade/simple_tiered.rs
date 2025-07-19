@@ -1,4 +1,4 @@
-use crate::Building;
+use crate::building::Building;
 use cookie_clicker_tui_utils::num;
 
 #[derive(Debug)]
@@ -155,7 +155,6 @@ mod labels {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Building;
     use approx_eq_trait::assert_approx_eq_slice;
     use cookie_clicker_tui_utils::num::*;
 
