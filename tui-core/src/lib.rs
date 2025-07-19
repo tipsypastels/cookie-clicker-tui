@@ -14,7 +14,9 @@ pub struct Core {
 }
 
 #[derive(Debug)]
-struct State {}
+struct State {
+    cookies: f64,
+}
 
 #[derive(Debug)]
 struct Computed {
@@ -26,6 +28,10 @@ impl Core {
         todo!()
     }
 
+    pub fn cookies(&self) -> f64 {
+        self.state.cookies
+    }
+
     pub fn cps(&self) -> f64 {
         self.computed.cps
     }
@@ -35,6 +41,7 @@ impl Core {
     }
 
     pub fn tick(&mut self) {
+        self.state.cookies += self.computed.cps / self.fps;
         self.ticker.tick(self.fps, &self.state, &self.computed);
     }
 }
