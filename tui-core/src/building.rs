@@ -1,6 +1,7 @@
 use cookie_clicker_tui_utils::num;
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
+use std::collections::HashMap;
 
 #[derive(Assoc, Name, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[func(pub(crate) const fn base_cost(self) -> f64)]
@@ -47,6 +48,80 @@ pub enum Building {
     #[assoc(base_cost = 540.0 * num::SEPTILLION, base_cps = 510.0 * num::TRILLION)]
     #[name(plural = "of You")]
     You,
+}
+
+#[derive(Debug)]
+pub struct Buildings {
+    map: HashMap<Building, BuildingState>,
+}
+
+impl Buildings {
+    pub fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+        }
+    }
+
+    pub fn infos(&self) -> impl Iterator<Item = BuildingInfo> {
+        Building::variants().map(|b| self.info(b))
+    }
+
+    pub fn info(&self, building: Building) -> BuildingInfo {
+        let state = self.state(building);
+        let cps = crate::calc::building_cps(self, building, state);
+        BuildingInfo {
+            building,
+            state,
+            cps,
+        }
+    }
+
+    pub fn state(&self, building: Building) -> BuildingState {
+        self.map.get(&building).copied().unwrap_or_default()
+    }
+
+    pub fn grandma_co_tiered_upgrade_count(&self) -> u16 {
+        self.map
+            .values()
+            .map(|s| s.has_grandma_co_tiered_upgrade as u16)
+            .sum()
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct BuildingInfo {
+    building: Building,
+    state: BuildingState,
+    cps: f64,
+}
+
+impl BuildingInfo {
+    pub const fn building(&self) -> Building {
+        self.building
+    }
+
+    pub const fn count(&self) -> u16 {
+        self.state.count
+    }
+
+    pub const fn simple_tiered_upgrade_count(&self) -> u16 {
+        self.state.simple_tiered_upgrade_count
+    }
+
+    pub const fn has_grandma_co_tiered_upgrade(&self) -> bool {
+        self.state.has_grandma_co_tiered_upgrade
+    }
+
+    pub const fn cps(&self) -> f64 {
+        self.cps
+    }
+}
+
+#[derive(Default, Debug, Copy, Clone)]
+pub struct BuildingState {
+    pub count: u16,
+    pub simple_tiered_upgrade_count: u16,
+    pub has_grandma_co_tiered_upgrade: bool,
 }
 
 macro_rules! all_the_buildings {

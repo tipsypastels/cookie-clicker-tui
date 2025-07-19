@@ -11,7 +11,7 @@ pub enum Requirement {
 }
 
 impl Requirement {
-    pub(crate) fn check(&self, state: &State, computed: &Computed) -> bool {
+    pub fn check(&self, state: &State, computed: &Computed) -> bool {
         match self {
             Self::CookieUnder(max) => state.cookies < *max,
             Self::CookieAbove(min) => state.cookies > *min,
