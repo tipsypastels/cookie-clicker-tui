@@ -25,10 +25,10 @@ impl GrandmaCoTieredUpgrade {
     }
 
     pub fn requirement(&self) -> Requirement {
-        Requirement::All(Cow::Owned(vec![
-            Requirement::BuildingCountMin(self.building, 15),
-            Requirement::BuildingCountMin(Building::Grandma, 1),
-        ]))
+        Requirement::all_rc([
+            Requirement::building_count_min(self.building, 15),
+            Requirement::building_count_min(Building::Grandma, 1),
+        ])
     }
 
     pub fn cost(&self) -> f64 {

@@ -20,7 +20,7 @@ impl Core {
     pub fn new(fps: f64) -> Self {
         let state = State::new();
         let computed = Computed::new(&state);
-        let ticker = Ticker::new(fps, &state, &computed);
+        let ticker = Ticker::new(fps, &state);
 
         Self {
             fps,
@@ -52,7 +52,7 @@ impl Core {
 
     pub fn tick(&mut self) {
         self.state.cookies += self.computed.cps / self.fps;
-        self.ticker.tick(self.fps, &self.state, &self.computed);
+        self.ticker.tick(self.fps, &self.state);
     }
 }
 

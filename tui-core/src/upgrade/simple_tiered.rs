@@ -20,7 +20,7 @@ impl SimpleTieredUpgrade {
     }
 
     pub fn requirement(&self) -> Requirement {
-        Requirement::BuildingCountMin(self.building, self.template.building_req)
+        Requirement::building_count_min(self.building, self.template.building_req)
     }
 
     pub fn cost(&self) -> f64 {
