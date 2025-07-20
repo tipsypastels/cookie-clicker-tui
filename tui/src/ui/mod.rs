@@ -1,11 +1,11 @@
 mod buildings;
 mod cookies;
-mod debug;
+mod modal;
 mod ticker;
 mod upgrades;
 mod utils;
 
-use crate::app::{AppCountdownState, AppListState};
+use crate::app::{AppCountdownState, AppListState, AppModalState};
 use cookie_clicker_tui_core::Core;
 use ratatui::prelude::*;
 
@@ -14,6 +14,7 @@ pub struct UiApp<'a> {
     pub core: &'a Core,
     pub list: &'a mut AppListState,
     pub countdown: &'a AppCountdownState,
+    pub modal: &'a AppModalState,
 }
 
 pub fn ui(app: &mut UiApp, frame: &mut Frame) {
@@ -33,7 +34,7 @@ pub fn ui(app: &mut UiApp, frame: &mut Frame) {
     buildings::buildings(app, cols[1], buf);
     upgrades::upgrades(app, cols[2], buf);
 
-    debug::debug(app, area, buf);
+    modal::modal(app, area, buf);
 }
 
 fn left_col(app: &mut UiApp, area: Rect, buf: &mut Buffer) {

@@ -1,4 +1,3 @@
-pub mod modal;
 pub mod num;
 pub mod shop;
 pub mod style;

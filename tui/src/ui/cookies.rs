@@ -31,7 +31,11 @@ pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 
     Paragraph::new(Text::from(lines))
         .centered()
-        .block(Block::bordered().title(Line::styled(" Cookies ", Modifier::BOLD).centered()))
+        .block(
+            Block::bordered()
+                .title(Line::styled(" Cookies ", Modifier::BOLD).centered())
+                .title_bottom(Line::styled(" Click <Space> ", Modifier::BOLD).centered()),
+        )
         .render(area, buf);
 }
 

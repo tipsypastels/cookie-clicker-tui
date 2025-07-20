@@ -33,6 +33,7 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 
     let block = Block::bordered()
         .title(Line::styled(" Buildings ", Modifier::BOLD).centered())
+        .title_bottom(Line::styled(" Buy <Enter> Inspect <I> ", Modifier::BOLD).centered())
         .padding(Padding::uniform(1));
 
     list_view

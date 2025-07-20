@@ -1,7 +1,7 @@
 use crate::event::{Event, Events, FPS};
 use anyhow::{Context, Result};
 use cookie_clicker_tui_core::{Building, Core};
-use cookie_clicker_tui_utils::countdown::{Countdown, CountdownOf};
+use cookie_clicker_tui_utils::countdown::Countdown;
 use ratatui::DefaultTerminal;
 use tui_widget_list::ListState;
 
@@ -10,6 +10,7 @@ pub struct App {
     core: Core,
     list: AppListState,
     countdown: AppCountdownState,
+    modal: AppModalState,
     events: Events,
     quit: bool,
 }
@@ -31,7 +32,14 @@ pub enum AppListPane {
 pub struct AppCountdownState {
     just_pressed_cookie: Countdown<3>,
     error_insufficient_cookies: Countdown<10>,
-    debug_message: CountdownOf<String, 25>,
+}
+
+#[derive(Default, Debug)]
+pub enum AppModalState {
+    Debug(String),
+    ListItem,
+    #[default]
+    Closed,
 }
 
 impl App {
@@ -45,8 +53,8 @@ impl App {
             countdown: AppCountdownState {
                 just_pressed_cookie: Countdown::new(),
                 error_insufficient_cookies: Countdown::new(),
-                debug_message: CountdownOf::new(),
             },
+            modal: AppModalState::default(),
             events: Events::new(),
             quit: false,
         }
@@ -91,6 +99,13 @@ impl App {
                         }
                         _ => {}
                     },
+                    KeyCode::Esc => {
+                        if !matches!(self.modal, AppModalState::Closed) {
+                            self.modal = AppModalState::Closed
+                        } else {
+                            self.quit = true;
+                        }
+                    }
                     KeyCode::Char(' ') => {
                         self.core.give_cookies(1.0);
                         self.countdown.just_pressed_cookie.run();
@@ -98,8 +113,11 @@ impl App {
                     KeyCode::Char('q') => {
                         self.quit = true;
                     }
+                    KeyCode::Char('i') => {
+                        self.modal.toggle();
+                    }
                     KeyCode::Char('/') => {
-                        self.countdown.debug_message.run(format!("{:?}", self.core));
+                        self.modal.debug(format!("{:?}", self.core));
                     }
                     _ => {}
                 },
@@ -115,6 +133,7 @@ impl App {
                 core: &self.core,
                 list: &mut self.list,
                 countdown: &self.countdown,
+                modal: &self.modal,
             };
             crate::ui::ui(&mut ui, frame);
         })
@@ -162,6 +181,10 @@ impl AppListState {
         self.pane = new_pane;
     }
 
+    pub fn selected(&self) -> Option<(AppListPane, usize)> {
+        self.state.selected.map(|i| (self.pane, i))
+    }
+
     pub fn pane(&mut self, pane: AppListPane) -> Option<&mut ListState> {
         (self.pane == pane).then_some(&mut self.state)
     }
@@ -206,13 +229,21 @@ impl AppCountdownState {
         self.error_insufficient_cookies.is_running()
     }
 
-    pub fn debug_message(&self) -> Option<&str> {
-        self.debug_message.value().map(|s| s.as_str())
-    }
-
     pub fn tick(&mut self) {
         self.just_pressed_cookie.tick();
         self.error_insufficient_cookies.tick();
-        self.debug_message.tick();
+    }
+}
+
+impl AppModalState {
+    fn toggle(&mut self) {
+        *self = match *self {
+            Self::Closed => Self::ListItem,
+            _ => Self::Closed,
+        }
+    }
+
+    fn debug(&mut self, message: String) {
+        *self = Self::Debug(message)
     }
 }

@@ -33,6 +33,7 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 
     let block = Block::bordered()
         .title(Line::styled(" Upgrades ", Modifier::BOLD))
+        .title_bottom(Line::styled(" Buy <Enter> Inspect <I> ", Modifier::BOLD).centered())
         .padding(Padding::uniform(1));
 
     list_view
