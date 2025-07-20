@@ -34,7 +34,7 @@ impl Achivements {
                     continue;
                 }
 
-                if achivement.req().check(state, computed) {
+                if achivement.req().as_late_req().check(state, computed) {
                     self.owned.insert(achivement);
                     self.display_queue.push_back(achivement);
                 }
@@ -52,11 +52,24 @@ impl Achivements {
 }
 
 #[derive(Assoc, Name, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[func(pub(crate) fn req(&self) -> LateReq)]
+#[func(pub fn req(&self) -> AchivementReq)]
 #[name(base = "title case")]
 pub enum Achivement {
-    #[assoc(req = LateReq::CookiesAboveOrEq(1.0))]
+    #[assoc(req = AchivementReq::CookiesBaked(1.0))]
     WakeAndBake,
-    #[assoc(req = LateReq::CookiesAboveOrEq(1.0 * num::THOUSAND))]
+    #[assoc(req = AchivementReq::CookiesBaked(1.0 * num::THOUSAND))]
     MakingSomeDough,
+}
+
+#[derive(Debug)]
+pub enum AchivementReq {
+    CookiesBaked(f64),
+}
+
+impl AchivementReq {
+    pub(crate) fn as_late_req(&self) -> LateReq {
+        match self {
+            Self::CookiesBaked(v) => LateReq::CookiesAboveOrEq(*v),
+        }
+    }
 }

@@ -6,7 +6,7 @@ mod ticker;
 mod upgrade;
 
 pub use self::{
-    achivement::Achivement,
+    achivement::{Achivement, AchivementReq},
     building::{Building, BuildingInfo},
     upgrade::{Upgrade, UpgradeEffectInfo},
 };
