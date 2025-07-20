@@ -90,7 +90,7 @@ fn render_upgrade(app: &mut UiApp, index: usize, area: Rect, buf: &mut Buffer) {
         return;
     };
 
-    let title = upgrade.label();
+    let title = format!(" {} ", upgrade.label());
 
     render_outer(area, buf, title, |area, buf, block| {
         // TODO: Consider making more of upgrade public

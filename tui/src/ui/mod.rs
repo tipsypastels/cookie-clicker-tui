@@ -1,3 +1,4 @@
+mod achivement;
 mod buildings;
 mod cookies;
 mod modal;
@@ -34,6 +35,7 @@ pub fn ui(app: &mut UiApp, frame: &mut Frame) {
     buildings::buildings(app, cols[1], buf);
     upgrades::upgrades(app, cols[2], buf);
 
+    achivement::achivement(app, area, buf);
     modal::modal(app, area, buf);
 }
 
