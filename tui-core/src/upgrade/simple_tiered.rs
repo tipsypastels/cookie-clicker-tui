@@ -61,7 +61,7 @@ impl SimpleTieredUpgrade {
     }
 
     pub fn description(&self) -> String {
-        format!("2x {} cps", self.building.name())
+        format!("2x {} cps", self.building.name_lower())
     }
 
     pub fn buy(&self, state: &mut State) {

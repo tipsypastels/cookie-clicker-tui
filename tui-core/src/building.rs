@@ -6,6 +6,12 @@ use std::collections::HashMap;
 #[derive(Assoc, Name, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[func(pub(crate) const fn base_cost(self) -> f64)]
 #[func(pub(crate) const fn base_cps(self) -> f64)]
+#[name(base = "title case")]
+#[name(extra(plural = "title case plural"))]
+#[name(extra(lower = "title case lower"))]
+#[name(extra(lower_plural = "title case lower plural"))]
+#[name(pluralizer(base, plural))]
+#[name(pluralizer(lower, lower_plural))]
 pub enum Building {
     #[assoc(base_cost = 15.0, base_cps = 0.1)]
     Cursor,
@@ -16,6 +22,7 @@ pub enum Building {
     #[assoc(base_cost = 12.0 * num::THOUSAND, base_cps = 47.0)]
     Mine,
     #[assoc(base_cost = 130.0 * num::THOUSAND, base_cps = 260.0)]
+    #[name(plural = "Factories", lower_plural = "factories")]
     Factory,
     #[assoc(base_cost = 1.4 * num::MILLION, base_cps = 1_400.0)]
     Bank,
@@ -46,7 +53,7 @@ pub enum Building {
     #[assoc(base_cost = 1.9 * num::SEPTILLION, base_cps = 64.0 * num::TRILLION)]
     CortexBaker,
     #[assoc(base_cost = 540.0 * num::SEPTILLION, base_cps = 510.0 * num::TRILLION)]
-    #[name(plural = "of You")]
+    #[name(plural = "of You", lower_plural = "of you")]
     You,
 }
 

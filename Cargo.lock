@@ -367,18 +367,18 @@ dependencies = [
 
 [[package]]
 name = "enum-fun"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eee28e699ea0dd4afc0adbb057d614f29aaca2c1d1ad2a42e3eaa79f81b4dd20"
+checksum = "4b154205cca25150177cd2233a650db1c02a866074c2e579f1c679a01a7f8fcc"
 dependencies = [
  "enum-fun-macros",
 ]
 
 [[package]]
 name = "enum-fun-macros"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86542e4c0f332b31cfa1d924754153a8384f1e4b1ac9abf0f9c7c108989607bc"
+checksum = "df5e88a8151509062b2958ab840ed5c04209563d4286fc1caf20f4b6bd9fe9fb"
 dependencies = [
  "heck",
  "proc-macro2",

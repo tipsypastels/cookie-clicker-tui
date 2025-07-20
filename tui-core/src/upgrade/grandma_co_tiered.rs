@@ -46,8 +46,8 @@ impl GrandmaCoTieredUpgrade {
         let num_req = crate::calc::grandma_co_tiered_upgrade_num_req_for_1p(self.building);
         format!(
             "2x {grandma} cps, +1% cps / {num_req} {grandmas}",
-            grandma = Building::Grandma.name(),
-            grandmas = Building::Grandma.name_pluralized(num_req as _)
+            grandma = Building::Grandma.name_lower(),
+            grandmas = Building::Grandma.name_lower_pluralized(num_req as _)
         )
     }
 
