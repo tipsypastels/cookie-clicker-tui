@@ -8,6 +8,11 @@ pub enum Req {
     CookiesBelow(f64),
     CookiesBelowOrEq(f64),
     CookiesRange(f64, f64),
+    CookiesAllTimeAbove(f64),
+    CookiesAllTimeAboveOrEq(f64),
+    CookiesAllTimeBelow(f64),
+    CookiesAllTimeBelowOrEq(f64),
+    CookiesAllTimeRange(f64, f64),
     BuildingCountMin(Building, u16),
     Custom(fn(&State) -> bool),
     Any(&'static [Req]),
@@ -24,6 +29,11 @@ impl Req {
             Self::CookiesBelow(v) => state.cookies < *v,
             Self::CookiesBelowOrEq(v) => state.cookies <= *v,
             Self::CookiesRange(a, b) => (*a..*b).contains(&state.cookies),
+            Self::CookiesAllTimeAbove(v) => state.cookies_all_time > *v,
+            Self::CookiesAllTimeAboveOrEq(v) => state.cookies_all_time >= *v,
+            Self::CookiesAllTimeBelow(v) => state.cookies_all_time < *v,
+            Self::CookiesAllTimeBelowOrEq(v) => state.cookies_all_time <= *v,
+            Self::CookiesAllTimeRange(a, b) => (*a..*b).contains(&state.cookies_all_time),
             Self::BuildingCountMin(b, c) => state.buildings.get(*b).count >= *c,
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
@@ -61,6 +71,11 @@ impl LateReq {
         CookiesBelow(v: f64);
         CookiesBelowOrEq(v: f64);
         CookiesRange(a: f64, b: f64);
+        CookiesAllTimeAbove(v: f64);
+        CookiesAllTimeAboveOrEq(v: f64);
+        CookiesAllTimeBelow(v: f64);
+        CookiesAllTimeBelowOrEq(v: f64);
+        CookiesAllTimeRange(a: f64, b: f64);
         BuildingCountMin(b: Building, c: u16);
     }
 

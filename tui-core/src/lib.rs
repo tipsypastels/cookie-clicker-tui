@@ -42,6 +42,10 @@ impl Core {
         self.state.cookies
     }
 
+    pub fn cookies_all_time(&self) -> f64 {
+        self.state.cookies_all_time
+    }
+
     pub fn cps(&self) -> f64 {
         self.computed.cps
     }
@@ -80,6 +84,7 @@ impl Core {
 
     pub fn give_cookies(&mut self, amount: f64) {
         self.state.cookies += amount;
+        self.state.cookies_all_time += amount;
     }
 
     pub fn buy_building(&mut self, building: Building) -> bool {
@@ -119,11 +124,7 @@ impl Core {
     }
 
     pub fn tick(&mut self) {
-        self.state.cookies += self.computed.cps / self.fps;
-        self.state
-            .milk
-            .tick(self.fps, self.computed2.achievements.owned().len() as _);
-
+        self.state.tick(self.fps, &self.computed, &self.computed2);
         self.computed.tick(self.fps, &self.state);
         self.computed2.tick(self.fps, &self.state, &self.computed);
     }
@@ -132,6 +133,7 @@ impl Core {
 #[derive(Debug)]
 struct State {
     cookies: f64,
+    cookies_all_time: f64,
     buildings: Buildings,
     milk: Milk,
 }
@@ -140,9 +142,19 @@ impl State {
     fn new(fps: f64) -> Self {
         Self {
             cookies: 0.0,
+            cookies_all_time: 0.0,
             buildings: Buildings::new(),
             milk: Milk::new(fps),
         }
+    }
+
+    fn tick(&mut self, fps: f64, computed: &Computed, computed2: &Computed2) {
+        let addl_cookies = computed.cps / fps;
+
+        self.cookies += addl_cookies;
+        self.cookies_all_time += addl_cookies;
+        self.milk
+            .tick(fps, computed2.achievements.owned().len() as _);
     }
 }
 

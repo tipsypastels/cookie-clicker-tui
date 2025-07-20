@@ -69,7 +69,7 @@ pub enum AchievementReq {
 impl AchievementReq {
     fn as_late_req(&self) -> LateReq {
         match self {
-            Self::CookiesBaked(v) => LateReq::CookiesAboveOrEq(*v),
+            Self::CookiesBaked(v) => LateReq::CookiesAllTimeAboveOrEq(*v),
         }
     }
 }
