@@ -9,11 +9,6 @@ use crate::app::{AppCountdownState, AppListState};
 use cookie_clicker_tui_core::Core;
 use ratatui::prelude::*;
 
-const SELECTED_STYLE: Style = Style::new()
-    .bg(Color::White)
-    .fg(Color::Black)
-    .add_modifier(Modifier::BOLD);
-
 #[derive(Debug)]
 pub struct UiApp<'a> {
     pub core: &'a Core,

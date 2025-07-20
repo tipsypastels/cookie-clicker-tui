@@ -1,6 +1,9 @@
 use super::{
-    SELECTED_STYLE, UiApp,
-    utils::{num::PrintFloat, style::StyleExt, widget::StatefulOrDefaultStateWidget},
+    UiApp,
+    utils::{
+        shop::{ShopItemRender, ShopItemWidget},
+        widget::*,
+    },
 };
 use crate::app::AppListPane;
 use cookie_clicker_tui_core::Upgrade;
@@ -8,6 +11,7 @@ use ratatui::{
     prelude::*,
     widgets::{Block, Padding},
 };
+use std::borrow::Cow;
 use tui_widget_list::{ListBuilder, ListView};
 
 pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
@@ -15,15 +19,13 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         let selected = ctx.is_selected;
         let upgrade = &app.core.upgrades()[ctx.index];
         let affordable = upgrade.cost() <= app.core.cookies();
-        let widget = UpgradeWidget {
+        let widget = ShopItemWidget {
             selected,
             affordable,
-            upgrade,
+            item: upgrade,
         };
 
-        const HEIGHT: u16 = 1;
-
-        (widget, HEIGHT)
+        (widget, ShopItemWidget::HEIGHT)
     });
 
     let list_view = ListView::new(builder, app.core.upgrades().len());
@@ -38,38 +40,12 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         .render_stateful_or_default_state(area, buf, list_state);
 }
 
-struct UpgradeWidget<'a> {
-    selected: bool,
-    affordable: bool,
-    upgrade: &'a Upgrade,
-}
-
-impl Widget for UpgradeWidget<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let cols = Layout::horizontal([Constraint::Percentage(75), Constraint::Percentage(25)])
-            .split(area);
-
-        self.label_line().render(cols[0], buf);
-        self.cost_line().render(cols[1], buf);
-    }
-}
-
-impl UpgradeWidget<'_> {
-    fn label_line(&self) -> Line {
-        Line::styled(
-            self.upgrade.label(),
-            Style::new().patch_if(self.selected, SELECTED_STYLE),
-        )
+impl ShopItemRender for &Upgrade {
+    fn label(&self) -> Cow<'static, str> {
+        Upgrade::label(self).into()
     }
 
-    fn cost_line(&self) -> Line {
-        Line::styled(
-            format!("{} $c", self.upgrade.cost().print_float(0, 0)),
-            Style::new()
-                .patch_if(self.selected, SELECTED_STYLE)
-                .fg_if(!self.affordable, Color::DarkGray)
-                .add_modifier(Modifier::ITALIC),
-        )
-        .right_aligned()
+    fn cost(&self) -> f64 {
+        Upgrade::cost(self)
     }
 }

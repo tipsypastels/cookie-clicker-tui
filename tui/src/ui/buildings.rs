@@ -1,6 +1,9 @@
 use super::{
-    SELECTED_STYLE, UiApp,
-    utils::{num::PrintFloat, style::StyleExt, widget::*},
+    UiApp,
+    utils::{
+        shop::{ShopItemRender, ShopItemWidget},
+        widget::*,
+    },
 };
 use crate::app::AppListPane;
 use cookie_clicker_tui_core::{Building, BuildingInfo};
@@ -8,6 +11,7 @@ use ratatui::{
     prelude::*,
     widgets::{Block, Padding},
 };
+use std::borrow::Cow;
 use tui_widget_list::{ListBuilder, ListView};
 
 pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
@@ -15,15 +19,13 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         let selected = ctx.is_selected;
         let info = app.core.building_info_nth(ctx.index);
         let affordable = info.cost() <= app.core.cookies();
-        let widget = BuildingWidget {
+        let widget = ShopItemWidget {
             selected,
             affordable,
-            info,
+            item: info,
         };
 
-        const HEIGHT: u16 = 1;
-
-        (widget, HEIGHT)
+        (widget, ShopItemWidget::HEIGHT)
     });
 
     let list_view = ListView::new(builder, Building::VARIANT_COUNT);
@@ -38,42 +40,17 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         .render_stateful_or_default_state(area, buf, list_state);
 }
 
-struct BuildingWidget {
-    selected: bool,
-    affordable: bool,
-    info: BuildingInfo,
-}
-
-impl Widget for BuildingWidget {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let cols = Layout::horizontal([Constraint::Percentage(75), Constraint::Percentage(25)])
-            .split(area);
-
-        self.label_line().render(cols[0], buf);
-        self.cost_line().render(cols[1], buf);
-    }
-}
-
-impl BuildingWidget {
-    fn label_line(&self) -> Line {
-        Line::styled(
-            format!(
-                "{} {}",
-                self.info.count(),
-                self.info.building().name_pluralized(self.info.count() as _)
-            ),
-            Style::new().patch_if(self.selected, SELECTED_STYLE),
+impl ShopItemRender for BuildingInfo {
+    fn label(&self) -> Cow<'static, str> {
+        format!(
+            "{} {}",
+            self.count(),
+            self.building().name_pluralized(self.count() as _)
         )
+        .into()
     }
 
-    fn cost_line(&self) -> Line {
-        Line::styled(
-            format!("{} $c", self.info.cost().print_float(0, 0)),
-            Style::new()
-                .patch_if(self.selected, SELECTED_STYLE)
-                .fg_if(!self.affordable, Color::DarkGray)
-                .add_modifier(Modifier::ITALIC),
-        )
-        .right_aligned()
+    fn cost(&self) -> f64 {
+        self.cost()
     }
 }
