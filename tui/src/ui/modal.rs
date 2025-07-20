@@ -54,18 +54,18 @@ fn render_building(app: &mut UiApp, index: usize, area: Rect, buf: &mut Buffer) 
             cps / app.core.cps() * 100.0
         };
 
-        let cps_line = Line::from(vec![
-            Span::raw("• producing "),
-            Span::styled(format!("{}", cps.print_float(1, 0)), Modifier::BOLD),
-            Span::raw(" cookies per second "),
-            Span::styled("total", Modifier::BOLD),
-        ]);
-
         let cps_per_line = Line::from(vec![
             Span::raw("• producing "),
             Span::styled(format!("{}", cps_per.print_float(1, 0)), Modifier::BOLD),
             Span::raw(" cookies per second "),
             Span::styled("each", Modifier::BOLD),
+        ]);
+
+        let cps_line = Line::from(vec![
+            Span::raw("• producing "),
+            Span::styled(format!("{}", cps.print_float(1, 0)), Modifier::BOLD),
+            Span::raw(" cookies per second "),
+            Span::styled("total", Modifier::BOLD),
         ]);
 
         let cps_percent_line = Line::from(vec![
@@ -74,10 +74,12 @@ fn render_building(app: &mut UiApp, index: usize, area: Rect, buf: &mut Buffer) 
                 format!("{}%", cps_percent.print_float(1, 1)),
                 Modifier::BOLD,
             ),
-            Span::raw(" of your total cookies per second"),
+            Span::raw(" of your "),
+            Span::styled("total", Modifier::BOLD),
+            Span::raw(" cookies per second"),
         ]);
 
-        Paragraph::new(vec![cps_line, cps_per_line, cps_percent_line])
+        Paragraph::new(vec![cps_per_line, cps_line, cps_percent_line])
             .block(block)
             .render(area, buf);
     });

@@ -1,6 +1,6 @@
 mod building;
 mod calc;
-mod requirement;
+mod req;
 mod ticker;
 mod upgrade;
 

@@ -58,7 +58,7 @@ impl Upgrade {
             ($($type:ident),*$(,)?) => {
                 $(out.extend(
                     $type::without_taken(state)
-                        .filter(|u| u.requirement().check(state))
+                        .filter(|u| u.req().check(state))
                         .map(|u| Self(Inner::from(u))),
                 ));*
             };

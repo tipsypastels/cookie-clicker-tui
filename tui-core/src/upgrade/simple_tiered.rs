@@ -1,7 +1,7 @@
 use crate::{
     State,
     building::{Building, all_the_buildings},
-    requirement::Requirement,
+    req::Req,
 };
 use cookie_clicker_tui_utils::num;
 
@@ -41,8 +41,8 @@ impl SimpleTieredUpgrade {
         })
     }
 
-    pub fn requirement(&self) -> Requirement {
-        Requirement::building_count_min(self.building, self.building_req)
+    pub fn req(&self) -> Req {
+        Req::BuildingCountMin(self.building, self.building_req)
     }
 
     pub fn cost(&self) -> f64 {

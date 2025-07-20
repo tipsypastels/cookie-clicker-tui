@@ -1,4 +1,4 @@
-use crate::{State, building::Building, requirement::Requirement};
+use crate::{State, building::Building, req::Req};
 
 const SKIP: usize = 2; // cursors and grandmas
 const COST_MULT: f64 = 50.0;
@@ -27,11 +27,11 @@ impl GrandmaCoTieredUpgrade {
         })
     }
 
-    pub fn requirement(&self) -> Requirement {
-        Requirement::all_rc([
-            Requirement::building_count_min(self.building, 15),
-            Requirement::building_count_min(Building::Grandma, 1),
-        ])
+    pub fn req(&self) -> Req {
+        Req::AllBox(Box::new([
+            Req::BuildingCountMin(self.building, 15),
+            Req::BuildingCountMin(Building::Grandma, 1),
+        ]))
     }
 
     pub fn cost(&self) -> f64 {
