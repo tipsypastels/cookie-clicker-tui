@@ -1,0 +1,10 @@
+use crate::Building;
+
+#[derive(Debug)]
+pub enum UpgradeEffectInfo {
+    SimpleTiered(Building),
+    GrandmaCoTiered {
+        building: Building,
+        num_req_for_1p: u16,
+    },
+}

@@ -1,6 +1,6 @@
 use super::{UiApp, utils::num::PrintFloat};
 use crate::app::{AppListPane, AppModalState};
-use cookie_clicker_tui_core::Building;
+use cookie_clicker_tui_core::{Building, UpgradeEffectInfo};
 use ratatui::{
     prelude::*,
     widgets::{Block, Clear, Paragraph, Wrap},
@@ -93,13 +93,44 @@ fn render_upgrade(app: &mut UiApp, index: usize, area: Rect, buf: &mut Buffer) {
     let title = format!(" {} ", upgrade.label());
 
     render_outer(area, buf, title, |area, buf, block| {
-        // TODO: Consider making more of upgrade public
-        // so that tokens in here can be bolded?
-        let description_line = Line::raw(format!("• {}", upgrade.description()));
+        let mut lines = Vec::new();
 
-        Paragraph::new(vec![description_line])
-            .block(block)
-            .render(area, buf);
+        let line_2x = |building: Building| {
+            Line::from(vec![
+                Span::raw("• "),
+                Span::styled("2x", Modifier::BOLD),
+                Span::raw(" cookies per second from "),
+                Span::styled(building.name_lower_plural(), Modifier::BOLD),
+            ])
+        };
+
+        match upgrade.effect_info() {
+            UpgradeEffectInfo::SimpleTiered(building) => {
+                lines.push(line_2x(building));
+            }
+            UpgradeEffectInfo::GrandmaCoTiered {
+                building,
+                num_req_for_1p,
+            } => {
+                lines.push(line_2x(Building::Grandma));
+                lines.push(Line::from(vec![
+                    Span::raw("• "),
+                    Span::styled("+1%", Modifier::BOLD),
+                    Span::raw(" cookies per second from "),
+                    Span::styled(building.name_lower_plural(), Modifier::BOLD),
+                    Span::raw(" per "),
+                    Span::styled(
+                        format!(
+                            "{num_req_for_1p} {}",
+                            Building::Grandma.name_lower_pluralized(num_req_for_1p as _)
+                        ),
+                        Modifier::BOLD,
+                    ),
+                ]));
+            }
+        }
+
+        Paragraph::new(lines).block(block).render(area, buf);
     });
 }
 

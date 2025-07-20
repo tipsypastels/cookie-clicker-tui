@@ -1,5 +1,8 @@
+mod effect_info;
 mod grandma_co_tiered;
 mod simple_tiered;
+
+pub use self::effect_info::UpgradeEffectInfo;
 
 use self::{grandma_co_tiered::GrandmaCoTieredUpgrade, simple_tiered::SimpleTieredUpgrade};
 use crate::State;
@@ -87,10 +90,10 @@ impl Upgrade {
         }
     }
 
-    pub fn description(&self) -> String {
+    pub fn effect_info(&self) -> UpgradeEffectInfo {
         match &self.0 {
-            Inner::SimpleTiered(u) => u.description(),
-            Inner::GrandmaCoTiered(u) => u.description(),
+            Inner::SimpleTiered(u) => u.effect_info(),
+            Inner::GrandmaCoTiered(u) => u.effect_info(),
         }
     }
 

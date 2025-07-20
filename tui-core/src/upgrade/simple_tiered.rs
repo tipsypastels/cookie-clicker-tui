@@ -1,3 +1,4 @@
+use super::effect_info::UpgradeEffectInfo;
 use crate::{
     State,
     building::{Building, all_the_buildings},
@@ -60,8 +61,8 @@ impl SimpleTieredUpgrade {
         all_the_buildings!(arms)[self.index]
     }
 
-    pub fn description(&self) -> String {
-        format!("2x {} cps", self.building.name_lower())
+    pub fn effect_info(&self) -> UpgradeEffectInfo {
+        UpgradeEffectInfo::SimpleTiered(self.building)
     }
 
     pub fn buy(&self, state: &mut State) {

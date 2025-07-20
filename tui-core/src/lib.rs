@@ -5,15 +5,14 @@ mod req;
 mod ticker;
 mod upgrade;
 
-use std::collections::BTreeSet;
-
 pub use self::{
     achivement::Achivement,
     building::{Building, BuildingInfo},
-    upgrade::Upgrade,
+    upgrade::{Upgrade, UpgradeEffectInfo},
 };
 
 use self::{achivement::Achivements, building::Buildings, ticker::Ticker, upgrade::Upgrades};
+use std::collections::BTreeSet;
 
 #[derive(Debug)]
 pub struct Core {
