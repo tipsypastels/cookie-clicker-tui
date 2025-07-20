@@ -7,13 +7,13 @@ use std::collections::{BTreeSet, VecDeque};
 const SECONDS_UNTIL_REFRESH: f64 = 10.0;
 
 #[derive(Debug)]
-pub struct Achivements {
-    owned: BTreeSet<Achivement>,
-    display_queue: VecDeque<Achivement>,
+pub struct Achievements {
+    owned: BTreeSet<Achievement>,
+    display_queue: VecDeque<Achievement>,
     ticks_until_refresh: u16,
 }
 
-impl Achivements {
+impl Achievements {
     pub fn new(fps: f64) -> Self {
         Self {
             owned: BTreeSet::new(),
@@ -29,45 +29,45 @@ impl Achivements {
             self.ticks_until_refresh = (SECONDS_UNTIL_REFRESH * fps) as u16;
             self.display_queue.pop_front();
 
-            for achivement in Achivement::variants() {
-                if self.owned.contains(&achivement) {
+            for achievement in Achievement::variants() {
+                if self.owned.contains(&achievement) {
                     continue;
                 }
 
-                if achivement.req().as_late_req().check(state, computed) {
-                    self.owned.insert(achivement);
-                    self.display_queue.push_back(achivement);
+                if achievement.req().as_late_req().check(state, computed) {
+                    self.owned.insert(achievement);
+                    self.display_queue.push_back(achievement);
                 }
             }
         }
     }
 
-    pub fn owned(&self) -> &BTreeSet<Achivement> {
+    pub fn owned(&self) -> &BTreeSet<Achievement> {
         &self.owned
     }
 
-    pub fn queued(&self) -> Option<Achivement> {
+    pub fn queued(&self) -> Option<Achievement> {
         self.display_queue.front().copied()
     }
 }
 
 #[derive(Assoc, Name, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[func(pub fn req(&self) -> AchivementReq)]
+#[func(pub fn req(&self) -> AchievementReq)]
 #[name(base = "title case")]
-pub enum Achivement {
-    #[assoc(req = AchivementReq::CookiesBaked(1.0))]
+pub enum Achievement {
+    #[assoc(req = AchievementReq::CookiesBaked(1.0))]
     WakeAndBake,
-    #[assoc(req = AchivementReq::CookiesBaked(1.0 * num::THOUSAND))]
+    #[assoc(req = AchievementReq::CookiesBaked(1.0 * num::THOUSAND))]
     MakingSomeDough,
 }
 
 #[derive(Debug)]
-pub enum AchivementReq {
+pub enum AchievementReq {
     CookiesBaked(f64),
 }
 
-impl AchivementReq {
-    pub(crate) fn as_late_req(&self) -> LateReq {
+impl AchievementReq {
+    fn as_late_req(&self) -> LateReq {
         match self {
             Self::CookiesBaked(v) => LateReq::CookiesAboveOrEq(*v),
         }

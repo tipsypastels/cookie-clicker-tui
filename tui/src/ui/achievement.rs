@@ -1,5 +1,5 @@
 use super::{UiApp, utils::num::PrintFloat};
-use cookie_clicker_tui_core::AchivementReq;
+use cookie_clicker_tui_core::AchievementReq;
 use cookie_clicker_tui_utils::pluralized;
 use ratatui::{
     prelude::*,
@@ -8,18 +8,18 @@ use ratatui::{
 
 const SCREEN_PERCENT: (u16, u16) = (33, 15);
 
-pub fn achivement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
-    let Some(achivement) = app.core.queued_achivement() else {
+pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
+    let Some(achievement) = app.core.queued_achievement() else {
         return;
     };
 
     let title = Line::styled(
-        format!(" Achivement Unlocked: {} ", achivement.name()),
+        format!(" Achievement Unlocked: {} ", achievement.name()),
         Modifier::BOLD,
     );
 
-    let req = match achivement.req() {
-        AchivementReq::CookiesBaked(n) => {
+    let req = match achievement.req() {
+        AchievementReq::CookiesBaked(n) => {
             format!(
                 "• bake {} {}",
                 n.print_float(0, 0),

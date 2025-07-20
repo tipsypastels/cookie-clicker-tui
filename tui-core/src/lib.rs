@@ -1,17 +1,19 @@
-mod achivement;
+mod achievement;
 mod building;
 mod calc;
+mod milk;
 mod req;
 mod ticker;
 mod upgrade;
 
 pub use self::{
-    achivement::{Achivement, AchivementReq},
+    achievement::{Achievement, AchievementReq},
     building::{Building, BuildingInfo},
+    milk::{Milk, MilkFlavor},
     upgrade::{Upgrade, UpgradeEffectInfo},
 };
 
-use self::{achivement::Achivements, building::Buildings, ticker::Ticker, upgrade::Upgrades};
+use self::{achievement::Achievements, building::Buildings, ticker::Ticker, upgrade::Upgrades};
 use std::collections::BTreeSet;
 
 #[derive(Debug)]
@@ -19,20 +21,20 @@ pub struct Core {
     fps: f64,
     state: State,
     computed: Computed,
-    late_computed: LateComputed,
+    computed2: Computed2,
 }
 
 impl Core {
     pub fn new(fps: f64) -> Self {
-        let state = State::new();
+        let state = State::new(fps);
         let computed = Computed::new(fps, &state);
-        let late_computed = LateComputed::new(fps);
+        let computed2 = Computed2::new(fps);
 
         Self {
             fps,
             state,
             computed,
-            late_computed,
+            computed2,
         }
     }
 
@@ -42,6 +44,10 @@ impl Core {
 
     pub fn cps(&self) -> f64 {
         self.computed.cps
+    }
+
+    pub fn milk(&self) -> &Milk {
+        &self.state.milk
     }
 
     pub fn building_infos(&self) -> impl Iterator<Item = BuildingInfo> {
@@ -60,12 +66,12 @@ impl Core {
         &self.computed.upgrades
     }
 
-    pub fn owned_achivements(&self) -> &BTreeSet<Achivement> {
-        self.late_computed.achivements.owned()
+    pub fn owned_achievements(&self) -> &BTreeSet<Achievement> {
+        self.computed2.achievements.owned()
     }
 
-    pub fn queued_achivement(&self) -> Option<Achivement> {
-        self.late_computed.achivements.queued()
+    pub fn queued_achievement(&self) -> Option<Achievement> {
+        self.computed2.achievements.queued()
     }
 
     pub fn ticker(&self) -> Option<&'static str> {
@@ -114,9 +120,12 @@ impl Core {
 
     pub fn tick(&mut self) {
         self.state.cookies += self.computed.cps / self.fps;
+        self.state
+            .milk
+            .tick(self.fps, self.computed2.achievements.owned().len() as _);
+
         self.computed.tick(self.fps, &self.state);
-        self.late_computed
-            .tick(self.fps, &self.state, &self.computed);
+        self.computed2.tick(self.fps, &self.state, &self.computed);
     }
 }
 
@@ -124,13 +133,15 @@ impl Core {
 struct State {
     cookies: f64,
     buildings: Buildings,
+    milk: Milk,
 }
 
 impl State {
-    fn new() -> Self {
+    fn new(fps: f64) -> Self {
         Self {
             cookies: 0.0,
             buildings: Buildings::new(),
+            milk: Milk::new(fps),
         }
     }
 }
@@ -170,18 +181,18 @@ impl Computed {
 }
 
 #[derive(Debug)]
-struct LateComputed {
-    achivements: Achivements,
+struct Computed2 {
+    achievements: Achievements,
 }
 
-impl LateComputed {
+impl Computed2 {
     fn new(fps: f64) -> Self {
-        let achivements = Achivements::new(fps);
+        let achievements = Achievements::new(fps);
 
-        Self { achivements }
+        Self { achievements }
     }
 
     fn tick(&mut self, fps: f64, state: &State, computed: &Computed) {
-        self.achivements.tick(fps, state, computed);
+        self.achievements.tick(fps, state, computed);
     }
 }
