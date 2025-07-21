@@ -271,7 +271,7 @@ impl fmt::Debug for BuildingInfo {
     }
 }
 
-#[derive(Serialize, Deserialize, Default, Debug, Copy, Clone)]
+#[derive(Serialize, Deserialize, Default, Copy, Clone)]
 pub struct BuildingState {
     pub count: u16,
     pub cookies_all_time: f64,
@@ -279,7 +279,7 @@ pub struct BuildingState {
     pub has_grandma_co_tiered_upgrade: bool,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct BuildingComputed {
     pub cost: f64,
     pub sell_cost: f64,

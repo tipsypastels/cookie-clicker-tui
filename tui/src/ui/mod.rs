@@ -11,7 +11,6 @@ use crate::app::{AppCountdownState, AppDebugView, AppListState, AppModalState};
 use cookie_clicker_tui_core::Core;
 use ratatui::prelude::*;
 
-#[derive(Debug)]
 pub struct UiApp<'a> {
     pub core: &'a Core,
     pub list: &'a mut AppListState,

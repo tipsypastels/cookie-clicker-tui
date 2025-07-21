@@ -21,7 +21,6 @@ use self::{
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::{collections::BTreeSet, fmt};
 
-#[derive(Debug)]
 pub struct Core {
     state: State,
     computed: Computed,
@@ -178,7 +177,7 @@ impl<'de> Deserialize<'de> for Core {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct State {
     #[serde(default = "Cookies::new")]
     cookies: Cookies,
@@ -209,7 +208,6 @@ impl State {
     }
 }
 
-#[derive(Debug)]
 struct Computed {
     cps: f64,
     ticker: Ticker,

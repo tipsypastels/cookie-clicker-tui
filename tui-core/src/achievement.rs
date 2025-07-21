@@ -315,7 +315,6 @@ pub enum Achievement {
     SpeedsTheNameOfTheGame,
 }
 
-#[derive(Debug)]
 pub enum AchievementReq {
     CookiesBaked(f64),
     Cps(f64),

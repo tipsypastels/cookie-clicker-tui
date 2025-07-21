@@ -5,13 +5,11 @@ use futures::{FutureExt, StreamExt};
 use std::time::Duration;
 use tokio::sync::mpsc;
 
-#[derive(Debug)]
 pub enum Event {
     Tick,
     Term(crossterm::event::Event),
 }
 
-#[derive(Debug)]
 pub struct Events {
     tx: mpsc::UnboundedSender<Event>,
     rx: mpsc::UnboundedReceiver<Event>,

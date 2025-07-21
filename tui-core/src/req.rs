@@ -1,7 +1,6 @@
 use crate::{Building, Computed, State};
 
 #[allow(unused)]
-#[derive(Debug)]
 pub enum Req {
     Cookies(Comparator<f64>),
     CookiesAllTime(Comparator<f64>),
@@ -31,7 +30,6 @@ impl Req {
 }
 
 #[allow(unused)]
-#[derive(Debug)]
 pub enum LateReq {
     Req(Req),
     Cps(Comparator<f64>),
@@ -72,7 +70,7 @@ impl LateReq {
 }
 
 #[allow(unused)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub enum Comparator<T> {
     Above(T),
     AboveOrEq(T),

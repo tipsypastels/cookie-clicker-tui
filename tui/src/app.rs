@@ -9,7 +9,6 @@ use enum_fun::Name;
 use ratatui::DefaultTerminal;
 use tui_widget_list::ListState;
 
-#[derive(Debug)]
 pub struct App {
     storage: Storage,
     core: Core,
@@ -21,34 +20,32 @@ pub struct App {
     quit: bool,
 }
 
-#[derive(Debug)]
 pub struct AppListState {
     buildings: ListState,
     upgrades: ListState,
     pane: AppListPane,
 }
 
-#[derive(Default, Debug, Copy, Clone, PartialEq)]
+#[derive(Default, Copy, Clone, PartialEq)]
 pub enum AppListPane {
     #[default]
     Buildings,
     Upgrades,
 }
 
-#[derive(Debug)]
 pub struct AppCountdownState {
     just_pressed_cookie: Countdown<3>,
     error_insufficient_cookies: Countdown<10>,
 }
 
-#[derive(Default, Debug, Copy, Clone)]
+#[derive(Default, Copy, Clone)]
 pub enum AppModalState {
     ListItem,
     #[default]
     Closed,
 }
 
-#[derive(Name, Default, Debug, Copy, Clone)]
+#[derive(Name, Default, Copy, Clone)]
 #[name(base = "title case")]
 pub enum AppDebugView {
     #[default]
