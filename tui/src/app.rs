@@ -1,4 +1,7 @@
-use crate::event::{Event, Events};
+use crate::{
+    event::{Event, Events},
+    storage::Storage,
+};
 use anyhow::{Context, Result};
 use cookie_clicker_tui_core::{Building, Core};
 use cookie_clicker_tui_utils::countdown::Countdown;
@@ -7,6 +10,7 @@ use tui_widget_list::ListState;
 
 #[derive(Debug)]
 pub struct App {
+    storage: Storage,
     core: Core,
     list: AppListState,
     countdown: AppCountdownState,
@@ -43,9 +47,10 @@ pub enum AppModalState {
 }
 
 impl App {
-    pub fn new() -> Self {
+    pub fn new(storage: Storage, core: Core) -> Self {
         Self {
-            core: Core::new(),
+            storage,
+            core,
             list: AppListState {
                 state: ListState::default(),
                 pane: AppListPane::default(),
@@ -68,7 +73,7 @@ impl App {
 
             match self.events.next().await? {
                 Event::Tick => {
-                    self.tick();
+                    self.tick().await?;
                 }
                 Event::Term(Key(event)) if event.is_press() => match event.code {
                     KeyCode::Up => {
@@ -103,7 +108,7 @@ impl App {
                         if !matches!(self.modal, AppModalState::Closed) {
                             self.modal = AppModalState::Closed
                         } else {
-                            self.quit = true;
+                            self.quit().await?;
                         }
                     }
                     KeyCode::Char(' ') => {
@@ -111,7 +116,7 @@ impl App {
                         self.countdown.just_pressed_cookie.run();
                     }
                     KeyCode::Char('q') => {
-                        self.quit = true;
+                        self.quit().await?;
                     }
                     KeyCode::Char('i') => {
                         self.modal.toggle();
@@ -141,9 +146,15 @@ impl App {
         Ok(())
     }
 
-    fn tick(&mut self) {
+    async fn tick(&mut self) -> Result<()> {
         self.core.tick();
         self.countdown.tick();
+        self.storage.tick(&self.core).await
+    }
+
+    async fn quit(&mut self) -> Result<()> {
+        self.quit = true;
+        self.storage.save(&self.core).await
     }
 }
 

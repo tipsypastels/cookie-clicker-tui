@@ -1,7 +1,7 @@
 use cookie_clicker_tui_utils::frames::RefreshClock;
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::ops::RangeInclusive;
 
 const PERCENT_PER_ACHIEVEMENT: u16 = 4;
@@ -48,6 +48,12 @@ impl Milk {
 
     pub fn flavor(&self) -> MilkFlavor {
         self.flavor
+    }
+}
+
+impl Serialize for Milk {
+    fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
+        self.achievements.serialize(ser)
     }
 }
 

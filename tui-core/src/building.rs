@@ -2,7 +2,7 @@ use crate::calc;
 use cookie_clicker_tui_utils::{frames::FPS, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Predicates, Variants};
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::collections::HashMap;
 
 #[derive(
@@ -10,6 +10,7 @@ use std::collections::HashMap;
     Name,
     Variants,
     Predicates,
+    Serialize,
     Deserialize,
     Debug,
     Copy,
@@ -179,6 +180,12 @@ impl Buildings {
     }
 }
 
+impl Serialize for Buildings {
+    fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
+        self.states.serialize(ser)
+    }
+}
+
 impl<'de> Deserialize<'de> for Buildings {
     fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
         let states = HashMap::deserialize(de)?;
@@ -224,7 +231,7 @@ impl BuildingInfo {
     }
 }
 
-#[derive(Deserialize, Default, Debug, Copy, Clone)]
+#[derive(Serialize, Deserialize, Default, Debug, Copy, Clone)]
 pub struct BuildingState {
     pub count: u16,
     pub cookies_all_time: f64,
