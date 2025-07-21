@@ -1,10 +1,25 @@
 use crate::calc;
 use cookie_clicker_tui_utils::{frames::FPS, num};
 use enum_assoc::Assoc;
-use enum_fun::{Name, Variants};
+use enum_fun::{Name, Predicates, Variants};
+use serde::{Deserialize, Deserializer};
 use std::collections::HashMap;
 
-#[derive(Assoc, Name, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Assoc,
+    Name,
+    Variants,
+    Predicates,
+    Deserialize,
+    Debug,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+)]
 #[func(pub(crate) const fn base_cost(self) -> f64)]
 #[func(pub(crate) const fn base_cps(self) -> f64)]
 #[name(base = "title case")]
@@ -164,6 +179,14 @@ impl Buildings {
     }
 }
 
+impl<'de> Deserialize<'de> for Buildings {
+    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
+        let states = HashMap::deserialize(de)?;
+        let computeds = HashMap::new();
+        Ok(Self { states, computeds })
+    }
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct BuildingInfo {
     building: Building,
@@ -201,7 +224,7 @@ impl BuildingInfo {
     }
 }
 
-#[derive(Default, Debug, Copy, Clone)]
+#[derive(Deserialize, Default, Debug, Copy, Clone)]
 pub struct BuildingState {
     pub count: u16,
     pub cookies_all_time: f64,

@@ -9,3 +9,4 @@ cookie-clicker-tui-utils.workspace = true
 enum-assoc.workspace = true
 enum-fun.workspace = true
 rand.workspace = true
+serde.workspace = true

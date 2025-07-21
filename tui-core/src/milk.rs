@@ -1,6 +1,7 @@
 use cookie_clicker_tui_utils::frames::RefreshClock;
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
+use serde::{Deserialize, Deserializer};
 use std::ops::RangeInclusive;
 
 const PERCENT_PER_ACHIEVEMENT: u16 = 4;
@@ -47,6 +48,12 @@ impl Milk {
 
     pub fn flavor(&self) -> MilkFlavor {
         self.flavor
+    }
+}
+
+impl<'de> Deserialize<'de> for Milk {
+    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
+        u16::deserialize(de).map(Self::_new)
     }
 }
 

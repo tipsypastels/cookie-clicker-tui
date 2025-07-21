@@ -15,6 +15,7 @@ pub use self::{
 
 use self::{achievement::Achievements, building::Buildings, ticker::Ticker, upgrade::Upgrades};
 use cookie_clicker_tui_utils::frames::FPS;
+use serde::{Deserialize, Deserializer};
 use std::collections::BTreeSet;
 
 #[derive(Debug)]
@@ -26,7 +27,10 @@ pub struct Core {
 
 impl Core {
     pub fn new() -> Self {
-        let state = State::new();
+        Self::from_state(State::new())
+    }
+
+    fn from_state(state: State) -> Self {
         let computed = Computed::new(&state);
         let computed2 = Computed2::new();
 
@@ -129,7 +133,19 @@ impl Core {
     }
 }
 
-#[derive(Debug)]
+impl Default for Core {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<'de> Deserialize<'de> for Core {
+    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
+        State::deserialize(de).map(Self::from_state)
+    }
+}
+
+#[derive(Deserialize, Debug)]
 struct State {
     cookies: f64,
     cookies_all_time: f64,

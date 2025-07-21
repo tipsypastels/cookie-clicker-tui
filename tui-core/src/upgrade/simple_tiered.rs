@@ -17,7 +17,7 @@ pub struct SimpleTieredUpgrade {
 impl SimpleTieredUpgrade {
     pub fn all() -> impl Iterator<Item = Self> {
         Building::variants().flat_map(|building| {
-            if matches!(building, Building::Cursor) {
+            if building.is_cursor() {
                 TEMPLATES_CURSOR
             } else {
                 TEMPLATES_NON_CURSOR
