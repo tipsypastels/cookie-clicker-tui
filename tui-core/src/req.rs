@@ -20,7 +20,7 @@ impl Req {
             Self::Cookies(c) => c.check(state.cookies.current()),
             Self::CookiesAllTime(c) => c.check(state.cookies.all_time()),
             Self::CookiesAllTimeFromClicking(c) => c.check(state.cookies.all_time_from_clicking()),
-            Self::BuildingCountMin(b, c) => state.buildings.state(*b).count >= *c,
+            Self::BuildingCountMin(b, c) => state.buildings.count(*b) >= *c,
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state)),

@@ -3,7 +3,6 @@ use cookie_clicker_tui_utils::{frames::FPS, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Predicates, Variants};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::collections::HashMap;
 
 #[derive(
     Assoc,
@@ -82,15 +81,15 @@ impl Building {
 
 #[derive(Debug)]
 pub struct Buildings {
-    states: HashMap<Building, BuildingState>,
-    computeds: HashMap<Building, BuildingComputed>,
+    states: BuildingMap<BuildingState>,
+    computeds: BuildingMap<Option<BuildingComputed>>,
 }
 
 impl Buildings {
     pub fn new() -> Self {
         Self {
-            states: HashMap::new(),
-            computeds: HashMap::new(),
+            states: BuildingMap::new(),
+            computeds: BuildingMap::new(),
         }
     }
 
@@ -101,8 +100,8 @@ impl Buildings {
     pub fn info(&self, building: Building) -> BuildingInfo {
         BuildingInfo {
             building,
-            state: self.state(building),
-            computed: self.computed(building),
+            state: self.get_state(building),
+            computed: self.get_or_calc_computed(building),
         }
     }
 
@@ -111,41 +110,47 @@ impl Buildings {
     }
 
     pub fn modify(&mut self, building: Building, f: impl Fn(&mut BuildingState) + Clone) {
-        let state = *self
-            .states
-            .entry(building)
-            .and_modify(f.clone())
-            .or_insert_with(|| {
-                let mut state = BuildingState::default();
-                f(&mut state);
-                state
-            });
-
-        let computed = self.compute(building, state);
-        self.computeds.insert(building, computed);
+        f(self.states.get_mut(building));
+        self.recalc_computed(building);
     }
 
     pub fn tick(&mut self) {
         for building in Building::variants() {
-            let Some(cps) = self.computeds.get(&building).map(|c| c.cps) else {
-                continue;
-            };
-            let Some(state) = self.states.get_mut(&building) else {
-                continue;
-            };
+            let cps = self.get_or_insert_computed(building).cps;
+            let state = self.states.get_mut(building);
+
             state.cookies_all_time += cps / FPS;
         }
     }
 
-    pub fn state(&self, building: Building) -> BuildingState {
-        self.states.get(&building).copied().unwrap_or_default()
+    pub fn count(&self, building: Building) -> u16 {
+        self.get_state(building).count
     }
 
-    pub fn computed(&self, building: Building) -> BuildingComputed {
+    pub fn get_state(&self, building: Building) -> BuildingState {
+        *self.states.get(building)
+    }
+
+    fn get_or_calc_computed(&self, building: Building) -> BuildingComputed {
         self.computeds
-            .get(&building)
-            .copied()
-            .unwrap_or_else(|| self.compute(building, self.state(building)))
+            .get(building)
+            .unwrap_or_else(|| self.compute(building, self.get_state(building)))
+    }
+
+    fn get_or_insert_computed(&mut self, building: Building) -> BuildingComputed {
+        if let Some(&computed) = self.computeds.get(building).as_ref() {
+            return computed;
+        }
+
+        self.recalc_computed(building)
+    }
+
+    fn recalc_computed(&mut self, building: Building) -> BuildingComputed {
+        let state = self.get_state(building);
+        let computed = self.compute(building, state);
+
+        *self.computeds.get_mut(building) = Some(computed);
+        computed
     }
 
     fn compute(&self, building: Building, state: BuildingState) -> BuildingComputed {
@@ -159,7 +164,7 @@ impl Buildings {
                 },
                 _ => calc::BuildingCpsClass::Other {
                     grandma_count_for_co_tiered_upgrade: if state.has_grandma_co_tiered_upgrade {
-                        Some(self.state(Building::Grandma).count)
+                        Some(self.states.grandma.count)
                     } else {
                         None
                     },
@@ -173,9 +178,8 @@ impl Buildings {
     }
 
     fn grandma_co_tiered_upgrade_count(&self) -> u16 {
-        self.states
-            .values()
-            .map(|s| s.has_grandma_co_tiered_upgrade as u16)
+        Building::variants()
+            .map(|b| self.states.get(b).has_grandma_co_tiered_upgrade as u16)
             .sum()
     }
 }
@@ -188,8 +192,8 @@ impl Serialize for Buildings {
 
 impl<'de> Deserialize<'de> for Buildings {
     fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        let states = HashMap::deserialize(de)?;
-        let computeds = HashMap::new();
+        let states = BuildingMap::deserialize(de)?;
+        let computeds = BuildingMap::new();
         Ok(Self { states, computeds })
     }
 }
@@ -243,6 +247,61 @@ pub struct BuildingState {
 pub struct BuildingComputed {
     pub cost: f64,
     pub cps: f64,
+}
+
+macro_rules! make_building_map {
+    ($($field:ident: $variant:ident),*$(,)?) => {
+        #[derive(Serialize, Deserialize, Debug)]
+        struct BuildingMap<T> {
+            $(#[serde(default)] $field: T),*
+        }
+
+        impl<T> BuildingMap<T> {
+            fn new() -> Self
+            where
+                T: Default,
+            {
+                Self {
+                    $($field: Default::default()),*
+                }
+            }
+
+            fn get(&self, building: Building) -> &T {
+                match building {
+                    $(Building::$variant => &self.$field),*
+                }
+            }
+
+            fn get_mut(&mut self, building: Building) -> &mut T {
+                match building {
+                    $(Building::$variant => &mut self.$field),*
+                }
+            }
+        }
+    };
+}
+
+make_building_map! {
+    cursor: Cursor,
+    grandma: Grandma,
+    farm: Farm,
+    mine: Mine,
+    factory: Factory,
+    bank: Bank,
+    temple: Temple,
+    wizard_tower: WizardTower,
+    shipment: Shipment,
+    alchemy_lab: AlchemyLab,
+    portal: Portal,
+    time_machine: TimeMachine,
+    antimatter_condenser: AntimatterCondenser,
+    prism: Prism,
+    chancemaker: Chancemaker,
+    fractal_engine: FractalEngine,
+    rust_playground: RustPlayground,
+    idleverse: Idleverse,
+    cortex_baker: CortexBaker,
+    you: You,
 }
 
 macro_rules! all_the_buildings {
