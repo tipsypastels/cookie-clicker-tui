@@ -8,6 +8,10 @@ pub fn building_cost(building: Building, count: u16) -> f64 {
     building.base_cost() * 1.15f64.powi(count as _)
 }
 
+pub fn building_sell_cost(cost: f64) -> f64 {
+    cost * (1.0 / 4.5)
+}
+
 pub struct BuildingCps {
     pub building: Building,
     pub building_class: BuildingCpsClass,

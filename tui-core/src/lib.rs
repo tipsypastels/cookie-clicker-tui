@@ -109,6 +109,19 @@ impl Core {
         true
     }
 
+    pub fn sell_building(&mut self, building: Building) -> bool {
+        let info = self.building_info(building);
+
+        if info.count() == 0 {
+            return false;
+        };
+
+        self.state.cookies.gain(info.sell_cost());
+        self.state.buildings.modify(building, |b| b.count -= 1);
+
+        true
+    }
+
     pub fn buy_upgrade(&mut self, index: usize) -> bool {
         let Some(upgrade) = self.computed.upgrades.get(index) else {
             return false;

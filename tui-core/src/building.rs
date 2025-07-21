@@ -155,6 +155,8 @@ impl Buildings {
 
     fn compute(&self, building: Building, state: BuildingState) -> BuildingComputed {
         let cost = calc::building_cost(building, state.count);
+        let sell_cost = calc::building_sell_cost(cost);
+
         let cps = calc::building_cps(calc::BuildingCps {
             building,
             building_class: match building {
@@ -174,7 +176,11 @@ impl Buildings {
             simple_tiered_upgrade_count: state.simple_tiered_upgrade_count,
         });
 
-        BuildingComputed { cost, cps }
+        BuildingComputed {
+            cost,
+            sell_cost,
+            cps,
+        }
     }
 
     fn grandma_co_tiered_upgrade_count(&self) -> u16 {
@@ -230,6 +236,10 @@ impl BuildingInfo {
         self.computed.cost
     }
 
+    pub fn sell_cost(&self) -> f64 {
+        self.computed.sell_cost
+    }
+
     pub fn cps(&self) -> f64 {
         self.computed.cps
     }
@@ -246,6 +256,7 @@ pub struct BuildingState {
 #[derive(Debug, Copy, Clone)]
 pub struct BuildingComputed {
     pub cost: f64,
+    pub sell_cost: f64,
     pub cps: f64,
 }
 
