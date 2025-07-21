@@ -2,7 +2,10 @@ mod debug;
 mod list;
 mod modal;
 
-pub use self::debug::{AppDebugState, AppDebugView};
+pub use self::{
+    debug::{AppDebugState, AppDebugView},
+    list::{AppListPane, AppListPointee, AppListState},
+};
 
 use crate::{
     event::{Event, Events, REVERSE_MODIFIER},
@@ -13,7 +16,6 @@ use cookie_clicker_tui_core::{Building, Core};
 use cookie_clicker_tui_utils::countdown::{Countdown, CountdownOf};
 use crossterm::event::KeyEvent;
 use ratatui::DefaultTerminal;
-use tui_widget_list::ListState;
 
 pub struct App {
     storage: Storage,
@@ -24,19 +26,6 @@ pub struct App {
     debug: AppDebugState,
     events: Events,
     quit: bool,
-}
-
-pub struct AppListState {
-    buildings: ListState,
-    upgrades: ListState,
-    pane: AppListPane,
-}
-
-#[derive(Default, Copy, Clone, PartialEq)]
-pub enum AppListPane {
-    #[default]
-    Buildings,
-    Upgrades,
 }
 
 pub struct AppCountdownState {
@@ -57,11 +46,7 @@ impl App {
         Self {
             storage,
             core,
-            list: AppListState {
-                buildings: ListState::default(),
-                upgrades: ListState::default(),
-                pane: AppListPane::default(),
-            },
+            list: AppListState::default(),
             countdown: AppCountdownState {
                 just_pressed_cookie: Countdown::new(),
                 error_insufficient_cookies: Countdown::new(),
@@ -110,36 +95,34 @@ impl App {
                 self.list.right(&self.core);
             }
             KeyCode::Enter if event.modifiers.contains(REVERSE_MODIFIER) => {
-                if let AppListPane::Buildings = self.list.pane
-                    && let Some(i) = self.list.buildings.selected
-                {
-                    let Some(building) = Building::nth(i) else {
-                        return Ok(());
-                    };
-                    if !self.core.sell_building(building) {
-                        self.countdown
-                            .error_tried_to_sell_unowned_building
-                            .run(building);
+                match self.list.pointee(&self.core) {
+                    Some((_, AppListPointee::Building(building))) => {
+                        if !self.core.sell_building(building) {
+                            self.countdown
+                                .error_tried_to_sell_unowned_building
+                                .run(building);
+                        }
                     }
+                    Some((_, AppListPointee::Upgrade(_))) => {
+                        todo!()
+                    }
+                    None => {}
                 }
             }
-            KeyCode::Enter => {
-                if let AppListPane::Buildings = self.list.pane
-                    && let Some(i) = self.list.buildings.selected
-                {
-                    let Some(building) = Building::nth(i) else {
-                        return Ok(());
-                    };
+
+            KeyCode::Enter => match self.list.pointee(&self.core) {
+                Some((_, AppListPointee::Building(building))) => {
                     if !self.core.buy_building(building) {
                         self.countdown.error_insufficient_cookies.run();
                     }
-                } else if let AppListPane::Upgrades = self.list.pane
-                    && let Some(i) = self.list.upgrades.selected
-                    && !self.core.buy_upgrade(i)
-                {
-                    self.countdown.error_insufficient_cookies.run();
                 }
-            }
+                Some((i, AppListPointee::Upgrade(_))) => {
+                    if !self.core.buy_upgrade(i) {
+                        self.countdown.error_insufficient_cookies.run();
+                    }
+                }
+                None => {}
+            },
             KeyCode::Esc => {
                 if !matches!(self.modal, AppModalState::Closed) {
                     self.modal = AppModalState::Closed
@@ -192,82 +175,6 @@ impl App {
     async fn quit(&mut self) -> Result<()> {
         self.quit = true;
         self.storage.save(&self.core).await
-    }
-}
-
-impl AppListState {
-    fn up(&mut self) {
-        self.state_mut().previous();
-    }
-
-    fn down(&mut self) {
-        self.state_mut().next();
-    }
-
-    fn left(&mut self, core: &Core) {
-        self.switch(core, AppListPane::prev);
-    }
-
-    fn right(&mut self, core: &Core) {
-        self.switch(core, AppListPane::next);
-    }
-
-    fn switch(&mut self, core: &Core, change: fn(AppListPane) -> AppListPane) {
-        let mut new_pane = change(self.pane);
-        loop {
-            if new_pane.available(core) {
-                break;
-            }
-            new_pane = change(new_pane);
-        }
-
-        self.pane = new_pane;
-        self.state_mut().select(Some(0));
-    }
-
-    pub fn selected(&self) -> Option<(AppListPane, usize)> {
-        self.state().selected.map(|i| (self.pane, i))
-    }
-
-    pub fn state(&self) -> &ListState {
-        match self.pane {
-            AppListPane::Buildings => &self.buildings,
-            AppListPane::Upgrades => &self.upgrades,
-        }
-    }
-
-    pub fn state_mut(&mut self) -> &mut ListState {
-        match self.pane {
-            AppListPane::Buildings => &mut self.buildings,
-            AppListPane::Upgrades => &mut self.upgrades,
-        }
-    }
-
-    pub fn state_matching_mut(&mut self, pane: AppListPane) -> Option<&mut ListState> {
-        (self.pane == pane).then(|| self.state_mut())
-    }
-}
-
-impl AppListPane {
-    fn available(self, core: &Core) -> bool {
-        match self {
-            Self::Buildings => true,
-            Self::Upgrades => !core.upgrades().is_empty(),
-        }
-    }
-
-    fn prev(self) -> Self {
-        match self {
-            Self::Buildings => Self::Upgrades,
-            Self::Upgrades => Self::Buildings,
-        }
-    }
-
-    fn next(self) -> Self {
-        match self {
-            Self::Buildings => Self::Upgrades,
-            Self::Upgrades => Self::Buildings,
-        }
     }
 }
 

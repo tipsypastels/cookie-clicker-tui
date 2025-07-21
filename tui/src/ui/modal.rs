@@ -1,6 +1,6 @@
 use super::{UiApp, utils::num::PrintFloat};
-use crate::app::{AppListPane, AppModalState};
-use cookie_clicker_tui_core::{Building, UpgradeEffectInfo};
+use crate::app::{AppListPointee, AppModalState};
+use cookie_clicker_tui_core::{Building, Upgrade, UpgradeEffectInfo};
 use ratatui::{
     prelude::*,
     widgets::{Block, Clear, Paragraph},
@@ -17,19 +17,14 @@ pub fn modal(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 }
 
 fn render_list_item(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
-    let Some((pane, index)) = app.list.selected() else {
-        return;
-    };
-    match pane {
-        AppListPane::Buildings => render_building(app, index, area, buf),
-        AppListPane::Upgrades => render_upgrade(app, index, area, buf),
+    match app.list.pointee(app.core) {
+        Some((_, AppListPointee::Building(building))) => render_building(app, building, area, buf),
+        Some((_, AppListPointee::Upgrade(upgrade))) => render_upgrade(upgrade, area, buf),
+        None => {}
     }
 }
 
-fn render_building(app: &mut UiApp, index: usize, area: Rect, buf: &mut Buffer) {
-    let Some(building) = Building::nth(index) else {
-        return;
-    };
+fn render_building(app: &mut UiApp, building: Building, area: Rect, buf: &mut Buffer) {
     let info = app.core.building_info(building);
     let count = info.count();
     let name = building.name_pluralized(count as _);
@@ -89,11 +84,7 @@ fn render_building(app: &mut UiApp, index: usize, area: Rect, buf: &mut Buffer) 
     });
 }
 
-fn render_upgrade(app: &mut UiApp, index: usize, area: Rect, buf: &mut Buffer) {
-    let Some(upgrade) = app.core.upgrades().get(index) else {
-        return;
-    };
-
+fn render_upgrade(upgrade: &Upgrade, area: Rect, buf: &mut Buffer) {
     let title = format!(" {} ", upgrade.label());
 
     render_outer(area, buf, title, |area, buf, block| {

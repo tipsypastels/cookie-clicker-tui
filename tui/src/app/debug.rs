@@ -17,6 +17,7 @@ pub enum AppDebugView {
     Achievements,
     Milk,
     Ticker,
+    List,
     Keypress,
 }
 
@@ -53,7 +54,8 @@ impl AppDebugView {
             Self::Upgrades => Self::Achievements,
             Self::Achievements => Self::Milk,
             Self::Milk => Self::Ticker,
-            Self::Ticker => Self::Keypress,
+            Self::Ticker => Self::List,
+            Self::List => Self::Keypress,
             Self::Keypress => Self::Cookies,
         }
     }
