@@ -5,6 +5,7 @@ use crate::{
 use anyhow::{Context, Result};
 use cookie_clicker_tui_core::{Building, Core};
 use cookie_clicker_tui_utils::countdown::Countdown;
+use crossterm::event::KeyEvent;
 use enum_fun::Name;
 use ratatui::DefaultTerminal;
 use tui_widget_list::ListState;
@@ -16,6 +17,7 @@ pub struct App {
     countdown: AppCountdownState,
     modal: AppModalState,
     debug: Option<AppDebugView>,
+    latest_key: Option<KeyEvent>,
     events: Events,
     quit: bool,
 }
@@ -52,6 +54,7 @@ pub enum AppDebugView {
     Cookies,
     Buildings,
     Upgrades,
+    Keypress,
 }
 
 impl App {
@@ -70,6 +73,7 @@ impl App {
             },
             modal: AppModalState::default(),
             debug: None,
+            latest_key: None,
             events: Events::new(),
             quit: false,
         }
@@ -77,74 +81,84 @@ impl App {
 
     pub async fn run(mut self, term: &mut DefaultTerminal) -> Result<()> {
         while !self.quit {
-            use crossterm::event::{Event::Key, KeyCode};
-
             self.draw(term)?;
 
             match self.events.next().await? {
                 Event::Tick => {
                     self.tick().await?;
                 }
-                Event::Term(Key(event)) if event.is_press() => match event.code {
-                    KeyCode::Up => {
-                        self.list.up();
-                    }
-                    KeyCode::Down => {
-                        self.list.down();
-                    }
-                    KeyCode::Left => {
-                        self.list.left(&self.core);
-                    }
-                    KeyCode::Right => {
-                        self.list.right(&self.core);
-                    }
-                    KeyCode::Enter => {
-                        if let AppListPane::Buildings = self.list.pane
-                            && let Some(i) = self.list.buildings.selected
-                        {
-                            let Some(building) = Building::nth(i) else {
-                                continue;
-                            };
-                            if !self.core.buy_building(building) {
-                                self.countdown.error_insufficient_cookies.run();
-                            }
-                        } else if let AppListPane::Upgrades = self.list.pane
-                            && let Some(i) = self.list.upgrades.selected
-                            && !self.core.buy_upgrade(i)
-                        {
-                            self.countdown.error_insufficient_cookies.run();
-                        }
-                    }
-                    KeyCode::Esc => {
-                        if !matches!(self.modal, AppModalState::Closed) {
-                            self.modal = AppModalState::Closed
-                        } else if self.debug.is_some() {
-                            self.debug = None;
-                        } else {
-                            self.quit().await?;
-                        }
-                    }
-                    KeyCode::Char(' ') => {
-                        self.core.click_cookie();
-                        self.countdown.just_pressed_cookie.run();
-                    }
-                    KeyCode::Char('q') => {
-                        self.quit().await?;
-                    }
-                    KeyCode::Char('i') => {
-                        self.modal.toggle();
-                    }
-                    KeyCode::Char('/') => {
-                        self.debug = self
-                            .debug
-                            .map(|v| v.next())
-                            .or_else(|| Some(Default::default()));
-                    }
-                    _ => {}
-                },
+                Event::Term(crossterm::event::Event::Key(event)) if event.is_press() => {
+                    self.handle_key_event(event).await?;
+                }
                 _ => {}
             }
         }
+        Ok(())
+    }
+
+    async fn handle_key_event(&mut self, event: KeyEvent) -> Result<()> {
+        use crossterm::event::KeyCode;
+
+        self.latest_key = Some(event);
+
+        match event.code {
+            KeyCode::Up => {
+                self.list.up();
+            }
+            KeyCode::Down => {
+                self.list.down();
+            }
+            KeyCode::Left => {
+                self.list.left(&self.core);
+            }
+            KeyCode::Right => {
+                self.list.right(&self.core);
+            }
+            KeyCode::Enter => {
+                if let AppListPane::Buildings = self.list.pane
+                    && let Some(i) = self.list.buildings.selected
+                {
+                    let Some(building) = Building::nth(i) else {
+                        return Ok(());
+                    };
+                    if !self.core.buy_building(building) {
+                        self.countdown.error_insufficient_cookies.run();
+                    }
+                } else if let AppListPane::Upgrades = self.list.pane
+                    && let Some(i) = self.list.upgrades.selected
+                    && !self.core.buy_upgrade(i)
+                {
+                    self.countdown.error_insufficient_cookies.run();
+                }
+            }
+            KeyCode::Esc => {
+                if !matches!(self.modal, AppModalState::Closed) {
+                    self.modal = AppModalState::Closed
+                } else if self.debug.is_some() {
+                    self.debug = None;
+                } else {
+                    self.quit().await?;
+                }
+            }
+            KeyCode::Char(' ') => {
+                self.core.click_cookie();
+                self.countdown.just_pressed_cookie.run();
+            }
+            KeyCode::Char('q') => {
+                self.quit().await?;
+            }
+            KeyCode::Char('i') => {
+                self.modal.toggle();
+            }
+            KeyCode::Char('/') => {
+                self.debug = self
+                    .debug
+                    .map(|v| v.next())
+                    .or_else(|| Some(Default::default()));
+            }
+            _ => {}
+        }
+
         Ok(())
     }
 
@@ -156,6 +170,7 @@ impl App {
                 countdown: &self.countdown,
                 modal: self.modal,
                 debug: self.debug,
+                latest_key: self.latest_key,
             };
             crate::ui::ui(&mut ui, frame);
         })
@@ -280,7 +295,8 @@ impl AppDebugView {
         match self {
             Self::Cookies => Self::Buildings,
             Self::Buildings => Self::Upgrades,
-            Self::Upgrades => Self::Cookies,
+            Self::Upgrades => Self::Keypress,
+            Self::Keypress => Self::Cookies,
         }
     }
 }

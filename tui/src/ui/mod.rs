@@ -9,6 +9,7 @@ mod utils;
 
 use crate::app::{AppCountdownState, AppDebugView, AppListState, AppModalState};
 use cookie_clicker_tui_core::Core;
+use crossterm::event::KeyEvent;
 use ratatui::prelude::*;
 
 pub struct UiApp<'a> {
@@ -17,6 +18,7 @@ pub struct UiApp<'a> {
     pub countdown: &'a AppCountdownState,
     pub modal: AppModalState,
     pub debug: Option<AppDebugView>,
+    pub latest_key: Option<KeyEvent>,
 }
 
 pub fn ui(app: &mut UiApp, frame: &mut Frame) {
