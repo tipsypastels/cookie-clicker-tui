@@ -158,7 +158,7 @@ fn render_outer<'a>(
     let block = Block::bordered()
         .border_style(Style::new().black())
         .title(Line::styled(title, Modifier::BOLD))
-        .title_bottom(Line::styled(" Close <I> ", Modifier::BOLD).right_aligned())
+        .title_bottom(Line::styled(" Close <Esc> ", Modifier::BOLD).right_aligned())
         .style(Style::new().bg(Color::DarkGray));
 
     Clear.render(area, buf);
