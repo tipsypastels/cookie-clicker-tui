@@ -28,8 +28,22 @@ impl fmt::Display for Display {
 
         macro_rules! all_the_bases {
             ($macro:ident) => {
+                $macro!(TREVIGINTILLION, " TV");
+                $macro!(DUOVIGINTILLION, " DV");
+                $macro!(UNVIGINTILLION, " UV");
+                $macro!(VIGINTILLION, " V");
+                $macro!(NOVEMDECILLION, " ND");
+                $macro!(OCTODECILLION, " OD");
+                $macro!(SEPTENDECILLION, " SpD");
+                $macro!(SEXDECILLION, " SxD");
+                $macro!(QUINDECILLION, " QiD");
+                $macro!(QUATTORDECILLION, " QaD");
+                $macro!(TREDECILLION, " TD");
+                $macro!(DUODECILLION, " DD");
+                $macro!(UNDECILLION, " UD");
+                $macro!(DECILLION, " D");
                 $macro!(NONILLION, " N");
-                $macro!(OCTILLION, " Oc");
+                $macro!(OCTILLION, " O");
                 $macro!(SEPTILLION, " Sp");
                 $macro!(SEXTILLION, " Sx");
                 $macro!(QUINTILLION, " Qi");
@@ -60,7 +74,7 @@ impl fmt::Display for Display {
         if n == n.floor() {
             write!(f, "{n:.0}")
         } else {
-            write!(f, "{n:.0$}", precision_below_base)
+            write!(f, "{n:.precision_below_base$}")
         }
     }
 }
