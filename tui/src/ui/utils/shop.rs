@@ -31,7 +31,9 @@ impl<T: ShopItemRender> ShopItemWidget<T> {
     fn label_line(&self) -> Line {
         Line::styled(
             self.item.label(),
-            Style::new().patch_if(self.selected, SELECTED_STYLE),
+            Style::new()
+                .patch_if(self.selected, SELECTED_STYLE)
+                .fg_if(!self.affordable, Color::DarkGray),
         )
     }
 
