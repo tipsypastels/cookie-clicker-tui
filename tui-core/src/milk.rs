@@ -1,43 +1,43 @@
+use cookie_clicker_tui_utils::frames::RefreshClock;
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 use std::ops::RangeInclusive;
 
 const PERCENT_PER_ACHIEVEMENT: u16 = 4;
-const SECONDS_UNTIL_REFRESH: f64 = 15.0;
 
 #[derive(Debug)]
 pub struct Milk {
     achievements: u16,
     percent: u16,
     flavor: MilkFlavor,
-    ticks_until_refresh: u16,
+    refresh: RefreshClock<15>,
 }
 
 impl Milk {
-    pub(crate) fn new(fps: f64) -> Self {
-        Self::_new(fps, 0)
+    pub(crate) fn new() -> Self {
+        Self::_new(0)
     }
 
-    fn _new(fps: f64, achievements: u16) -> Self {
+    fn _new(achievements: u16) -> Self {
         let percent = achievements * PERCENT_PER_ACHIEVEMENT;
         let flavor = MilkFlavor::find(achievements);
-        let ticks_until_refresh = (SECONDS_UNTIL_REFRESH * fps) as u16;
+        let refresh = RefreshClock::new();
 
         Self {
             achievements,
             percent,
             flavor,
-            ticks_until_refresh,
+            refresh,
         }
     }
 
-    pub(crate) fn tick(&mut self, fps: f64, achievements: u16) {
-        if let Some(ticks_until_refresh) = self.ticks_until_refresh.checked_sub(1) {
-            self.ticks_until_refresh = ticks_until_refresh;
-        } else if achievements > self.achievements {
-            *self = Self::_new(fps, achievements);
-        } else {
-            self.ticks_until_refresh = (SECONDS_UNTIL_REFRESH * fps) as u16;
+    pub(crate) fn tick(&mut self, achievements: u16) {
+        if self.refresh.finish() {
+            if achievements > self.achievements {
+                *self = Self::_new(achievements);
+            } else {
+                self.refresh.restart();
+            }
         }
     }
 

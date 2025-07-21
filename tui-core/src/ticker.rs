@@ -1,8 +1,6 @@
 use crate::{State, req::Req};
-use cookie_clicker_tui_utils::num;
+use cookie_clicker_tui_utils::{frames::RefreshClock, num};
 use rand::seq::IndexedRandom;
-
-const SECONDS_UNTIL_CHANGE: f64 = 30.0;
 
 static ENTRIES: &[(&str, Req)] = &[
     (
@@ -118,18 +116,18 @@ static ENTRIES: &[(&str, Req)] = &[
 #[derive(Debug)]
 pub struct Ticker {
     current_index: Option<usize>,
-    ticks_until_change: u16,
+    refresh: RefreshClock<30>,
 }
 
 impl Ticker {
-    pub fn new(fps: f64, state: &State) -> Self {
+    pub fn new(state: &State) -> Self {
         let enabled_indices = get_indices(state);
         let current_index = enabled_indices.choose(&mut rand::rng()).copied();
-        let ticks_until_change = (SECONDS_UNTIL_CHANGE * fps) as u16;
+        let refresh = RefreshClock::new();
 
         Self {
             current_index,
-            ticks_until_change,
+            refresh,
         }
     }
 
@@ -137,11 +135,9 @@ impl Ticker {
         self.current_index.and_then(|i| ENTRIES.get(i).map(|e| e.0))
     }
 
-    pub fn tick(&mut self, fps: f64, state: &State) {
-        if let Some(ticks_until_change) = self.ticks_until_change.checked_sub(1) {
-            self.ticks_until_change = ticks_until_change;
-        } else {
-            *self = Self::new(fps, state);
+    pub fn tick(&mut self, state: &State) {
+        if self.refresh.finish() {
+            *self = Self::new(state);
         }
     }
 }

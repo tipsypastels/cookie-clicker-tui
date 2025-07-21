@@ -1,4 +1,4 @@
-use crate::event::{Event, Events, FPS};
+use crate::event::{Event, Events};
 use anyhow::{Context, Result};
 use cookie_clicker_tui_core::{Building, Core};
 use cookie_clicker_tui_utils::countdown::Countdown;
@@ -45,7 +45,7 @@ pub enum AppModalState {
 impl App {
     pub fn new() -> Self {
         Self {
-            core: Core::new(FPS),
+            core: Core::new(),
             list: AppListState {
                 state: ListState::default(),
                 pane: AppListPane::default(),

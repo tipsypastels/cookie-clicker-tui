@@ -1,4 +1,5 @@
 pub mod countdown;
+pub mod frames;
 pub mod num;
 
 pub fn pluralized<T>(n: usize, singular: T, plural: T) -> T {

@@ -19,6 +19,12 @@ impl<const MAX: u16> Countdown<MAX> {
     }
 }
 
+impl<const MAX: u16> Default for Countdown<MAX> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug)]
 pub struct CountdownOf<T, const MAX: u16>(Option<(u16, T)>);
 
@@ -44,5 +50,11 @@ impl<T, const MAX: u16> CountdownOf<T, MAX> {
             .0
             .take()
             .and_then(|(n, t)| Some((n.checked_sub(1)?, t)))
+    }
+}
+
+impl<T, const MAX: u16> Default for CountdownOf<T, MAX> {
+    fn default() -> Self {
+        Self::new()
     }
 }

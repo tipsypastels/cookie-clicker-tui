@@ -1,32 +1,28 @@
 use crate::{Computed, State, req::LateReq};
-use cookie_clicker_tui_utils::num;
+use cookie_clicker_tui_utils::{frames::RefreshClock, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 use std::collections::{BTreeSet, VecDeque};
-
-const SECONDS_UNTIL_REFRESH: f64 = 10.0;
 
 #[derive(Debug)]
 pub struct Achievements {
     owned: BTreeSet<Achievement>,
     display_queue: VecDeque<Achievement>,
-    ticks_until_refresh: u16,
+    refresh: RefreshClock<10>,
 }
 
 impl Achievements {
-    pub fn new(fps: f64) -> Self {
+    pub fn new() -> Self {
         Self {
             owned: BTreeSet::new(),
             display_queue: VecDeque::new(),
-            ticks_until_refresh: (SECONDS_UNTIL_REFRESH * fps) as u16,
+            refresh: RefreshClock::new(),
         }
     }
 
-    pub fn tick(&mut self, fps: f64, state: &State, computed: &Computed) {
-        if let Some(ticks_until_refresh) = self.ticks_until_refresh.checked_sub(1) {
-            self.ticks_until_refresh = ticks_until_refresh;
-        } else {
-            self.ticks_until_refresh = (SECONDS_UNTIL_REFRESH * fps) as u16;
+    pub fn tick(&mut self, state: &State, computed: &Computed) {
+        if self.refresh.finish() {
+            self.refresh.restart();
             self.display_queue.pop_front();
 
             for achievement in Achievement::variants() {

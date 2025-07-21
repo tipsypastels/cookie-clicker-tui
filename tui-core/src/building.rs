@@ -1,4 +1,5 @@
-use cookie_clicker_tui_utils::num;
+use crate::calc;
+use cookie_clicker_tui_utils::{frames::FPS, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 use std::collections::HashMap;
@@ -108,7 +109,7 @@ impl Buildings {
         self.computeds.insert(building, computed);
     }
 
-    pub fn tick(&mut self, fps: f64) {
+    pub fn tick(&mut self) {
         for building in Building::variants() {
             let Some(cps) = self.computeds.get(&building).map(|c| c.cps) else {
                 continue;
@@ -116,7 +117,7 @@ impl Buildings {
             let Some(state) = self.states.get_mut(&building) else {
                 continue;
             };
-            state.cookies_all_time += cps / fps;
+            state.cookies_all_time += cps / FPS;
         }
     }
 
@@ -242,5 +243,3 @@ macro_rules! all_the_buildings {
 }
 
 pub(crate) use all_the_buildings;
-
-use crate::calc;

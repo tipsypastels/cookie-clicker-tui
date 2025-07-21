@@ -14,24 +14,23 @@ pub use self::{
 };
 
 use self::{achievement::Achievements, building::Buildings, ticker::Ticker, upgrade::Upgrades};
+use cookie_clicker_tui_utils::frames::FPS;
 use std::collections::BTreeSet;
 
 #[derive(Debug)]
 pub struct Core {
-    fps: f64,
     state: State,
     computed: Computed,
     computed2: Computed2,
 }
 
 impl Core {
-    pub fn new(fps: f64) -> Self {
-        let state = State::new(fps);
-        let computed = Computed::new(fps, &state);
-        let computed2 = Computed2::new(fps);
+    pub fn new() -> Self {
+        let state = State::new();
+        let computed = Computed::new(&state);
+        let computed2 = Computed2::new();
 
         Self {
-            fps,
             state,
             computed,
             computed2,
@@ -98,7 +97,7 @@ impl Core {
         self.state.buildings.modify(building, |b| b.count += 1);
 
         self.computed.recalc_cps(&self.state);
-        self.computed.recalc_upgrades(self.fps, &self.state);
+        self.computed.recalc_upgrades(&self.state);
 
         true
     }
@@ -118,15 +117,15 @@ impl Core {
         upgrade.buy(&mut self.state);
 
         self.computed.recalc_cps(&self.state);
-        self.computed.recalc_upgrades(self.fps, &self.state);
+        self.computed.recalc_upgrades(&self.state);
 
         true
     }
 
     pub fn tick(&mut self) {
-        self.state.tick(self.fps, &self.computed, &self.computed2);
-        self.computed.tick(self.fps, &self.state);
-        self.computed2.tick(self.fps, &self.state, &self.computed);
+        self.state.tick(&self.computed, &self.computed2);
+        self.computed.tick(&self.state);
+        self.computed2.tick(&self.state, &self.computed);
     }
 }
 
@@ -139,23 +138,23 @@ struct State {
 }
 
 impl State {
-    fn new(fps: f64) -> Self {
+    fn new() -> Self {
         Self {
             cookies: 0.0,
             cookies_all_time: 0.0,
             buildings: Buildings::new(),
-            milk: Milk::new(fps),
+            milk: Milk::new(),
         }
     }
 
-    fn tick(&mut self, fps: f64, computed: &Computed, computed2: &Computed2) {
-        let addl_cookies = computed.cps / fps;
+    fn tick(&mut self, computed: &Computed, computed2: &Computed2) {
+        let addl_cookies = computed.cps / FPS;
 
         self.cookies += addl_cookies;
         self.cookies_all_time += addl_cookies;
-        self.buildings.tick(fps);
-        self.milk
-            .tick(fps, computed2.achievements.owned().len() as _);
+
+        self.buildings.tick();
+        self.milk.tick(computed2.achievements.owned().len() as _);
     }
 }
 
@@ -167,10 +166,10 @@ struct Computed {
 }
 
 impl Computed {
-    fn new(fps: f64, state: &State) -> Self {
+    fn new(state: &State) -> Self {
         let cps = self::calc::cps(state);
-        let ticker = Ticker::new(fps, state);
-        let upgrades = Upgrades::new(fps, state);
+        let ticker = Ticker::new(state);
+        let upgrades = Upgrades::new(state);
 
         Self {
             cps,
@@ -179,17 +178,17 @@ impl Computed {
         }
     }
 
-    fn tick(&mut self, fps: f64, state: &State) {
-        self.ticker.tick(fps, state);
-        self.upgrades.tick(fps, state);
+    fn tick(&mut self, state: &State) {
+        self.ticker.tick(state);
+        self.upgrades.tick(state);
     }
 
     fn recalc_cps(&mut self, state: &State) {
         self.cps = self::calc::cps(state);
     }
 
-    fn recalc_upgrades(&mut self, fps: f64, state: &State) {
-        self.upgrades = Upgrades::new(fps, state);
+    fn recalc_upgrades(&mut self, state: &State) {
+        self.upgrades = Upgrades::new(state);
     }
 }
 
@@ -199,13 +198,13 @@ struct Computed2 {
 }
 
 impl Computed2 {
-    fn new(fps: f64) -> Self {
-        let achievements = Achievements::new(fps);
+    fn new() -> Self {
+        let achievements = Achievements::new();
 
         Self { achievements }
     }
 
-    fn tick(&mut self, fps: f64, state: &State, computed: &Computed) {
-        self.achievements.tick(fps, state, computed);
+    fn tick(&mut self, state: &State, computed: &Computed) {
+        self.achievements.tick(state, computed);
     }
 }

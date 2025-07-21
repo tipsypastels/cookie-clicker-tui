@@ -1,0 +1,33 @@
+pub const FPS: f64 = 30.0;
+
+#[derive(Debug)]
+pub struct RefreshClock<const SECONDS: u16> {
+    ticks_until_refresh: u16,
+}
+
+impl<const SECONDS: u16> RefreshClock<SECONDS> {
+    pub fn new() -> Self {
+        Self {
+            ticks_until_refresh: SECONDS * FPS as u16,
+        }
+    }
+
+    pub fn restart(&mut self) {
+        *self = Self::new();
+    }
+
+    pub fn finish(&mut self) -> bool {
+        if let Some(ticks_until_refresh) = self.ticks_until_refresh.checked_sub(1) {
+            self.ticks_until_refresh = ticks_until_refresh;
+            false
+        } else {
+            true
+        }
+    }
+}
+
+impl<const SECONDS: u16> Default for RefreshClock<SECONDS> {
+    fn default() -> Self {
+        Self::new()
+    }
+}

@@ -1,10 +1,9 @@
 use anyhow::{Context, Result};
+use cookie_clicker_tui_utils::frames::FPS;
 use crossterm::event::EventStream;
 use futures::{FutureExt, StreamExt};
 use std::time::Duration;
 use tokio::sync::mpsc;
-
-pub const FPS: f64 = 30.0;
 
 #[derive(Debug)]
 pub enum Event {

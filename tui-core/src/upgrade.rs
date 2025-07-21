@@ -6,32 +6,26 @@ pub use self::effect_info::UpgradeEffectInfo;
 
 use self::{grandma_co_tiered::GrandmaCoTieredUpgrade, simple_tiered::SimpleTieredUpgrade};
 use crate::State;
+use cookie_clicker_tui_utils::frames::RefreshClock;
 use std::ops::Deref;
-
-const SECONDS_UNTIL_REFRESH: f64 = 5.0;
 
 #[derive(Debug)]
 pub struct Upgrades {
     list: Box<[Upgrade]>,
-    ticks_until_refresh: u16,
+    refresh: RefreshClock<5>,
 }
 
 impl Upgrades {
-    pub fn new(fps: f64, state: &State) -> Self {
+    pub fn new(state: &State) -> Self {
         let list = Upgrade::unlocked(state);
-        let ticks_until_refresh = (SECONDS_UNTIL_REFRESH * fps) as u16;
+        let refresh = RefreshClock::new();
 
-        Self {
-            list,
-            ticks_until_refresh,
-        }
+        Self { list, refresh }
     }
 
-    pub fn tick(&mut self, fps: f64, state: &State) {
-        if let Some(ticks_until_refresh) = self.ticks_until_refresh.checked_sub(1) {
-            self.ticks_until_refresh = ticks_until_refresh;
-        } else {
-            *self = Self::new(fps, state)
+    pub fn tick(&mut self, state: &State) {
+        if self.refresh.finish() {
+            *self = Self::new(state);
         }
     }
 }
