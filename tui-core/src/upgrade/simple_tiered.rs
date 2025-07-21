@@ -37,7 +37,7 @@ impl SimpleTieredUpgrade {
             upgrade.index
                 >= state
                     .buildings
-                    .get(upgrade.building)
+                    .state(upgrade.building)
                     .simple_tiered_upgrade_count as usize
         })
     }

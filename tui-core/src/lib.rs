@@ -153,6 +153,7 @@ impl State {
 
         self.cookies += addl_cookies;
         self.cookies_all_time += addl_cookies;
+        self.buildings.tick(fps);
         self.milk
             .tick(fps, computed2.achievements.owned().len() as _);
     }

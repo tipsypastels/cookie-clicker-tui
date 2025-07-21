@@ -7,7 +7,7 @@ use ratatui::{
 };
 use std::borrow::Cow;
 
-const SCREEN_PERCENT: (u16, u16) = (60, 25);
+const SCREEN_PERCENT: (u16, u16) = (60, 31);
 
 pub fn modal(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     match app.modal {
@@ -79,9 +79,23 @@ fn render_building(app: &mut UiApp, index: usize, area: Rect, buf: &mut Buffer) 
             Span::raw(" cookies per second"),
         ]);
 
-        Paragraph::new(vec![cps_per_line, cps_line, cps_percent_line])
-            .block(block)
-            .render(area, buf);
+        let cookies_all_time_line = Line::from(vec![
+            Span::raw("• produced "),
+            Span::styled(
+                format!("{}", info.cookies_all_time().print_float(0, 0)),
+                Modifier::BOLD,
+            ),
+            Span::raw(" cookies in all time"),
+        ]);
+
+        Paragraph::new(vec![
+            cps_per_line,
+            cps_line,
+            cps_percent_line,
+            cookies_all_time_line,
+        ])
+        .block(block)
+        .render(area, buf);
     });
 }
 

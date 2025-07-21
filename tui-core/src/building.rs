@@ -108,12 +108,27 @@ impl Buildings {
         self.computeds.insert(building, computed);
     }
 
+    pub fn tick(&mut self, fps: f64) {
+        for building in Building::variants() {
+            let Some(cps) = self.computeds.get(&building).map(|c| c.cps) else {
+                continue;
+            };
+            let Some(state) = self.states.get_mut(&building) else {
+                continue;
+            };
+            state.cookies_all_time += cps / fps;
+        }
+    }
+
     pub fn state(&self, building: Building) -> BuildingState {
         self.states.get(&building).copied().unwrap_or_default()
     }
 
     pub fn computed(&self, building: Building) -> BuildingComputed {
-        self.computeds.get(&building).copied().unwrap_or_default()
+        self.computeds
+            .get(&building)
+            .copied()
+            .unwrap_or_else(|| self.compute(building, self.state(building)))
     }
 
     fn compute(&self, building: Building, state: BuildingState) -> BuildingComputed {
@@ -164,6 +179,10 @@ impl BuildingInfo {
         self.state.count
     }
 
+    pub fn cookies_all_time(&self) -> f64 {
+        self.state.cookies_all_time
+    }
+
     pub fn simple_tiered_upgrade_count(&self) -> u16 {
         self.state.simple_tiered_upgrade_count
     }
@@ -184,11 +203,12 @@ impl BuildingInfo {
 #[derive(Default, Debug, Copy, Clone)]
 pub struct BuildingState {
     pub count: u16,
+    pub cookies_all_time: f64,
     pub simple_tiered_upgrade_count: u16,
     pub has_grandma_co_tiered_upgrade: bool,
 }
 
-#[derive(Default, Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct BuildingComputed {
     pub cost: f64,
     pub cps: f64,
