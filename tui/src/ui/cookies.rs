@@ -1,4 +1,5 @@
 use super::{UiApp, utils::num::PrintFloat};
+use cookie_clicker_tui_core::MilkFlavor;
 use ratatui::{
     prelude::*,
     widgets::{Block, Paragraph},
@@ -20,9 +21,6 @@ const LOGO: &str = r#"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡴⠚⣉⡙⠲⠦⠤⠤�
 ⠀⠀⠀⠀⠀⠀⠀⠀⢠⡾⣆⠑⠋⠀⢀⣀⠀⠀⠀⠀⠈⠈⢁⣴⢫⡿⠁⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⣧⣄⡄⠴⣿⣶⣿⢀⣤⠶⣞⣋⣩⣵⠏⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⣿⢯⣭⣭⣯⣯⣥⡵⠿⠟⠛⠉⠉⠀⠀⠀⠀⠀⠀⠀"#;
-
-const MILK_WAVE: &str =
-    "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ";
 
 pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let mut lines = Vec::with_capacity(LOGO_HEIGHT + 3);
@@ -71,12 +69,14 @@ fn logo(app: &mut UiApp, lines: &mut Vec<Line>) {
         lines.push(if app.countdown.just_pressed_cookie() {
             Line::styled(line_text, Color::Green)
         } else {
-            Line::raw(line_text)
+            Line::styled(line_text, Color::White)
         })
     }
 }
 
 fn milk_wave(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
+    const WAVE: &str = "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ";
+
     let milk = app.core.milk();
 
     if milk.is_empty() {
@@ -84,11 +84,43 @@ fn milk_wave(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     }
 
     let percent = ((milk.ratio() * 100.0) as u16).min(100);
+    let style = milk_style(milk.flavor());
+
     let area = Layout::vertical([
         Constraint::Percentage(100 - percent),
         Constraint::Percentage(percent),
     ])
     .split(area)[1];
 
-    Text::styled(MILK_WAVE, Color::White).render(area, buf);
+    Text::styled(WAVE, style).render(area, buf);
+}
+
+fn milk_style(flavor: MilkFlavor) -> Style {
+    match flavor {
+        MilkFlavor::Plain => Style::new().white(),
+        MilkFlavor::Chocolate => Style::new().dark_gray(),
+        MilkFlavor::Raspberry => Style::new().red(),
+        MilkFlavor::Orange => Style::new().yellow(),
+        MilkFlavor::Caramel => Style::new().gray(),
+        MilkFlavor::Banana => Style::new().yellow(),
+        MilkFlavor::Lime => Style::new().light_green(),
+        MilkFlavor::Blueberry => Style::new().cyan(),
+        MilkFlavor::Strawberry => Style::new().light_red(),
+        MilkFlavor::Vanilla => Style::new().light_yellow(),
+        MilkFlavor::Honey => Style::new().yellow(),
+        MilkFlavor::Coffee => Style::new().dark_gray(),
+        MilkFlavor::Tea => Style::new().gray(),
+        MilkFlavor::Coconut => Style::new().white(),
+        MilkFlavor::Cherry => Style::new().red(),
+        MilkFlavor::Spiced => Style::new().white().italic(),
+        MilkFlavor::Maple => Style::new().gray(),
+        MilkFlavor::Mint => Style::new().light_cyan(),
+        MilkFlavor::Licorice => Style::new().black().italic(),
+        MilkFlavor::Rose => Style::new().light_magenta(),
+        MilkFlavor::Dragonfruit => Style::new().magenta(),
+        MilkFlavor::Melon => Style::new().green(),
+        MilkFlavor::Blackcurrant => Style::new().magenta().italic(),
+        MilkFlavor::Peach => Style::new().light_magenta().italic(),
+        MilkFlavor::Hazelnut => Style::new().white().italic(),
+    }
 }

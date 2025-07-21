@@ -1,10 +1,8 @@
 use crate::Achievement;
 use approx_eq_trait::ApproxEq;
 use cookie_clicker_tui_utils::frames::RefreshClock;
-use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::ops::RangeInclusive;
 
 #[derive(Debug)]
 pub struct Milk {
@@ -67,70 +65,49 @@ impl<'de> Deserialize<'de> for Milk {
     }
 }
 
-#[derive(Assoc, Name, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[func(fn achievement_range(&self) -> Option<RangeInclusive<u16>>)]
+#[derive(Name, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[name(base = "title case")]
 pub enum MilkFlavor {
-    #[assoc(achievement_range = 0..=24)]
     Plain,
-    #[assoc(achievement_range = 25..=49)]
     Chocolate,
-    #[assoc(achievement_range = 50..=74)]
     Raspberry,
-    #[assoc(achievement_range = 75..=99)]
     Orange,
-    #[assoc(achievement_range = 100..=124)]
     Caramel,
-    #[assoc(achievement_range = 125..=149)]
     Banana,
-    #[assoc(achievement_range = 150..=174)]
     Lime,
-    #[assoc(achievement_range = 175..=199)]
     Blueberry,
-    #[assoc(achievement_range = 200..=224)]
     Strawberry,
-    #[assoc(achievement_range = 225..=249)]
     Vanilla,
-    #[assoc(achievement_range = 250..=274)]
     Honey,
-    #[assoc(achievement_range = 275..=299)]
     Coffee,
-    #[assoc(achievement_range = 300..=324)]
     Tea,
-    #[assoc(achievement_range = 325..=349)]
     Coconut,
-    #[assoc(achievement_range = 350..=374)]
     Cherry,
-    #[assoc(achievement_range = 375..=399)]
     Spiced,
-    #[assoc(achievement_range = 400..=424)]
     Maple,
-    #[assoc(achievement_range = 425..=449)]
     Mint,
-    #[assoc(achievement_range = 450..=474)]
     Licorice,
-    #[assoc(achievement_range = 475..=499)]
     Rose,
-    #[assoc(achievement_range = 500..=524)]
     Dragonfruit,
-    #[assoc(achievement_range = 525..=549)]
     Melon,
-    #[assoc(achievement_range = 550..=574)]
     Blackcurrant,
-    #[assoc(achievement_range = 575..=599)]
     Peach,
-    // fallback
     Hazelnut,
 }
 
 impl MilkFlavor {
     fn find(len: u16) -> Self {
-        Self::variants().find(|f| f.matches(len)).unwrap()
-    }
+        let total = Achievement::VARIANT_COUNT as f64;
+        let ratio = len as f64 / total;
 
-    fn matches(&self, len: u16) -> bool {
-        let range = self.achievement_range();
-        let range = range.as_ref();
-        range.is_some_and(|r| r.contains(&len)) || range.is_none()
+        Self::variants()
+            .enumerate()
+            .zip(Self::variants().enumerate().skip(1))
+            .find_map(|((cur_i, cur), (next_i, _))| {
+                let cur_ratio = cur_i as f64 / total;
+                let next_ratio = next_i as f64 / total;
+                (ratio >= cur_ratio && ratio < next_ratio).then_some(cur)
+            })
+            .unwrap_or(Self::VARIANTS[Self::VARIANT_COUNT - 1])
     }
 }
