@@ -64,7 +64,12 @@ impl Storage {
             return Ok(());
         };
 
-        let json = serde_json::to_string(core).context("could not serialize core")?;
+        #[cfg(debug_assertions)]
+        let res = serde_json::to_string_pretty(core);
+        #[cfg(not(debug_assertions))]
+        let res = serde_json::to_string(core);
+
+        let json = res.context("could not serialize core")?;
         fs::write(core_path, json)
             .await
             .context("could not write core")
