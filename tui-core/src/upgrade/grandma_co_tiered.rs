@@ -23,7 +23,7 @@ impl GrandmaCoTieredUpgrade {
         Self::all().filter(|u| {
             !state
                 .buildings
-                .get(u.building)
+                .state(u.building)
                 .has_grandma_co_tiered_upgrade
         })
     }

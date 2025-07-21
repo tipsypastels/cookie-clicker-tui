@@ -65,13 +65,15 @@ impl Building {
 
 #[derive(Debug)]
 pub struct Buildings {
-    map: HashMap<Building, BuildingState>,
+    states: HashMap<Building, BuildingState>,
+    computeds: HashMap<Building, BuildingComputed>,
 }
 
 impl Buildings {
     pub fn new() -> Self {
         Self {
-            map: HashMap::new(),
+            states: HashMap::new(),
+            computeds: HashMap::new(),
         }
     }
 
@@ -80,15 +82,10 @@ impl Buildings {
     }
 
     pub fn info(&self, building: Building) -> BuildingInfo {
-        let state = self.get(building);
-        let cost = building.base_cost() * 1.15f64.powi(state.count as _);
-        let cps = crate::calc::building_cps(self, building, state);
-
         BuildingInfo {
             building,
-            state,
-            cost,
-            cps,
+            state: self.state(building),
+            computed: self.computed(building),
         }
     }
 
@@ -96,12 +93,9 @@ impl Buildings {
         self.info(Building::VARIANTS[index])
     }
 
-    pub fn get(&self, building: Building) -> BuildingState {
-        self.map.get(&building).copied().unwrap_or_default()
-    }
-
     pub fn modify(&mut self, building: Building, f: impl Fn(&mut BuildingState) + Clone) {
-        self.map
+        let state = *self
+            .states
             .entry(building)
             .and_modify(f.clone())
             .or_insert_with(|| {
@@ -109,10 +103,45 @@ impl Buildings {
                 f(&mut state);
                 state
             });
+
+        let computed = self.compute(building, state);
+        self.computeds.insert(building, computed);
     }
 
-    pub fn grandma_co_tiered_upgrade_count(&self) -> u16 {
-        self.map
+    pub fn state(&self, building: Building) -> BuildingState {
+        self.states.get(&building).copied().unwrap_or_default()
+    }
+
+    pub fn computed(&self, building: Building) -> BuildingComputed {
+        self.computeds.get(&building).copied().unwrap_or_default()
+    }
+
+    fn compute(&self, building: Building, state: BuildingState) -> BuildingComputed {
+        let cost = calc::building_cost(building, state.count);
+        let cps = calc::building_cps(calc::BuildingCps {
+            building,
+            building_class: match building {
+                Building::Cursor => calc::BuildingCpsClass::Cursor,
+                Building::Grandma => calc::BuildingCpsClass::Grandma {
+                    grandma_co_tiered_upgrade_count: self.grandma_co_tiered_upgrade_count(),
+                },
+                _ => calc::BuildingCpsClass::Other {
+                    grandma_count_for_co_tiered_upgrade: if state.has_grandma_co_tiered_upgrade {
+                        Some(self.state(Building::Grandma).count)
+                    } else {
+                        None
+                    },
+                },
+            },
+            count: state.count,
+            simple_tiered_upgrade_count: state.simple_tiered_upgrade_count,
+        });
+
+        BuildingComputed { cost, cps }
+    }
+
+    fn grandma_co_tiered_upgrade_count(&self) -> u16 {
+        self.states
             .values()
             .map(|s| s.has_grandma_co_tiered_upgrade as u16)
             .sum()
@@ -123,8 +152,7 @@ impl Buildings {
 pub struct BuildingInfo {
     building: Building,
     state: BuildingState,
-    cost: f64,
-    cps: f64,
+    computed: BuildingComputed,
 }
 
 impl BuildingInfo {
@@ -145,11 +173,11 @@ impl BuildingInfo {
     }
 
     pub fn cost(&self) -> f64 {
-        self.cost
+        self.computed.cost
     }
 
     pub fn cps(&self) -> f64 {
-        self.cps
+        self.computed.cps
     }
 }
 
@@ -158,6 +186,12 @@ pub struct BuildingState {
     pub count: u16,
     pub simple_tiered_upgrade_count: u16,
     pub has_grandma_co_tiered_upgrade: bool,
+}
+
+#[derive(Default, Debug, Copy, Clone)]
+pub struct BuildingComputed {
+    pub cost: f64,
+    pub cps: f64,
 }
 
 macro_rules! all_the_buildings {
@@ -188,3 +222,5 @@ macro_rules! all_the_buildings {
 }
 
 pub(crate) use all_the_buildings;
+
+use crate::calc;

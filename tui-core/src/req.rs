@@ -34,7 +34,7 @@ impl Req {
             Self::CookiesAllTimeBelow(v) => state.cookies_all_time < *v,
             Self::CookiesAllTimeBelowOrEq(v) => state.cookies_all_time <= *v,
             Self::CookiesAllTimeRange(a, b) => (*a..*b).contains(&state.cookies_all_time),
-            Self::BuildingCountMin(b, c) => state.buildings.get(*b).count >= *c,
+            Self::BuildingCountMin(b, c) => state.buildings.state(*b).count >= *c,
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state)),
