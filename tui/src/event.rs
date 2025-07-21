@@ -1,9 +1,16 @@
 use anyhow::{Context, Result};
 use cookie_clicker_tui_utils::frames::FPS;
-use crossterm::event::EventStream;
+use crossterm::event::{EventStream, KeyModifiers};
 use futures::{FutureExt, StreamExt};
 use std::time::Duration;
 use tokio::sync::mpsc;
+
+// the vscode integrated terminal does not seem to support SHIFT,
+// so use ALT while in development.
+#[cfg(debug_assertions)]
+pub const REVERSE_MODIFIER: KeyModifiers = KeyModifiers::ALT;
+#[cfg(not(debug_assertions))]
+pub const REVERSE_MODIFIER: KeyModifiers = KeyModifiers::SHIFT;
 
 pub enum Event {
     Tick,
@@ -11,16 +18,15 @@ pub enum Event {
 }
 
 pub struct Events {
-    tx: mpsc::UnboundedSender<Event>,
     rx: mpsc::UnboundedReceiver<Event>,
 }
 
 impl Events {
     pub fn new() -> Self {
         let (tx, rx) = mpsc::unbounded_channel();
-        let actor = Actor { tx: tx.clone() };
+        let actor = Actor { tx };
         tokio::spawn(async move { actor.run().await });
-        Self { tx, rx }
+        Self { rx }
     }
 
     pub async fn next(&mut self) -> Result<Event> {

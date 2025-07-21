@@ -1,10 +1,10 @@
 use crate::{
-    event::{Event, Events},
+    event::{Event, Events, REVERSE_MODIFIER},
     storage::Storage,
 };
 use anyhow::{Context, Result};
 use cookie_clicker_tui_core::{Building, Core};
-use cookie_clicker_tui_utils::countdown::Countdown;
+use cookie_clicker_tui_utils::countdown::{Countdown, CountdownOf};
 use crossterm::event::KeyEvent;
 use enum_fun::Name;
 use ratatui::DefaultTerminal;
@@ -38,6 +38,7 @@ pub enum AppListPane {
 pub struct AppCountdownState {
     just_pressed_cookie: Countdown<3>,
     error_insufficient_cookies: Countdown<10>,
+    error_tried_to_sell_unowned_building: CountdownOf<Building, 10>,
 }
 
 #[derive(Default, Copy, Clone)]
@@ -73,6 +74,7 @@ impl App {
             countdown: AppCountdownState {
                 just_pressed_cookie: Countdown::new(),
                 error_insufficient_cookies: Countdown::new(),
+                error_tried_to_sell_unowned_building: CountdownOf::new(),
             },
             modal: AppModalState::default(),
             debug: None,
@@ -116,6 +118,20 @@ impl App {
             }
             KeyCode::Right => {
                 self.list.right(&self.core);
+            }
+            KeyCode::Enter if event.modifiers.contains(REVERSE_MODIFIER) => {
+                if let AppListPane::Buildings = self.list.pane
+                    && let Some(i) = self.list.buildings.selected
+                {
+                    let Some(building) = Building::nth(i) else {
+                        return Ok(());
+                    };
+                    if !self.core.sell_building(building) {
+                        self.countdown
+                            .error_tried_to_sell_unowned_building
+                            .run(building);
+                    }
+                }
             }
             KeyCode::Enter => {
                 if let AppListPane::Buildings = self.list.pane

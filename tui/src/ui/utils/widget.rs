@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use ratatui::prelude::*;
 
 pub trait WidgetExt: Widget + Sized {
