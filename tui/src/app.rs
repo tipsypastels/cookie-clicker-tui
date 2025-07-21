@@ -115,7 +115,7 @@ impl App {
                         }
                     }
                     KeyCode::Char(' ') => {
-                        self.core.give_cookies(1.0);
+                        self.core.click_cookie();
                         self.countdown.just_pressed_cookie.run();
                     }
                     KeyCode::Char('q') => {

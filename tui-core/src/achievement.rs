@@ -1,4 +1,7 @@
-use crate::{Computed, State, req::LateReq};
+use crate::{
+    Computed, State,
+    req::{Comparator, LateReq},
+};
 use cookie_clicker_tui_utils::{frames::RefreshClock, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
@@ -321,8 +324,8 @@ pub enum AchievementReq {
 impl AchievementReq {
     fn as_late_req(&self) -> LateReq {
         match self {
-            Self::CookiesBaked(v) => LateReq::CookiesAllTimeAboveOrEq(*v),
-            Self::Cps(v) => LateReq::CpsAbove(*v),
+            Self::CookiesBaked(v) => LateReq::CookiesAllTime(Comparator::AboveOrEq(*v)),
+            Self::Cps(v) => LateReq::Cps(Comparator::AboveOrEq(*v)),
         }
     }
 }

@@ -1,6 +1,7 @@
 mod achievement;
 mod building;
 mod calc;
+mod cookies;
 mod milk;
 mod req;
 mod ticker;
@@ -13,8 +14,10 @@ pub use self::{
     upgrade::{Upgrade, UpgradeEffectInfo},
 };
 
-use self::{achievement::Achievements, building::Buildings, ticker::Ticker, upgrade::Upgrades};
-use cookie_clicker_tui_utils::frames::FPS;
+use self::{
+    achievement::Achievements, building::Buildings, cookies::Cookies, ticker::Ticker,
+    upgrade::Upgrades,
+};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::collections::BTreeSet;
 
@@ -36,11 +39,15 @@ impl Core {
     }
 
     pub fn cookies(&self) -> f64 {
-        self.state.cookies
+        self.state.cookies.current()
     }
 
     pub fn cookies_all_time(&self) -> f64 {
-        self.state.cookies_all_time
+        self.state.cookies.all_time()
+    }
+
+    pub fn cookies_all_time_from_clicking(&self) -> f64 {
+        self.state.cookies.all_time_from_clicking()
     }
 
     pub fn cps(&self) -> f64 {
@@ -79,9 +86,8 @@ impl Core {
         self.computed.ticker.text()
     }
 
-    pub fn give_cookies(&mut self, amount: f64) {
-        self.state.cookies += amount;
-        self.state.cookies_all_time += amount;
+    pub fn click_cookie(&mut self) {
+        self.state.cookies.gain_from_clicking(1.0);
     }
 
     pub fn give_free_building(&mut self, building: Building) {
@@ -93,11 +99,11 @@ impl Core {
     pub fn buy_building(&mut self, building: Building) -> bool {
         let cost = self.building_info(building).cost();
 
-        if cost > self.state.cookies {
+        if cost > self.state.cookies.current() {
             return false;
         }
 
-        self.state.cookies -= cost;
+        self.state.cookies.lose(cost);
         self.give_free_building(building);
 
         true
@@ -110,11 +116,11 @@ impl Core {
 
         let cost = upgrade.cost();
 
-        if cost > self.state.cookies {
+        if cost > self.state.cookies.current() {
             return false;
         }
 
-        self.state.cookies -= cost;
+        self.state.cookies.lose(cost);
         upgrade.buy(&mut self.state);
 
         self.computed.recalc_cps(&self.state);
@@ -149,18 +155,20 @@ impl<'de> Deserialize<'de> for Core {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct State {
-    cookies: f64,
-    cookies_all_time: f64,
+    #[serde(default = "Cookies::new")]
+    cookies: Cookies,
+    #[serde(default = "Buildings::new")]
     buildings: Buildings,
+    #[serde(default = "Milk::new")]
     milk: Milk,
+    #[serde(default = "Achievements::new")]
     achievements: Achievements,
 }
 
 impl State {
     fn new() -> Self {
         Self {
-            cookies: 0.0,
-            cookies_all_time: 0.0,
+            cookies: Cookies::new(),
             buildings: Buildings::new(),
             milk: Milk::new(),
             achievements: Achievements::new(),
@@ -168,11 +176,7 @@ impl State {
     }
 
     fn tick(&mut self, computed: &Computed) {
-        let addl_cookies = computed.cps / FPS;
-
-        self.cookies += addl_cookies;
-        self.cookies_all_time += addl_cookies;
-
+        self.cookies.tick(computed.cps);
         self.buildings.tick();
         self.milk.tick(self.achievements.owned().len() as _);
 

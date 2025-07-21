@@ -3,16 +3,9 @@ use crate::{Building, Computed, State};
 #[allow(unused)]
 #[derive(Debug)]
 pub enum Req {
-    CookiesAbove(f64),
-    CookiesAboveOrEq(f64),
-    CookiesBelow(f64),
-    CookiesBelowOrEq(f64),
-    CookiesRange(f64, f64),
-    CookiesAllTimeAbove(f64),
-    CookiesAllTimeAboveOrEq(f64),
-    CookiesAllTimeBelow(f64),
-    CookiesAllTimeBelowOrEq(f64),
-    CookiesAllTimeRange(f64, f64),
+    Cookies(Comparator<f64>),
+    CookiesAllTime(Comparator<f64>),
+    CookiesAllTimeFromClicking(Comparator<f64>),
     BuildingCountMin(Building, u16),
     Custom(fn(&State) -> bool),
     Any(&'static [Req]),
@@ -24,16 +17,9 @@ pub enum Req {
 impl Req {
     pub fn check(&self, state: &State) -> bool {
         match self {
-            Self::CookiesAbove(v) => state.cookies > *v,
-            Self::CookiesAboveOrEq(v) => state.cookies >= *v,
-            Self::CookiesBelow(v) => state.cookies < *v,
-            Self::CookiesBelowOrEq(v) => state.cookies <= *v,
-            Self::CookiesRange(a, b) => (*a..*b).contains(&state.cookies),
-            Self::CookiesAllTimeAbove(v) => state.cookies_all_time > *v,
-            Self::CookiesAllTimeAboveOrEq(v) => state.cookies_all_time >= *v,
-            Self::CookiesAllTimeBelow(v) => state.cookies_all_time < *v,
-            Self::CookiesAllTimeBelowOrEq(v) => state.cookies_all_time <= *v,
-            Self::CookiesAllTimeRange(a, b) => (*a..*b).contains(&state.cookies_all_time),
+            Self::Cookies(c) => c.check(state.cookies.current()),
+            Self::CookiesAllTime(c) => c.check(state.cookies.all_time()),
+            Self::CookiesAllTimeFromClicking(c) => c.check(state.cookies.all_time_from_clicking()),
             Self::BuildingCountMin(b, c) => state.buildings.state(*b).count >= *c,
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
@@ -48,7 +34,7 @@ impl Req {
 #[derive(Debug)]
 pub enum LateReq {
     Req(Req),
-    CpsAbove(f64),
+    Cps(Comparator<f64>),
     Custom(fn(&State, &Computed) -> bool),
     Any(&'static [LateReq]),
     AnyBox(Box<[LateReq]>),
@@ -66,28 +52,43 @@ macro_rules! delegated_late_variants {
 
 impl LateReq {
     delegated_late_variants! {
-        CookiesAbove(v: f64);
-        CookiesAboveOrEq(v: f64);
-        CookiesBelow(v: f64);
-        CookiesBelowOrEq(v: f64);
-        CookiesRange(a: f64, b: f64);
-        CookiesAllTimeAbove(v: f64);
-        CookiesAllTimeAboveOrEq(v: f64);
-        CookiesAllTimeBelow(v: f64);
-        CookiesAllTimeBelowOrEq(v: f64);
-        CookiesAllTimeRange(a: f64, b: f64);
+        Cookies(c: Comparator<f64>);
+        CookiesAllTime(c: Comparator<f64>);
+        CookiesAllTimeFromClicking(c: Comparator<f64>);
         BuildingCountMin(b: Building, c: u16);
     }
 
     pub fn check(&self, state: &State, computed: &Computed) -> bool {
         match self {
             Self::Req(req) => req.check(state),
-            Self::CpsAbove(v) => computed.cps > *v,
+            Self::Cps(c) => c.check(computed.cps),
             Self::Custom(f) => f(state, computed),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state, computed)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state, computed)),
             Self::All(reqs) => reqs.iter().all(|r| r.check(state, computed)),
             Self::AllBox(reqs) => reqs.iter().all(|r| r.check(state, computed)),
+        }
+    }
+}
+
+#[allow(unused)]
+#[derive(Debug, Copy, Clone)]
+pub enum Comparator<T> {
+    Above(T),
+    AboveOrEq(T),
+    Below(T),
+    BelowOrEq(T),
+    Range(T, T),
+}
+
+impl<T: PartialOrd> Comparator<T> {
+    fn check(self, value: T) -> bool {
+        match self {
+            Self::Above(v) => value > v,
+            Self::AboveOrEq(v) => value >= v,
+            Self::Below(v) => value < v,
+            Self::BelowOrEq(v) => value <= v,
+            Self::Range(a, b) => (a..b).contains(&value),
         }
     }
 }
