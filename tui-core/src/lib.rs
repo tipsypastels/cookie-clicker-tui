@@ -157,6 +157,18 @@ impl Core {
     pub fn debug_upgrades(&self) -> impl fmt::Debug {
         &self.computed.upgrades
     }
+
+    pub fn debug_achievements(&self) -> impl fmt::Debug {
+        &self.state.achievements
+    }
+
+    pub fn debug_milk(&self) -> impl fmt::Debug {
+        &self.state.milk
+    }
+
+    pub fn debug_ticker(&self) -> impl fmt::Debug {
+        &self.computed.ticker
+    }
 }
 
 impl Default for Core {

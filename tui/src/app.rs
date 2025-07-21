@@ -17,7 +17,7 @@ pub struct App {
     countdown: AppCountdownState,
     modal: AppModalState,
     debug: Option<AppDebugView>,
-    latest_key: Option<KeyEvent>,
+    debug_latest_key: Option<KeyEvent>,
     events: Events,
     quit: bool,
 }
@@ -54,6 +54,9 @@ pub enum AppDebugView {
     Cookies,
     Buildings,
     Upgrades,
+    Achievements,
+    Milk,
+    Ticker,
     Keypress,
 }
 
@@ -73,7 +76,7 @@ impl App {
             },
             modal: AppModalState::default(),
             debug: None,
-            latest_key: None,
+            debug_latest_key: None,
             events: Events::new(),
             quit: false,
         }
@@ -99,7 +102,7 @@ impl App {
     async fn handle_key_event(&mut self, event: KeyEvent) -> Result<()> {
         use crossterm::event::KeyCode;
 
-        self.latest_key = Some(event);
+        self.debug_latest_key = Some(event);
 
         match event.code {
             KeyCode::Up => {
@@ -170,7 +173,7 @@ impl App {
                 countdown: &self.countdown,
                 modal: self.modal,
                 debug: self.debug,
-                latest_key: self.latest_key,
+                debug_latest_key: self.debug_latest_key,
             };
             crate::ui::ui(&mut ui, frame);
         })
@@ -295,7 +298,10 @@ impl AppDebugView {
         match self {
             Self::Cookies => Self::Buildings,
             Self::Buildings => Self::Upgrades,
-            Self::Upgrades => Self::Keypress,
+            Self::Upgrades => Self::Achievements,
+            Self::Achievements => Self::Milk,
+            Self::Milk => Self::Ticker,
+            Self::Ticker => Self::Keypress,
             Self::Keypress => Self::Cookies,
         }
     }

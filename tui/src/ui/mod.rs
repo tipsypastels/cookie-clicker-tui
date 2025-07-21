@@ -18,7 +18,7 @@ pub struct UiApp<'a> {
     pub countdown: &'a AppCountdownState,
     pub modal: AppModalState,
     pub debug: Option<AppDebugView>,
-    pub latest_key: Option<KeyEvent>,
+    pub debug_latest_key: Option<KeyEvent>,
 }
 
 pub fn ui(app: &mut UiApp, frame: &mut Frame) {

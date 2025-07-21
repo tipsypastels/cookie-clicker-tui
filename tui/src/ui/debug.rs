@@ -13,9 +13,12 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
         AppDebugView::Cookies => format!("{:?}", core.debug_cookies()),
         AppDebugView::Buildings => format!("{:?}", core.debug_buildings()),
         AppDebugView::Upgrades => format!("{:?}", core.debug_upgrades()),
+        AppDebugView::Achievements => format!("{:?}", core.debug_achievements()),
+        AppDebugView::Milk => format!("{:?}", core.debug_milk()),
+        AppDebugView::Ticker => format!("{:?}", core.debug_ticker()),
         AppDebugView::Keypress => {
-            if let Some(latest_key) = app.latest_key {
-                format!("{latest_key:?}")
+            if let Some(key) = app.debug_latest_key {
+                format!("{key:?}")
             } else {
                 "".to_string()
             }
