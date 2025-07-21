@@ -1,3 +1,5 @@
+use std::fmt;
+
 use cookie_clicker_tui_core::{Building, Core, Upgrade};
 use tui_widget_list::ListState;
 
@@ -20,7 +22,14 @@ impl AppListState {
         }
     }
 
-    pub fn debug<'list, 'core>(&'list self, core: &'core Core) -> AppListDebug<'list, 'core> {
+    pub fn debug(&self, core: &Core) -> impl fmt::Debug {
+        #[allow(dead_code)]
+        #[derive(Debug)]
+        struct AppListDebug<'list, 'core> {
+            state: &'list ListState,
+            pane: AppListPane,
+            pointee: Option<(usize, AppListPointee<'core>)>,
+        }
         AppListDebug {
             state: &self.state,
             pane: self.pane,
@@ -96,11 +105,4 @@ impl AppListPane {
             Self::Upgrades => Self::Buildings,
         }
     }
-}
-
-#[derive(Debug)]
-pub struct AppListDebug<'list, 'core> {
-    state: &'list ListState,
-    pane: AppListPane,
-    pointee: Option<(usize, AppListPointee<'core>)>,
 }
