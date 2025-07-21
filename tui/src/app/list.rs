@@ -1,6 +1,5 @@
-use std::fmt;
-
 use cookie_clicker_tui_core::{Building, Core, Upgrade};
+use std::fmt;
 use tui_widget_list::ListState;
 
 #[derive(Default)]

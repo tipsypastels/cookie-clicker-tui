@@ -1,15 +1,15 @@
+use crate::Achievement;
+use approx_eq_trait::ApproxEq;
 use cookie_clicker_tui_utils::frames::RefreshClock;
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::ops::RangeInclusive;
 
-const PERCENT_PER_ACHIEVEMENT: u16 = 4;
-
 #[derive(Debug)]
 pub struct Milk {
     achievements: u16,
-    percent: u16,
+    ratio: f64,
     flavor: MilkFlavor,
     refresh: RefreshClock<15>,
 }
@@ -20,13 +20,13 @@ impl Milk {
     }
 
     fn _new(achievements: u16) -> Self {
-        let percent = achievements * PERCENT_PER_ACHIEVEMENT;
         let flavor = MilkFlavor::find(achievements);
+        let ratio = achievements as f64 / Achievement::VARIANT_COUNT as f64;
         let refresh = RefreshClock::new();
 
         Self {
             achievements,
-            percent,
+            ratio,
             flavor,
             refresh,
         }
@@ -42,8 +42,12 @@ impl Milk {
         }
     }
 
-    pub fn percent(&self) -> u16 {
-        self.percent
+    pub fn ratio(&self) -> f64 {
+        self.ratio
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.ratio.approx_eq(0.0)
     }
 
     pub fn flavor(&self) -> MilkFlavor {
