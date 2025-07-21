@@ -29,7 +29,7 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     });
 
     let list_view = ListView::new(builder, Building::VARIANT_COUNT);
-    let list_state = app.list.pane(AppListPane::Buildings);
+    let list_state = app.list.state_matching_mut(AppListPane::Buildings);
 
     let block = Block::bordered()
         .title(Line::styled(" Buildings ", Modifier::BOLD).centered())

@@ -29,7 +29,7 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     });
 
     let list_view = ListView::new(builder, app.core.upgrades().len());
-    let list_state = app.list.pane(AppListPane::Upgrades);
+    let list_state = app.list.state_matching_mut(AppListPane::Upgrades);
 
     let block = Block::bordered()
         .title(Line::styled(" Upgrades ", Modifier::BOLD))

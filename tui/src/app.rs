@@ -21,7 +21,8 @@ pub struct App {
 
 #[derive(Debug)]
 pub struct AppListState {
-    state: ListState,
+    buildings: ListState,
+    upgrades: ListState,
     pane: AppListPane,
 }
 
@@ -52,7 +53,8 @@ impl App {
             storage,
             core,
             list: AppListState {
-                state: ListState::default(),
+                buildings: ListState::default(),
+                upgrades: ListState::default(),
                 pane: AppListPane::default(),
             },
             countdown: AppCountdownState {
@@ -88,22 +90,23 @@ impl App {
                     KeyCode::Right => {
                         self.list.right(&self.core);
                     }
-                    KeyCode::Enter => match (self.list.state.selected, self.list.pane) {
-                        (Some(i), AppListPane::Buildings) => {
+                    KeyCode::Enter => {
+                        if let AppListPane::Buildings = self.list.pane
+                            && let Some(i) = self.list.buildings.selected
+                        {
                             let Some(building) = Building::nth(i) else {
                                 continue;
                             };
                             if !self.core.buy_building(building) {
                                 self.countdown.error_insufficient_cookies.run();
                             }
+                        } else if let AppListPane::Upgrades = self.list.pane
+                            && let Some(i) = self.list.upgrades.selected
+                            && !self.core.buy_upgrade(i)
+                        {
+                            self.countdown.error_insufficient_cookies.run();
                         }
-                        (Some(i), AppListPane::Upgrades) => {
-                            if !self.core.buy_upgrade(i) {
-                                self.countdown.error_insufficient_cookies.run();
-                            }
-                        }
-                        _ => {}
-                    },
+                    }
                     KeyCode::Esc => {
                         if !matches!(self.modal, AppModalState::Closed) {
                             self.modal = AppModalState::Closed
@@ -122,7 +125,7 @@ impl App {
                         self.modal.toggle();
                     }
                     KeyCode::Char('/') => {
-                        self.modal.debug(format!("{:?}", self.core));
+                        self.modal.debug(format!("{:?}", self.list));
                     }
                     _ => {}
                 },
@@ -160,11 +163,11 @@ impl App {
 
 impl AppListState {
     fn up(&mut self) {
-        self.state.previous();
+        self.state_mut().previous();
     }
 
     fn down(&mut self) {
-        self.state.next();
+        self.state_mut().next();
     }
 
     fn left(&mut self, core: &Core) {
@@ -184,20 +187,30 @@ impl AppListState {
             new_pane = change(new_pane);
         }
 
-        if let Some(cur) = self.state.selected {
-            let max = new_pane.max(core);
-            self.state.select(Some(std::cmp::min(cur, max)));
-        }
-
         self.pane = new_pane;
+        self.state_mut().select(Some(0));
     }
 
     pub fn selected(&self) -> Option<(AppListPane, usize)> {
-        self.state.selected.map(|i| (self.pane, i))
+        self.state().selected.map(|i| (self.pane, i))
     }
 
-    pub fn pane(&mut self, pane: AppListPane) -> Option<&mut ListState> {
-        (self.pane == pane).then_some(&mut self.state)
+    pub fn state(&self) -> &ListState {
+        match self.pane {
+            AppListPane::Buildings => &self.buildings,
+            AppListPane::Upgrades => &self.upgrades,
+        }
+    }
+
+    pub fn state_mut(&mut self) -> &mut ListState {
+        match self.pane {
+            AppListPane::Buildings => &mut self.buildings,
+            AppListPane::Upgrades => &mut self.upgrades,
+        }
+    }
+
+    pub fn state_matching_mut(&mut self, pane: AppListPane) -> Option<&mut ListState> {
+        (self.pane == pane).then(|| self.state_mut())
     }
 }
 
@@ -206,13 +219,6 @@ impl AppListPane {
         match self {
             Self::Buildings => true,
             Self::Upgrades => !core.upgrades().is_empty(),
-        }
-    }
-
-    fn max(self, core: &Core) -> usize {
-        match self {
-            Self::Buildings => Building::VARIANT_COUNT - 1,
-            Self::Upgrades => core.upgrades().len() - 1,
         }
     }
 
