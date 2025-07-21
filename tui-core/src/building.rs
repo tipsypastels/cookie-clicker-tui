@@ -3,6 +3,7 @@ use cookie_clicker_tui_utils::{frames::FPS, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Predicates, Variants};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::fmt;
 
 #[derive(
     Assoc,
@@ -79,7 +80,6 @@ impl Building {
     }
 }
 
-#[derive(Debug)]
 pub struct Buildings {
     states: BuildingMap<BuildingState>,
     computeds: BuildingMap<Option<BuildingComputed>>,
@@ -190,6 +190,12 @@ impl Buildings {
     }
 }
 
+impl fmt::Debug for Buildings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_list().entries(self.infos()).finish()
+    }
+}
+
 impl Serialize for Buildings {
     fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
         self.states.serialize(ser)
@@ -204,7 +210,7 @@ impl<'de> Deserialize<'de> for Buildings {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone)]
 pub struct BuildingInfo {
     building: Building,
     state: BuildingState,
@@ -242,6 +248,26 @@ impl BuildingInfo {
 
     pub fn cps(&self) -> f64 {
         self.computed.cps
+    }
+}
+
+impl fmt::Debug for BuildingInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct(self.building.name())
+            .field("count", &self.state.count)
+            .field("cps", &self.computed.cps)
+            .field("cost", &self.computed.cost)
+            .field("sell_cost", &self.computed.sell_cost)
+            .field("cookies_all_time", &self.state.cookies_all_time)
+            .field(
+                "simple_tiered_upgrade_count",
+                &self.state.simple_tiered_upgrade_count,
+            )
+            .field(
+                "has_grandma_co_tiered_upgrade",
+                &self.state.has_grandma_co_tiered_upgrade,
+            )
+            .finish()
     }
 }
 

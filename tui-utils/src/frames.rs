@@ -1,6 +1,7 @@
+use std::fmt;
+
 pub const FPS: f64 = 30.0;
 
-#[derive(Debug)]
 pub struct RefreshClock<const SECONDS: u16> {
     ticks_until_refresh: u16,
 }
@@ -31,5 +32,11 @@ impl<const SECONDS: u16> RefreshClock<SECONDS> {
 impl<const SECONDS: u16> Default for RefreshClock<SECONDS> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<const SECONDS: u16> fmt::Debug for RefreshClock<SECONDS> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.ticks_until_refresh.fmt(f)
     }
 }

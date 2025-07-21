@@ -219,6 +219,7 @@ dependencies = [
  "crossterm 0.29.0",
  "dirs",
  "enum-assoc",
+ "enum-fun",
  "futures",
  "ratatui",
  "serde",

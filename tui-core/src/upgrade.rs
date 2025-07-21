@@ -7,7 +7,7 @@ pub use self::effect_info::UpgradeEffectInfo;
 use self::{grandma_co_tiered::GrandmaCoTieredUpgrade, simple_tiered::SimpleTieredUpgrade};
 use crate::State;
 use cookie_clicker_tui_utils::frames::RefreshClock;
-use std::ops::Deref;
+use std::{fmt, ops::Deref};
 
 #[derive(Debug)]
 pub struct Upgrades {
@@ -38,10 +38,8 @@ impl Deref for Upgrades {
     }
 }
 
-#[derive(Debug)]
 pub struct Upgrade(Inner);
 
-#[derive(Debug)]
 enum Inner {
     SimpleTiered(SimpleTieredUpgrade),
     GrandmaCoTiered(GrandmaCoTieredUpgrade),
@@ -95,6 +93,15 @@ impl Upgrade {
         match &self.0 {
             Inner::SimpleTiered(u) => u.buy(state),
             Inner::GrandmaCoTiered(u) => u.buy(state),
+        }
+    }
+}
+
+impl fmt::Debug for Upgrade {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self.0 {
+            Inner::SimpleTiered(u) => u.fmt(f),
+            Inner::GrandmaCoTiered(u) => u.fmt(f),
         }
     }
 }

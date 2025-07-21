@@ -5,6 +5,7 @@ use crate::{
 use anyhow::{Context, Result};
 use cookie_clicker_tui_core::{Building, Core};
 use cookie_clicker_tui_utils::countdown::Countdown;
+use enum_fun::Name;
 use ratatui::DefaultTerminal;
 use tui_widget_list::ListState;
 
@@ -15,6 +16,7 @@ pub struct App {
     list: AppListState,
     countdown: AppCountdownState,
     modal: AppModalState,
+    debug: Option<AppDebugView>,
     events: Events,
     quit: bool,
 }
@@ -39,12 +41,20 @@ pub struct AppCountdownState {
     error_insufficient_cookies: Countdown<10>,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Copy, Clone)]
 pub enum AppModalState {
-    Debug(String),
     ListItem,
     #[default]
     Closed,
+}
+
+#[derive(Name, Default, Debug, Copy, Clone)]
+#[name(base = "title case")]
+pub enum AppDebugView {
+    #[default]
+    Cookies,
+    Buildings,
+    Upgrades,
 }
 
 impl App {
@@ -62,6 +72,7 @@ impl App {
                 error_insufficient_cookies: Countdown::new(),
             },
             modal: AppModalState::default(),
+            debug: None,
             events: Events::new(),
             quit: false,
         }
@@ -110,6 +121,8 @@ impl App {
                     KeyCode::Esc => {
                         if !matches!(self.modal, AppModalState::Closed) {
                             self.modal = AppModalState::Closed
+                        } else if self.debug.is_some() {
+                            self.debug = None;
                         } else {
                             self.quit().await?;
                         }
@@ -125,7 +138,10 @@ impl App {
                         self.modal.toggle();
                     }
                     KeyCode::Char('/') => {
-                        self.modal.debug(format!("{:?}", self.list));
+                        self.debug = self
+                            .debug
+                            .map(|v| v.next())
+                            .or_else(|| Some(Default::default()));
                     }
                     _ => {}
                 },
@@ -141,7 +157,8 @@ impl App {
                 core: &self.core,
                 list: &mut self.list,
                 countdown: &self.countdown,
-                modal: &self.modal,
+                modal: self.modal,
+                debug: self.debug,
             };
             crate::ui::ui(&mut ui, frame);
         })
@@ -259,8 +276,14 @@ impl AppModalState {
             _ => Self::Closed,
         }
     }
+}
 
-    fn debug(&mut self, message: String) {
-        *self = Self::Debug(message)
+impl AppDebugView {
+    fn next(self) -> Self {
+        match self {
+            Self::Cookies => Self::Buildings,
+            Self::Buildings => Self::Upgrades,
+            Self::Upgrades => Self::Cookies,
+        }
     }
 }

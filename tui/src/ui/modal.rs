@@ -3,7 +3,7 @@ use crate::app::{AppListPane, AppModalState};
 use cookie_clicker_tui_core::{Building, UpgradeEffectInfo};
 use ratatui::{
     prelude::*,
-    widgets::{Block, Clear, Paragraph, Wrap},
+    widgets::{Block, Clear, Paragraph},
 };
 use std::borrow::Cow;
 
@@ -12,18 +12,8 @@ const SCREEN_PERCENT: (u16, u16) = (60, 31);
 pub fn modal(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     match app.modal {
         AppModalState::Closed => {}
-        AppModalState::Debug(message) => render_debug(message, area, buf),
         AppModalState::ListItem => render_list_item(app, area, buf),
     }
-}
-
-fn render_debug(message: &str, area: Rect, buf: &mut Buffer) {
-    render_outer(area, buf, " Debug ", |area, buf, block| {
-        Paragraph::new(Text::raw(message))
-            .wrap(Wrap { trim: false })
-            .block(block)
-            .render(area, buf);
-    });
 }
 
 fn render_list_item(app: &mut UiApp, area: Rect, buf: &mut Buffer) {

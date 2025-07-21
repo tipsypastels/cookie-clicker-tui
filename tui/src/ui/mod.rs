@@ -1,12 +1,13 @@
 mod achievement;
 mod buildings;
 mod cookies;
+mod debug;
 mod modal;
 mod ticker;
 mod upgrades;
 mod utils;
 
-use crate::app::{AppCountdownState, AppListState, AppModalState};
+use crate::app::{AppCountdownState, AppDebugView, AppListState, AppModalState};
 use cookie_clicker_tui_core::Core;
 use ratatui::prelude::*;
 
@@ -15,7 +16,8 @@ pub struct UiApp<'a> {
     pub core: &'a Core,
     pub list: &'a mut AppListState,
     pub countdown: &'a AppCountdownState,
-    pub modal: &'a AppModalState,
+    pub modal: AppModalState,
+    pub debug: Option<AppDebugView>,
 }
 
 pub fn ui(app: &mut UiApp, frame: &mut Frame) {
@@ -42,6 +44,11 @@ pub fn ui(app: &mut UiApp, frame: &mut Frame) {
 fn left_col(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let rows = Layout::vertical([Constraint::Percentage(100), Constraint::Length(3)]).split(area);
 
-    cookies::cookies(app, rows[0], buf);
+    if let Some(view) = app.debug {
+        debug::debug(app, view, rows[0], buf);
+    } else {
+        cookies::cookies(app, rows[0], buf);
+    }
+
     ticker::ticker(app, rows[1], buf);
 }

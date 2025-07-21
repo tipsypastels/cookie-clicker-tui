@@ -19,7 +19,7 @@ use self::{
     upgrade::Upgrades,
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, fmt};
 
 #[derive(Debug)]
 pub struct Core {
@@ -145,6 +145,18 @@ impl Core {
     pub fn tick(&mut self) {
         self.state.tick(&self.computed);
         self.computed.tick(&self.state);
+    }
+
+    pub fn debug_cookies(&self) -> impl fmt::Debug {
+        &self.state.cookies
+    }
+
+    pub fn debug_buildings(&self) -> impl fmt::Debug {
+        &self.state.buildings
+    }
+
+    pub fn debug_upgrades(&self) -> impl fmt::Debug {
+        &self.computed.upgrades
     }
 }
 
