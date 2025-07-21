@@ -6,9 +6,11 @@ pub struct RefreshClock<const SECONDS: u16> {
 }
 
 impl<const SECONDS: u16> RefreshClock<SECONDS> {
+    pub const TICKS: u16 = SECONDS * FPS as u16;
+
     pub fn new() -> Self {
         Self {
-            ticks_until_refresh: SECONDS * FPS as u16,
+            ticks_until_refresh: Self::TICKS,
         }
     }
 

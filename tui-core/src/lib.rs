@@ -22,7 +22,6 @@ use std::collections::BTreeSet;
 pub struct Core {
     state: State,
     computed: Computed,
-    computed2: Computed2,
 }
 
 impl Core {
@@ -32,13 +31,8 @@ impl Core {
 
     fn from_state(state: State) -> Self {
         let computed = Computed::new(&state);
-        let computed2 = Computed2::new();
 
-        Self {
-            state,
-            computed,
-            computed2,
-        }
+        Self { state, computed }
     }
 
     pub fn cookies(&self) -> f64 {
@@ -74,11 +68,11 @@ impl Core {
     }
 
     pub fn owned_achievements(&self) -> &BTreeSet<Achievement> {
-        self.computed2.achievements.owned()
+        self.state.achievements.owned()
     }
 
     pub fn queued_achievement(&self) -> Option<Achievement> {
-        self.computed2.achievements.queued()
+        self.state.achievements.queued()
     }
 
     pub fn ticker(&self) -> Option<&'static str> {
@@ -127,9 +121,8 @@ impl Core {
     }
 
     pub fn tick(&mut self) {
-        self.state.tick(&self.computed, &self.computed2);
+        self.state.tick(&self.computed);
         self.computed.tick(&self.state);
-        self.computed2.tick(&self.state, &self.computed);
     }
 }
 
@@ -157,6 +150,7 @@ struct State {
     cookies_all_time: f64,
     buildings: Buildings,
     milk: Milk,
+    achievements: Achievements,
 }
 
 impl State {
@@ -166,17 +160,20 @@ impl State {
             cookies_all_time: 0.0,
             buildings: Buildings::new(),
             milk: Milk::new(),
+            achievements: Achievements::new(),
         }
     }
 
-    fn tick(&mut self, computed: &Computed, computed2: &Computed2) {
+    fn tick(&mut self, computed: &Computed) {
         let addl_cookies = computed.cps / FPS;
 
         self.cookies += addl_cookies;
         self.cookies_all_time += addl_cookies;
 
         self.buildings.tick();
-        self.milk.tick(computed2.achievements.owned().len() as _);
+        self.milk.tick(self.achievements.owned().len() as _);
+
+        achievement::tick(self, computed);
     }
 }
 
@@ -211,23 +208,5 @@ impl Computed {
 
     fn recalc_upgrades(&mut self, state: &State) {
         self.upgrades = Upgrades::new(state);
-    }
-}
-
-#[derive(Debug)]
-struct Computed2 {
-    // TODO: These should be state somehow.
-    achievements: Achievements,
-}
-
-impl Computed2 {
-    fn new() -> Self {
-        let achievements = Achievements::new();
-
-        Self { achievements }
-    }
-
-    fn tick(&mut self, state: &State, computed: &Computed) {
-        self.achievements.tick(state, computed);
     }
 }
