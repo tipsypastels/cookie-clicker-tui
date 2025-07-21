@@ -84,6 +84,12 @@ impl Core {
         self.state.cookies_all_time += amount;
     }
 
+    pub fn give_free_building(&mut self, building: Building) {
+        self.state.buildings.modify(building, |b| b.count += 1);
+        self.computed.recalc_cps(&self.state);
+        self.computed.recalc_upgrades(&self.state);
+    }
+
     pub fn buy_building(&mut self, building: Building) -> bool {
         let cost = self.building_info(building).cost();
 
@@ -92,10 +98,7 @@ impl Core {
         }
 
         self.state.cookies -= cost;
-        self.state.buildings.modify(building, |b| b.count += 1);
-
-        self.computed.recalc_cps(&self.state);
-        self.computed.recalc_upgrades(&self.state);
+        self.give_free_building(building);
 
         true
     }

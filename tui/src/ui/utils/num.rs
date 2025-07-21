@@ -33,7 +33,7 @@ impl fmt::Display for Display {
                 $macro!(UNVIGINTILLION, " UV");
                 $macro!(VIGINTILLION, " V");
                 $macro!(NOVEMDECILLION, " ND");
-                $macro!(OCTODECILLION, " OD");
+                $macro!(OCTODECILLION, " OcD");
                 $macro!(SEPTENDECILLION, " SpD");
                 $macro!(SEXDECILLION, " SxD");
                 $macro!(QUINDECILLION, " QiD");
@@ -43,7 +43,7 @@ impl fmt::Display for Display {
                 $macro!(UNDECILLION, " UD");
                 $macro!(DECILLION, " D");
                 $macro!(NONILLION, " N");
-                $macro!(OCTILLION, " O");
+                $macro!(OCTILLION, " Oc");
                 $macro!(SEPTILLION, " Sp");
                 $macro!(SEXTILLION, " Sx");
                 $macro!(QUINTILLION, " Qi");
