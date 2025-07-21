@@ -84,6 +84,9 @@ impl<'de> Deserialize<'de> for Achievements {
 #[func(pub fn req(&self) -> AchievementReq)]
 #[name(base = "title case")]
 pub enum Achievement {
+    /* -------------------------------------------------------------------------- */
+    /*                                Cookies Baked                               */
+    /* -------------------------------------------------------------------------- */
     #[assoc(req = AchievementReq::CookiesBaked(1.0))]
     WakeAndBake,
     #[assoc(req = AchievementReq::CookiesBaked(1.0 * num::THOUSAND))]
@@ -193,17 +196,133 @@ pub enum Achievement {
     RainyDayFund,
     #[assoc(req = AchievementReq::CookiesBaked(1.0 * num::TREVIGINTILLION))]
     AndALittleExtra,
+    /* -------------------------------------------------------------------------- */
+    /*                             Cookies Per Second                             */
+    /* -------------------------------------------------------------------------- */
+    #[assoc(req = AchievementReq::Cps(1.0))]
+    CasualBaking,
+    #[assoc(req = AchievementReq::Cps(10.0))]
+    HardcoreBaking,
+    #[assoc(req = AchievementReq::Cps(100.0))]
+    SteadyTastyStream,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::THOUSAND))]
+    CookieMonster,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::THOUSAND))]
+    MassProducer,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::MILLION))]
+    CookieVortex,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::MILLION))]
+    CookiePulsar,
+    #[assoc(req = AchievementReq::Cps(100.0 * num::MILLION))]
+    CookieQuasar,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::BILLION))]
+    #[name(base = "Oh Hey You're Still Here")]
+    OhHeyYoureStillHere,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::BILLION))]
+    #[name(base = "Let's Never Bake Again")]
+    LetsNeverBakeAgain,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::TRILLION))]
+    AWorldFilledWithCookies,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::TRILLION))]
+    WhenThisBabyHits36QuadrillionCookiesPerHour,
+    #[assoc(req = AchievementReq::Cps(100.0 * num::TRILLION))]
+    FastAndDelicious,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::QUADRILLION))]
+    CookieHertzAReallyReallyTastyHertz,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::QUADRILLION))]
+    #[name(base = "Whoops, You Solved World Hunger")]
+    WhoopsYouSolvedWorldHunger,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::QUINTILLION))]
+    Turbopuns,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::QUINTILLION))]
+    FasterMenner,
+    #[assoc(req = AchievementReq::Cps(100.0 * num::QUINTILLION))]
+    #[name(base = "And Yet You're Still Hungry")]
+    AndYetYoureStillHungry,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::SEXTILLION))]
+    TheAbakening,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::SEXTILLION))]
+    #[name(base = "There's A Hard Limit To How Long These Achievement Names Can Be")]
+    TheresAHardLimitToHowLongTheseAchievementNamesCanBe,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::SEPTILLION))]
+    Fast,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::SEPTILLION))]
+    KneadForSpeed,
+    #[assoc(req = AchievementReq::Cps(100.0 * num::SEPTILLION))]
+    #[name(base = "Well The Cookies Start Coming And They Don't Stop Coming")]
+    WellTheCookiesStartComingAndTheyDontStopComing,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::OCTILLION))]
+    #[name(base = "I Don't Know If You've Noticed But This Text Overflows")]
+    IDontKnowIfYouveNoticedButThisTextOverflows,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::OCTILLION))]
+    TheProofOfTheCookieIsInTheBaking,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::NONILLION))]
+    #[name(base = "If It's Worth Doing It's Worth Overdoing")]
+    IfItsWorthDoingItsWorthOverdoing,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::NONILLION))]
+    RunningWithScissors,
+    #[assoc(req = AchievementReq::Cps(100.0 * num::NONILLION))]
+    RarefiedAir,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::DECILLION))]
+    PushItToTheLimit,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::DECILLION))]
+    GreenCookiesSleepFuriously,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::UNDECILLION))]
+    LeisurelyPace,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::UNDECILLION))]
+    Hypersonic,
+    #[assoc(req = AchievementReq::Cps(100.0 * num::UNDECILLION))]
+    GottaGoFast,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::DUODECILLION))]
+    #[name(base = "Bake Him Away, Toys")]
+    BakeHimAwayToys,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::DUODECILLION))]
+    #[name(base = "You're #1 So Why Try Harder")]
+    YoureNumber1SoWhyTryHarder,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::TREDECILLION))]
+    #[name(base = "Haven't Even Begun To Peak")]
+    HaventEvenBegunToPeak,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::TREDECILLION))]
+    WhatDidWeEvenEatBeforeThese,
+    #[assoc(req = AchievementReq::Cps(100.0 * num::TREDECILLION))]
+    HeavyFlow,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::QUATTORDECILLION))]
+    #[name(base = "More You Say?")]
+    MoreYouSay,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::QUATTORDECILLION))]
+    KeepGoingUntilISayStop,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::QUINDECILLION))]
+    #[name(base = "But I Didn't Say Stop, Did I?")]
+    ButIDidntSayStopDidI,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::QUINDECILLION))]
+    WithUnrivaledFervor,
+    #[assoc(req = AchievementReq::Cps(100.0 * num::QUINDECILLION))]
+    IAmSpeed,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::SEXDECILLION))]
+    AndOnAndOn,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::SEXDECILLION))]
+    EverythingHappensSoMuch,
+    #[assoc(req = AchievementReq::Cps(1.0 * num::SEPTENDECILLION))]
+    #[name(base = "I'll Rest When I'm Dead")]
+    IllRestWhenImDead,
+    #[assoc(req = AchievementReq::Cps(10.0 * num::SEPTENDECILLION))]
+    CanWeGetMuchHigher,
+    #[assoc(req = AchievementReq::Cps(100.0 * num::SEPTENDECILLION))]
+    #[name(base = "Speed's The Name Of The Game")]
+    SpeedsTheNameOfTheGame,
 }
 
 #[derive(Debug)]
 pub enum AchievementReq {
     CookiesBaked(f64),
+    Cps(f64),
 }
 
 impl AchievementReq {
     fn as_late_req(&self) -> LateReq {
         match self {
             Self::CookiesBaked(v) => LateReq::CookiesAllTimeAboveOrEq(*v),
+            Self::Cps(v) => LateReq::CpsAbove(*v),
         }
     }
 }

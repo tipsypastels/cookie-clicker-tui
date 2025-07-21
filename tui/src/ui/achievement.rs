@@ -26,6 +26,13 @@ pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
                 pluralized(n as _, "cookie", "cookies")
             )
         }
+        AchievementReq::Cps(n) => {
+            format!(
+                "• bake {} {} per second",
+                n.print_float(0, 0),
+                pluralized(n as _, "cookie", "cookies")
+            )
+        }
     };
 
     let area = split_area(area);
