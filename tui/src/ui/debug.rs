@@ -17,7 +17,7 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
         AppDebugView::Milk => format!("{:?}", core.debug_milk()),
         AppDebugView::Ticker => format!("{:?}", core.debug_ticker()),
         AppDebugView::Keypress => {
-            if let Some(key) = app.debug_latest_key {
+            if let Some(key) = app.debug.latest_key() {
                 format!("{key:?}")
             } else {
                 "".to_string()

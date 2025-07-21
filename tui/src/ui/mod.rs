@@ -7,9 +7,8 @@ mod ticker;
 mod upgrades;
 mod utils;
 
-use crate::app::{AppCountdownState, AppDebugView, AppListState, AppModalState};
+use crate::app::{AppCountdownState, AppDebugState, AppListState, AppModalState};
 use cookie_clicker_tui_core::Core;
-use crossterm::event::KeyEvent;
 use ratatui::prelude::*;
 
 pub struct UiApp<'a> {
@@ -17,8 +16,7 @@ pub struct UiApp<'a> {
     pub list: &'a mut AppListState,
     pub countdown: &'a AppCountdownState,
     pub modal: AppModalState,
-    pub debug: Option<AppDebugView>,
-    pub debug_latest_key: Option<KeyEvent>,
+    pub debug: &'a AppDebugState,
 }
 
 pub fn ui(app: &mut UiApp, frame: &mut Frame) {
@@ -45,7 +43,7 @@ pub fn ui(app: &mut UiApp, frame: &mut Frame) {
 fn left_col(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let rows = Layout::vertical([Constraint::Percentage(100), Constraint::Length(3)]).split(area);
 
-    if let Some(view) = app.debug {
+    if let Some(view) = app.debug.view() {
         debug::debug(app, view, rows[0], buf);
     } else {
         cookies::cookies(app, rows[0], buf);

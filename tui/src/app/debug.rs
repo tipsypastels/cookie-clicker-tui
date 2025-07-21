@@ -1,0 +1,60 @@
+use crossterm::event::KeyEvent;
+use enum_fun::Name;
+
+#[derive(Default)]
+pub struct AppDebugState {
+    view: Option<AppDebugView>,
+    latest_key: Option<KeyEvent>,
+}
+
+#[derive(Name, Default, Copy, Clone)]
+#[name(base = "title case")]
+pub enum AppDebugView {
+    #[default]
+    Cookies,
+    Buildings,
+    Upgrades,
+    Achievements,
+    Milk,
+    Ticker,
+    Keypress,
+}
+
+impl AppDebugState {
+    pub fn view(&self) -> Option<AppDebugView> {
+        self.view
+    }
+
+    pub fn latest_key(&self) -> Option<KeyEvent> {
+        self.latest_key
+    }
+
+    pub fn pressed(&mut self, key: KeyEvent) {
+        self.latest_key = Some(key);
+    }
+
+    pub fn close(&mut self) {
+        self.view = None;
+    }
+
+    pub fn advance(&mut self) {
+        self.view = Some(match self.view {
+            Some(view) => view.next(),
+            None => AppDebugView::default(),
+        })
+    }
+}
+
+impl AppDebugView {
+    fn next(self) -> Self {
+        match self {
+            Self::Cookies => Self::Buildings,
+            Self::Buildings => Self::Upgrades,
+            Self::Upgrades => Self::Achievements,
+            Self::Achievements => Self::Milk,
+            Self::Milk => Self::Ticker,
+            Self::Ticker => Self::Keypress,
+            Self::Keypress => Self::Cookies,
+        }
+    }
+}

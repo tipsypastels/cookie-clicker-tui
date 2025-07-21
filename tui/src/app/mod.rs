@@ -1,3 +1,9 @@
+mod debug;
+mod list;
+mod modal;
+
+pub use self::debug::{AppDebugState, AppDebugView};
+
 use crate::{
     event::{Event, Events, REVERSE_MODIFIER},
     storage::Storage,
@@ -6,7 +12,6 @@ use anyhow::{Context, Result};
 use cookie_clicker_tui_core::{Building, Core};
 use cookie_clicker_tui_utils::countdown::{Countdown, CountdownOf};
 use crossterm::event::KeyEvent;
-use enum_fun::Name;
 use ratatui::DefaultTerminal;
 use tui_widget_list::ListState;
 
@@ -16,8 +21,7 @@ pub struct App {
     list: AppListState,
     countdown: AppCountdownState,
     modal: AppModalState,
-    debug: Option<AppDebugView>,
-    debug_latest_key: Option<KeyEvent>,
+    debug: AppDebugState,
     events: Events,
     quit: bool,
 }
@@ -48,19 +52,6 @@ pub enum AppModalState {
     Closed,
 }
 
-#[derive(Name, Default, Copy, Clone)]
-#[name(base = "title case")]
-pub enum AppDebugView {
-    #[default]
-    Cookies,
-    Buildings,
-    Upgrades,
-    Achievements,
-    Milk,
-    Ticker,
-    Keypress,
-}
-
 impl App {
     pub fn new(storage: Storage, core: Core) -> Self {
         Self {
@@ -77,8 +68,7 @@ impl App {
                 error_tried_to_sell_unowned_building: CountdownOf::new(),
             },
             modal: AppModalState::default(),
-            debug: None,
-            debug_latest_key: None,
+            debug: AppDebugState::default(),
             events: Events::new(),
             quit: false,
         }
@@ -104,7 +94,7 @@ impl App {
     async fn handle_key_event(&mut self, event: KeyEvent) -> Result<()> {
         use crossterm::event::KeyCode;
 
-        self.debug_latest_key = Some(event);
+        self.debug.pressed(event);
 
         match event.code {
             KeyCode::Up => {
@@ -153,8 +143,8 @@ impl App {
             KeyCode::Esc => {
                 if !matches!(self.modal, AppModalState::Closed) {
                     self.modal = AppModalState::Closed
-                } else if self.debug.is_some() {
-                    self.debug = None;
+                } else if self.debug.view().is_some() {
+                    self.debug.close();
                 } else {
                     self.quit().await?;
                 }
@@ -170,10 +160,7 @@ impl App {
                 self.modal.toggle();
             }
             KeyCode::Char('/') => {
-                self.debug = self
-                    .debug
-                    .map(|v| v.next())
-                    .or_else(|| Some(Default::default()));
+                self.debug.advance();
             }
             _ => {}
         }
@@ -188,8 +175,7 @@ impl App {
                 list: &mut self.list,
                 countdown: &self.countdown,
                 modal: self.modal,
-                debug: self.debug,
-                debug_latest_key: self.debug_latest_key,
+                debug: &self.debug,
             };
             crate::ui::ui(&mut ui, frame);
         })
@@ -305,20 +291,6 @@ impl AppModalState {
         *self = match *self {
             Self::Closed => Self::ListItem,
             _ => Self::Closed,
-        }
-    }
-}
-
-impl AppDebugView {
-    fn next(self) -> Self {
-        match self {
-            Self::Cookies => Self::Buildings,
-            Self::Buildings => Self::Upgrades,
-            Self::Upgrades => Self::Achievements,
-            Self::Achievements => Self::Milk,
-            Self::Milk => Self::Ticker,
-            Self::Ticker => Self::Keypress,
-            Self::Keypress => Self::Cookies,
         }
     }
 }
