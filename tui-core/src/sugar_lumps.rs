@@ -21,8 +21,10 @@ pub fn tick(state: &mut State) {
         }
     }
 
-    if state.sugar_lumps.grow_refresh.finish() {
-        state.sugar_lumps.state.count = state.sugar_lumps.state.count.saturating_add(1);
+    if state.sugar_lumps.grow_refresh.finish()
+        && let Some(count) = state.sugar_lumps.state.count.checked_sub(1)
+    {
+        state.sugar_lumps.state.count = count;
         state.sugar_lumps.grow_refresh.restart();
     }
 }
