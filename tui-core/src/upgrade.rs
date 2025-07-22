@@ -1,12 +1,13 @@
 mod effect_info;
 mod grandma;
+mod kitten;
 mod tiered;
 
 pub use effect_info::UpgradeEffectInfo;
 
-use self::{grandma::Grandma, tiered::Tiered};
+use self::{grandma::Grandma, kitten::Kitten, tiered::Tiered};
 use crate::{Building, State, req::Req};
-use cookie_clicker_tui_utils::frames::RefreshClock;
+use cookie_clicker_tui_utils::{frames::RefreshClock, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 use serde::{Deserialize, Serialize};
@@ -820,6 +821,39 @@ pub enum Upgrade {
     BrainyGrandmas,
     #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::You)))]
     CloneGrandmas,
+    /* -------------------------------------------------------------------------- */
+    /*                                   Kitten                                   */
+    /* -------------------------------------------------------------------------- */
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(52.0, 0.1, 9.0 * num::MILLION)))]
+    KittenHelpers,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(100.0, 0.125, 9.0 * num::BILLION)))]
+    KittenWorkers,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(200.0, 0.15, 90.0 * num::TRILLION)))]
+    KittenEngineers,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(300.0, 0.175, 90.0 * num::QUADRILLION)))]
+    KittenOverseers,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(400.0, 0.2, 900.0 * num::QUINTILLION)))]
+    KittenManagers,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(500.0, 0.2, 900.0 * num::SEXTILLION)))]
+    KittenAccountants,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(600.0, 0.2, 900.0 * num::SEPTILLION)))]
+    KittenSpecialists,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(700.0, 0.2, 900.0 * num::OCTILLION)))]
+    KittenExperts,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(800.0, 0.2, 900.0 * num::NONILLION)))]
+    KittenConsulants,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(900.0, 0.175, 900.0 * num::DECILLION)))]
+    KittenAssistantsToTheRegionalManager,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1000.0, 0.15, 900.0 * num::UNDECILLION)))]
+    KittenMarketers,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1100.0, 0.125, 900.0 * num::DUODECILLION)))]
+    KittenAnalysts,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1200.0, 0.115, 900.0 * num::TREDECILLION)))]
+    KittenExecutives,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1300.0, 0.11, 900.0 * num::QUATTORDECILLION)))]
+    KittenAdmins,
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1400.0, 0.105, 900.0 * num::QUINDECILLION)))]
+    KittenStrategists,
 }
 
 impl Upgrade {
@@ -839,6 +873,7 @@ impl Upgrade {
 enum UpgradeClass {
     Tiered(Tiered),
     Grandma(Grandma),
+    Kitten(Kitten),
 }
 
 impl UpgradeClass {
@@ -846,6 +881,7 @@ impl UpgradeClass {
         match self {
             Self::Tiered(u) => u.cost(),
             Self::Grandma(u) => u.cost(),
+            Self::Kitten(u) => u.cost(),
         }
     }
 
@@ -853,6 +889,7 @@ impl UpgradeClass {
         match self {
             Self::Tiered(u) => u.req(),
             Self::Grandma(u) => u.req(),
+            Self::Kitten(u) => u.req(),
         }
     }
 
@@ -860,6 +897,7 @@ impl UpgradeClass {
         match self {
             Self::Tiered(u) => u.buy(state),
             Self::Grandma(u) => u.buy(state),
+            Self::Kitten(u) => u.buy(state),
         }
     }
 
@@ -867,6 +905,7 @@ impl UpgradeClass {
         match self {
             Self::Tiered(u) => u.effect_info(),
             Self::Grandma(u) => u.effect_info(),
+            Self::Kitten(u) => u.effect_info(),
         }
     }
 }

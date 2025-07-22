@@ -122,6 +122,13 @@ fn render_upgrade(upgrade: Upgrade, area: Rect, buf: &mut Buffer) {
                     ),
                 ]));
             }
+            UpgradeEffectInfo::Kitten => {
+                lines.push(Line::from(vec![
+                    Span::raw("• you gain more cookies per second the more "),
+                    Span::styled("milk", Modifier::BOLD),
+                    Span::raw(" you have"),
+                ]));
+            }
         }
 
         Paragraph::new(lines).block(block).render(area, buf);

@@ -6,25 +6,28 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug)]
 pub struct Milk {
-    achievements: u16,
+    state: MilkState,
     ratio: f64,
+    cps_mult: f64,
     flavor: MilkFlavor,
     refresh: RefreshClock<15>,
 }
 
 impl Milk {
     pub(crate) fn new() -> Self {
-        Self::_new(0)
+        Self::from_state(Default::default())
     }
 
-    fn _new(achievements: u16) -> Self {
-        let flavor = MilkFlavor::find(achievements);
-        let ratio = achievements as f64 / Achievement::VARIANT_COUNT as f64;
+    fn from_state(state: MilkState) -> Self {
+        let ratio = state.achievements as f64 / Achievement::VARIANT_COUNT as f64;
+        let cps = crate::calc::kitten_cps_mult(ratio, &state.kitten_mults);
+        let flavor = MilkFlavor::find(state.achievements);
         let refresh = RefreshClock::new();
 
         Self {
-            achievements,
+            state,
             ratio,
+            cps_mult: cps,
             flavor,
             refresh,
         }
@@ -32,16 +35,27 @@ impl Milk {
 
     pub(crate) fn tick(&mut self, achievements: u16) {
         if self.refresh.finish() {
-            if achievements > self.achievements {
-                *self = Self::_new(achievements);
-            } else {
-                self.refresh.restart();
-            }
+            if achievements > self.state.achievements {
+                self.state.achievements = achievements;
+                self.ratio = achievements as f64 / Achievement::VARIANT_COUNT as f64;
+                self.cps_mult = crate::calc::kitten_cps_mult(self.ratio, &self.state.kitten_mults);
+                self.flavor = MilkFlavor::find(achievements);
+            };
+            self.refresh.restart();
         }
+    }
+
+    pub(crate) fn add_kitten_mult(&mut self, mult: f64) {
+        self.state.kitten_mults.push(mult);
+        self.cps_mult = crate::calc::kitten_cps_mult(self.ratio, &self.state.kitten_mults);
     }
 
     pub fn ratio(&self) -> f64 {
         self.ratio
+    }
+
+    pub fn cps_mult(&self) -> f64 {
+        self.cps_mult
     }
 
     pub fn is_empty(&self) -> bool {
@@ -55,14 +69,20 @@ impl Milk {
 
 impl Serialize for Milk {
     fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        self.achievements.serialize(ser)
+        self.state.serialize(ser)
     }
 }
 
 impl<'de> Deserialize<'de> for Milk {
     fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        u16::deserialize(de).map(Self::_new)
+        MilkState::deserialize(de).map(Self::from_state)
     }
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+struct MilkState {
+    achievements: u16,
+    kitten_mults: Vec<f64>,
 }
 
 #[derive(Name, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

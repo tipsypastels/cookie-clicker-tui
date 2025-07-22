@@ -6,4 +6,5 @@ pub enum UpgradeEffectInfo {
         building: Building,
         num_req_for_1p: u16,
     },
+    Kitten,
 }

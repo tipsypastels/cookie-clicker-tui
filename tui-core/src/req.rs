@@ -6,6 +6,7 @@ pub enum Req {
     CookiesAllTime(Comparator<f64>),
     CookiesAllTimeFromClicking(Comparator<f64>),
     BuildingCountMin(Building, u16),
+    MilkRatio(Comparator<f64>),
     Custom(fn(&State) -> bool),
     Any(&'static [Req]),
     AnyBox(Box<[Req]>),
@@ -20,6 +21,7 @@ impl Req {
             Self::CookiesAllTime(c) => c.check(state.cookies.all_time()),
             Self::CookiesAllTimeFromClicking(c) => c.check(state.cookies.all_time_from_clicking()),
             Self::BuildingCountMin(b, c) => state.buildings.count(*b) >= *c,
+            Self::MilkRatio(c) => c.check(state.milk.ratio()),
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state)),
@@ -54,6 +56,7 @@ impl LateReq {
         CookiesAllTime(c: Comparator<f64>);
         CookiesAllTimeFromClicking(c: Comparator<f64>);
         BuildingCountMin(b: Building, c: u16);
+        MilkRatio(c: Comparator<f64>);
     }
 
     pub fn check(&self, state: &State, computed: &Computed) -> bool {

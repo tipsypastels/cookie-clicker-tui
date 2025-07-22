@@ -1,7 +1,7 @@
 use crate::{State, building::Building};
 
 pub fn cps(state: &State) -> f64 {
-    state.buildings.infos().map(|i| i.cps()).sum()
+    state.buildings.infos().map(|i| i.cps()).sum::<f64>() * state.milk.cps_mult()
 }
 
 pub fn building_cost(building: Building, count: u16) -> f64 {
@@ -63,4 +63,11 @@ pub fn building_cps(
 
 pub fn grandma_upgrade_num_req_for_1p(building: Building) -> u16 {
     building as u16 - 1
+}
+
+pub fn kitten_cps_mult(milk_ratio: f64, kitten_mults: &[f64]) -> f64 {
+    kitten_mults
+        .iter()
+        .map(|mult| 1.0 + mult * milk_ratio)
+        .product()
 }
