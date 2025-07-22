@@ -2,6 +2,7 @@ mod achievement;
 mod buildings;
 mod cookies;
 mod debug;
+mod flash;
 mod modal;
 mod ticker;
 mod upgrades;
@@ -36,6 +37,7 @@ pub fn ui(app: &mut UiApp, frame: &mut Frame) {
     buildings::buildings(app, cols[1], buf);
     upgrades::upgrades(app, cols[2], buf);
 
+    flash::flash(app, area, buf);
     achievement::achievement(app, area, buf);
     modal::modal(app, area, buf);
 }

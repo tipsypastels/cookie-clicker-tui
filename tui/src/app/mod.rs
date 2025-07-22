@@ -5,7 +5,7 @@ mod modal;
 
 pub use self::{
     debug::{AppDebugState, AppDebugView},
-    interface::AppInterfaceState,
+    interface::{AppFlash, AppInterfaceState},
     list::{AppListPane, AppListPointee, AppListState},
     modal::AppModalState,
 };
@@ -79,19 +79,26 @@ impl App {
             KeyCode::Right => {
                 self.list.right(&self.core);
             }
-            KeyCode::Enter => {
+            KeyCode::Enter =>
+            {
+                #[allow(clippy::collapsible_else_if)]
                 match self.list.pointee(&self.core) {
                     Some((_, AppListPointee::Building(building))) => {
                         if self.iface.sell_mode() {
-                            // TODO: Flash message?;
-                            self.core.sell_building(building);
+                            if !self.core.sell_building(building) {
+                                self.iface
+                                    .add_flash(AppFlash::CantSellUnownedBuilding(building));
+                            }
                         } else {
-                            self.core.buy_building(building);
+                            if !self.core.buy_building(building) {
+                                self.iface.add_flash(AppFlash::CantAffordBuilding(building));
+                            }
                         }
                     }
                     Some((i, AppListPointee::Upgrade(_))) => {
-                        // TODO: Flash message?;
-                        self.core.buy_upgrade(i);
+                        if !self.core.buy_upgrade(i) {
+                            self.iface.add_flash(AppFlash::CantAffordUpgrade(i));
+                        }
                     }
                     None => {}
                 }
