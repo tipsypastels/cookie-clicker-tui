@@ -1,16 +1,9 @@
 use anyhow::{Context, Result};
 use cookie_clicker_tui_utils::frames::FPS;
-use crossterm::event::{EventStream, KeyModifiers};
+use crossterm::event::EventStream;
 use futures::{FutureExt, StreamExt};
 use std::time::Duration;
 use tokio::sync::mpsc;
-
-// the vscode integrated terminal does not seem to support SHIFT,
-// so use ALT while in development.
-#[cfg(debug_assertions)]
-pub const REVERSE_MODIFIER: KeyModifiers = KeyModifiers::ALT;
-#[cfg(not(debug_assertions))]
-pub const REVERSE_MODIFIER: KeyModifiers = KeyModifiers::SHIFT;
 
 pub enum Event {
     Tick,

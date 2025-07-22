@@ -45,15 +45,9 @@ pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 }
 
 fn cookie_count(app: &mut UiApp, lines: &mut Vec<Line>) {
-    let mut cookie_count_style = Style::new().add_modifier(Modifier::BOLD);
-
-    if app.iface.insufficient_cookies() {
-        cookie_count_style = cookie_count_style.fg(Color::Red);
-    }
-
     lines.push(Line::styled(
         format!("{}", app.core.cookies().print_float(0, 2)),
-        cookie_count_style,
+        Modifier::BOLD,
     ));
 }
 

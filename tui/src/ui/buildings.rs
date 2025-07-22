@@ -31,10 +31,17 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let list_view = ListView::new(builder, Building::VARIANT_COUNT);
     let list_state = app.list.state_matching_mut(AppListPane::Buildings);
 
+    let (title, border_style) = if app.iface.sell_mode() {
+        (" SELL Buildings ", Style::new().red())
+    } else {
+        (" Buildings ", Style::new())
+    };
+
     let block = Block::bordered()
-        .title(Line::styled(" Buildings ", Modifier::BOLD).centered())
+        .title(Line::styled(title, Modifier::BOLD).centered())
         .title_bottom(Line::styled(" Buy <Enter> Inspect <I> ", Modifier::BOLD).centered())
-        .padding(Padding::uniform(1));
+        .padding(Padding::uniform(1))
+        .border_style(border_style);
 
     list_view
         .block(block)

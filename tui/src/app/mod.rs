@@ -11,7 +11,7 @@ pub use self::{
 };
 
 use crate::{
-    event::{Event, Events, REVERSE_MODIFIER},
+    event::{Event, Events},
     storage::Storage,
 };
 use anyhow::{Context, Result};
@@ -79,33 +79,32 @@ impl App {
             KeyCode::Right => {
                 self.list.right(&self.core);
             }
-            KeyCode::Enter if event.modifiers.contains(REVERSE_MODIFIER) => {
-                match self.list.pointee(&self.core) {
-                    Some((_, AppListPointee::Building(building))) => {
-                        if !self.core.sell_building(building) {
-                            self.iface.set_tried_to_sell_unowned_building(building);
+            KeyCode::Enter => {
+                if self.iface.sell_mode() {
+                    match self.list.pointee(&self.core) {
+                        Some((_, AppListPointee::Building(building))) => {
+                            // TODO: Flash message?;
+                            self.core.sell_building(building);
                         }
+                        Some((_, AppListPointee::Upgrade(_))) => {
+                            todo!()
+                        }
+                        None => {}
                     }
-                    Some((_, AppListPointee::Upgrade(_))) => {
-                        todo!()
+                } else {
+                    match self.list.pointee(&self.core) {
+                        Some((_, AppListPointee::Building(building))) => {
+                            // TODO: Flash message?;
+                            self.core.buy_building(building);
+                        }
+                        Some((i, AppListPointee::Upgrade(_))) => {
+                            // TODO: Flash message?;
+                            self.core.buy_upgrade(i);
+                        }
+                        None => {}
                     }
-                    None => {}
                 }
             }
-
-            KeyCode::Enter => match self.list.pointee(&self.core) {
-                Some((_, AppListPointee::Building(building))) => {
-                    if !self.core.buy_building(building) {
-                        self.iface.set_insufficient_cookies();
-                    }
-                }
-                Some((i, AppListPointee::Upgrade(_))) => {
-                    if !self.core.buy_upgrade(i) {
-                        self.iface.set_insufficient_cookies();
-                    }
-                }
-                None => {}
-            },
             KeyCode::Esc => {
                 if self.modal.is_open() {
                     self.modal.close();
@@ -124,6 +123,9 @@ impl App {
             }
             KeyCode::Char('i') => {
                 self.modal.toggle();
+            }
+            KeyCode::Char('s') => {
+                self.iface.toggle_sell_mode();
             }
             KeyCode::Char('/') => {
                 self.debug.advance();
