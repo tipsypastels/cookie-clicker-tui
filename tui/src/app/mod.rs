@@ -5,6 +5,7 @@ mod modal;
 pub use self::{
     debug::{AppDebugState, AppDebugView},
     list::{AppListPane, AppListPointee, AppListState},
+    modal::AppModalState,
 };
 
 use crate::{
@@ -32,13 +33,6 @@ pub struct AppCountdownState {
     just_pressed_cookie: Countdown<3>,
     error_insufficient_cookies: Countdown<10>,
     error_tried_to_sell_unowned_building: CountdownOf<Building, 10>,
-}
-
-#[derive(Default, Copy, Clone)]
-pub enum AppModalState {
-    ListItem,
-    #[default]
-    Closed,
 }
 
 impl App {
@@ -79,7 +73,7 @@ impl App {
     async fn handle_key_event(&mut self, event: KeyEvent) -> Result<()> {
         use crossterm::event::KeyCode;
 
-        self.debug.pressed(event);
+        self.debug.set_latest_key_event(event);
 
         match event.code {
             KeyCode::Up => {
@@ -124,9 +118,9 @@ impl App {
                 None => {}
             },
             KeyCode::Esc => {
-                if !matches!(self.modal, AppModalState::Closed) {
-                    self.modal = AppModalState::Closed
-                } else if self.debug.view().is_some() {
+                if self.modal.is_open() {
+                    self.modal.close();
+                } else if self.debug.is_open() {
                     self.debug.close();
                 } else {
                     self.quit().await?;
@@ -190,14 +184,5 @@ impl AppCountdownState {
     pub fn tick(&mut self) {
         self.just_pressed_cookie.tick();
         self.error_insufficient_cookies.tick();
-    }
-}
-
-impl AppModalState {
-    fn toggle(&mut self) {
-        *self = match *self {
-            Self::Closed => Self::ListItem,
-            _ => Self::Closed,
-        }
     }
 }

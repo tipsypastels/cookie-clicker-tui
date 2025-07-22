@@ -26,11 +26,15 @@ impl AppDebugState {
         self.view
     }
 
-    pub fn latest_key(&self) -> Option<KeyEvent> {
+    pub fn is_open(&self) -> bool {
+        self.view.is_some()
+    }
+
+    pub fn latest_key_event(&self) -> Option<KeyEvent> {
         self.latest_key
     }
 
-    pub fn pressed(&mut self, key: KeyEvent) {
+    pub fn set_latest_key_event(&mut self, key: KeyEvent) {
         self.latest_key = Some(key);
     }
 

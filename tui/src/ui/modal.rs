@@ -1,5 +1,5 @@
 use super::{UiApp, utils::num::PrintFloat};
-use crate::app::{AppListPointee, AppModalState};
+use crate::app::AppListPointee;
 use cookie_clicker_tui_core::{Building, Upgrade, UpgradeEffectInfo};
 use ratatui::{
     prelude::*,
@@ -10,9 +10,8 @@ use std::borrow::Cow;
 const SCREEN_PERCENT: (u16, u16) = (60, 31);
 
 pub fn modal(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
-    match app.modal {
-        AppModalState::Closed => {}
-        AppModalState::ListItem => render_list_item(app, area, buf),
+    if app.modal.is_list_item() {
+        render_list_item(app, area, buf);
     }
 }
 
