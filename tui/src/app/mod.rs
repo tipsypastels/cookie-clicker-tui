@@ -80,29 +80,20 @@ impl App {
                 self.list.right(&self.core);
             }
             KeyCode::Enter => {
-                if self.iface.sell_mode() {
-                    match self.list.pointee(&self.core) {
-                        Some((_, AppListPointee::Building(building))) => {
+                match self.list.pointee(&self.core) {
+                    Some((_, AppListPointee::Building(building))) => {
+                        if self.iface.sell_mode() {
                             // TODO: Flash message?;
                             self.core.sell_building(building);
-                        }
-                        Some((_, AppListPointee::Upgrade(_))) => {
-                            todo!()
-                        }
-                        None => {}
-                    }
-                } else {
-                    match self.list.pointee(&self.core) {
-                        Some((_, AppListPointee::Building(building))) => {
-                            // TODO: Flash message?;
+                        } else {
                             self.core.buy_building(building);
                         }
-                        Some((i, AppListPointee::Upgrade(_))) => {
-                            // TODO: Flash message?;
-                            self.core.buy_upgrade(i);
-                        }
-                        None => {}
                     }
+                    Some((i, AppListPointee::Upgrade(_))) => {
+                        // TODO: Flash message?;
+                        self.core.buy_upgrade(i);
+                    }
+                    None => {}
                 }
             }
             KeyCode::Esc => {
@@ -125,7 +116,9 @@ impl App {
                 self.modal.toggle();
             }
             KeyCode::Char('s') => {
-                self.iface.toggle_sell_mode();
+                if self.list.is_pane(AppListPane::Buildings) {
+                    self.iface.toggle_sell_mode();
+                }
             }
             KeyCode::Char('/') => {
                 self.debug.advance();

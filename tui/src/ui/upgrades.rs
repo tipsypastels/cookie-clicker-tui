@@ -31,17 +31,10 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let list_view = ListView::new(builder, app.core.upgrades().len());
     let list_state = app.list.state_matching_mut(AppListPane::Upgrades);
 
-    let (title, border_style) = if app.iface.sell_mode() {
-        (" SELL Upgrades ", Style::new().red())
-    } else {
-        (" Upgrades ", Style::new())
-    };
-
     let block = Block::bordered()
-        .title(Line::styled(title, Modifier::BOLD).centered())
+        .title(Line::styled(" Upgrades ", Modifier::BOLD).centered())
         .title_bottom(Line::styled(" Buy <Enter> Inspect <I> ", Modifier::BOLD).centered())
-        .padding(Padding::uniform(1))
-        .border_style(border_style);
+        .padding(Padding::uniform(1));
 
     list_view
         .block(block)
