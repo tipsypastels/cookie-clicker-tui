@@ -2,12 +2,12 @@ use std::fmt;
 
 pub const FPS: f64 = 30.0;
 
-pub struct RefreshClock<const SECONDS: u16> {
-    ticks_until_refresh: u16,
+pub struct RefreshClock<const SECONDS: u32> {
+    ticks_until_refresh: u32,
 }
 
-impl<const SECONDS: u16> RefreshClock<SECONDS> {
-    pub const TICKS: u16 = SECONDS * FPS as u16;
+impl<const SECONDS: u32> RefreshClock<SECONDS> {
+    pub const TICKS: u32 = SECONDS * FPS as u32;
 
     pub fn new() -> Self {
         Self {
@@ -29,13 +29,13 @@ impl<const SECONDS: u16> RefreshClock<SECONDS> {
     }
 }
 
-impl<const SECONDS: u16> Default for RefreshClock<SECONDS> {
+impl<const SECONDS: u32> Default for RefreshClock<SECONDS> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<const SECONDS: u16> fmt::Debug for RefreshClock<SECONDS> {
+impl<const SECONDS: u32> fmt::Debug for RefreshClock<SECONDS> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.ticks_until_refresh.fmt(f)
     }

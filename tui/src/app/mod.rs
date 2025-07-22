@@ -154,7 +154,13 @@ impl App {
     async fn tick(&mut self) -> Result<()> {
         self.core.tick();
         self.iface.tick();
-        self.storage.tick(&self.core).await
+        self.storage.tick(&self.core).await?;
+
+        if self.core.sugar_lumps().just_unlocked() {
+            self.iface.add_flash(AppFlash::SugarLumpsUnlocked);
+        }
+
+        Ok(())
     }
 
     async fn quit(&mut self) -> Result<()> {

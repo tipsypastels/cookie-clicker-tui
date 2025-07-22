@@ -4,6 +4,7 @@ mod calc;
 mod cookies;
 mod milk;
 mod req;
+mod sugar_lumps;
 mod ticker;
 mod upgrade;
 
@@ -11,6 +12,7 @@ pub use self::{
     achievement::{Achievement, AchievementReq},
     building::{Building, BuildingInfo},
     milk::{Milk, MilkFlavor},
+    sugar_lumps::SugarLumps,
     upgrade::{Upgrade, UpgradeEffectInfo},
 };
 
@@ -55,6 +57,10 @@ impl Core {
 
     pub fn milk(&self) -> &Milk {
         &self.state.milk
+    }
+
+    pub fn sugar_lumps(&self) -> &SugarLumps {
+        &self.state.sugar_lumps
     }
 
     pub fn building_infos(&self) -> impl Iterator<Item = BuildingInfo> {
@@ -162,10 +168,6 @@ impl Core {
         &self.state.achievements
     }
 
-    pub fn debug_milk(&self) -> impl fmt::Debug {
-        &self.state.milk
-    }
-
     pub fn debug_ticker(&self) -> impl fmt::Debug {
         &self.computed.ticker
     }
@@ -199,6 +201,8 @@ struct State {
     milk: Milk,
     #[serde(default = "Achievements::new")]
     achievements: Achievements,
+    #[serde(default = "SugarLumps::new")]
+    sugar_lumps: SugarLumps,
 }
 
 impl State {
@@ -208,6 +212,7 @@ impl State {
             buildings: Buildings::new(),
             milk: Milk::new(),
             achievements: Achievements::new(),
+            sugar_lumps: SugarLumps::new(),
         }
     }
 
@@ -217,6 +222,7 @@ impl State {
         self.milk.tick(self.achievements.owned().len() as _);
 
         achievement::tick(self, computed);
+        sugar_lumps::tick(self);
     }
 }
 

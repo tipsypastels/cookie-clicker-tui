@@ -1,7 +1,7 @@
 use cookie_clicker_tui_core::Building;
 use cookie_clicker_tui_utils::{countdown::Countdown, frames::RefreshClock};
 use enum_assoc::Assoc;
-use ratatui::style::{Color, Style};
+use ratatui::style::{Color, Style, Stylize};
 use std::collections::{HashSet, VecDeque};
 
 #[derive(Default)]
@@ -78,10 +78,12 @@ impl AppFlashes {
     }
 }
 
-#[allow(clippy::enum_variant_names)] // temporary
+#[allow(clippy::enum_variant_names)]
 #[derive(Assoc, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[func(pub fn class(self) -> AppFlashClass)]
 pub enum AppFlash {
+    #[assoc(class = AppFlashClass::Info)]
+    SugarLumpsUnlocked,
     #[assoc(class = AppFlashClass::Error)]
     CantAffordBuilding(Building),
     #[assoc(class = AppFlashClass::Error)]
@@ -98,12 +100,19 @@ impl AppFlash {
     pub fn style(self) -> Style {
         self.class().style()
     }
+
+    pub fn border_style(self) -> Style {
+        self.class().border_style()
+    }
 }
 
 #[derive(Assoc, Copy, Clone)]
 #[func(pub fn title(self) -> &'static str)]
 #[func(pub fn style(self) -> Style)]
+#[func(pub fn border_style(self) -> Style)]
 enum AppFlashClass {
-    #[assoc(title = " Error ", style = Style::new().bg(Color::LightRed))]
+    #[assoc(title = " Info ", style = Style::new().bg(Color::LightBlue), border_style = Style::new().white())]
+    Info,
+    #[assoc(title = " Error ", style = Style::new().bg(Color::LightRed), border_style = Style::new().black())]
     Error,
 }

@@ -4,6 +4,7 @@ use ratatui::{
     prelude::*,
     widgets::{Block, Clear, Paragraph},
 };
+use std::borrow::Cow;
 
 const SCREEN_PERCENT: (u16, u16) = (33, 15);
 
@@ -12,28 +13,30 @@ pub fn flash(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         return;
     };
 
-    let text = match flash {
+    let text: Cow<str> = match flash {
+        AppFlash::SugarLumpsUnlocked => "• sugar lumps unlocked".into(),
         AppFlash::CantAffordBuilding(building) => {
-            format!("• you can't afford a {}", building.name_lower())
+            format!("• you can't afford a {}", building.name_lower()).into()
         }
         AppFlash::CantAffordUpgrade(index) => {
             let Some(upgrade) = &app.core.upgrades().get(index) else {
                 return;
             };
-            format!("• you can't afford {}", upgrade.label().to_lowercase())
+            format!("• you can't afford {}", upgrade.label().to_lowercase()).into()
         }
         AppFlash::CantSellUnownedBuilding(building) => {
-            format!("• you don't have a {} to sell", building.name_lower())
+            format!("• you don't have a {} to sell", building.name_lower()).into()
         }
     };
 
-    let title = flash.title();
     let style = flash.style();
+    let border_style = flash.border_style();
+    let title = flash.title();
 
     let area = split_area(area);
     let block = Block::bordered()
         .style(style)
-        .border_style(Style::new().black())
+        .border_style(border_style)
         .title(title);
 
     Clear.render(area, buf);
