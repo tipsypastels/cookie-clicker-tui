@@ -20,6 +20,11 @@ pub fn tick(state: &mut State) {
             state.sugar_lumps.unlock_refresh.restart();
         }
     }
+
+    if state.sugar_lumps.grow_refresh.finish() {
+        state.sugar_lumps.state.count = state.sugar_lumps.state.count.saturating_add(1);
+        state.sugar_lumps.grow_refresh.restart();
+    }
 }
 
 #[derive(Debug)]
