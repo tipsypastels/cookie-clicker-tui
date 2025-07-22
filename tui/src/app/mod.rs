@@ -116,7 +116,7 @@ impl App {
                 self.modal.toggle();
             }
             KeyCode::Char('s') => {
-                if self.list.is_pane(AppListPane::Buildings) {
+                if self.list.is_pane_highlighted(AppListPane::Buildings) {
                     self.iface.toggle_sell_mode();
                 }
             }

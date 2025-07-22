@@ -65,8 +65,8 @@ impl AppListState {
         self.state.select(Some(0));
     }
 
-    pub fn is_pane(&self, pane: AppListPane) -> bool {
-        self.pane == pane
+    pub fn is_pane_highlighted(&self, pane: AppListPane) -> bool {
+        self.pane == pane && self.state.selected.is_some()
     }
 
     pub fn state_matching_mut(&mut self, pane: AppListPane) -> Option<&mut ListState> {
