@@ -17,7 +17,7 @@ use tui_widget_list::{ListBuilder, ListView};
 pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let builder = ListBuilder::new(|ctx| {
         let selected = ctx.is_selected;
-        let upgrade = &app.core.upgrades()[ctx.index];
+        let upgrade = app.core.available_upgrades()[ctx.index];
         let affordable = upgrade.cost() <= app.core.cookies();
         let widget = ShopItemWidget {
             selected,
@@ -28,7 +28,7 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         (widget, ShopItemWidget::HEIGHT)
     });
 
-    let list_view = ListView::new(builder, app.core.upgrades().len());
+    let list_view = ListView::new(builder, app.core.available_upgrades().len());
     let list_state = app.list.state_matching_mut(AppListPane::Upgrades);
 
     let block = Block::bordered()
@@ -41,12 +41,12 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         .render_stateful_or_default_state(area, buf, list_state);
 }
 
-impl ShopItemRender for &Upgrade {
+impl ShopItemRender for Upgrade {
     fn label(&self) -> Cow<'static, str> {
-        Upgrade::label(self).into()
+        self.name().into()
     }
 
     fn cost(&self) -> f64 {
-        Upgrade::cost(self)
+        self.cost()
     }
 }

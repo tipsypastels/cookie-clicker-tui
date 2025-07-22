@@ -1,4 +1,4 @@
-use cookie_clicker_tui_core::Building;
+use cookie_clicker_tui_core::{Building, Upgrade};
 use cookie_clicker_tui_utils::{countdown::Countdown, frames::RefreshClock};
 use enum_assoc::Assoc;
 use ratatui::style::{Color, Style, Stylize};
@@ -87,7 +87,7 @@ pub enum AppFlash {
     #[assoc(class = AppFlashClass::Error)]
     CantAffordBuilding(Building),
     #[assoc(class = AppFlashClass::Error)]
-    CantAffordUpgrade(usize),
+    CantAffordUpgrade(Upgrade),
     #[assoc(class = AppFlashClass::Error)]
     CantSellUnownedBuilding(Building),
 }

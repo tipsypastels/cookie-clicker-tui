@@ -162,10 +162,10 @@ impl Buildings {
             building_class: match building {
                 Building::Cursor => calc::BuildingCpsClass::Cursor,
                 Building::Grandma => calc::BuildingCpsClass::Grandma {
-                    grandma_co_tiered_upgrade_count: self.grandma_co_tiered_upgrade_count(),
+                    grandma_upgrade_count: self.grandma_upgrade_count(),
                 },
                 _ => calc::BuildingCpsClass::Other {
-                    grandma_count_for_co_tiered_upgrade: if state.has_grandma_co_tiered_upgrade {
+                    grandma_count: if state.has_grandma_upgrade {
                         Some(self.states.grandma.count)
                     } else {
                         None
@@ -173,7 +173,7 @@ impl Buildings {
                 },
             },
             count: state.count,
-            simple_tiered_upgrade_count: state.simple_tiered_upgrade_count,
+            tiered_upgrade_count: state.tiered_upgrade_count,
         });
 
         BuildingComputed {
@@ -183,9 +183,9 @@ impl Buildings {
         }
     }
 
-    fn grandma_co_tiered_upgrade_count(&self) -> u16 {
+    fn grandma_upgrade_count(&self) -> u16 {
         Building::variants()
-            .map(|b| self.states.get(b).has_grandma_co_tiered_upgrade as u16)
+            .map(|b| self.states.get(b).has_grandma_upgrade as u16)
             .sum()
     }
 }
@@ -230,12 +230,12 @@ impl BuildingInfo {
         self.state.cookies_all_time
     }
 
-    pub fn simple_tiered_upgrade_count(&self) -> u16 {
-        self.state.simple_tiered_upgrade_count
+    pub fn tiered_upgrade_count(&self) -> u16 {
+        self.state.tiered_upgrade_count
     }
 
-    pub fn has_grandma_co_tiered_upgrade(&self) -> bool {
-        self.state.has_grandma_co_tiered_upgrade
+    pub fn has_grandma_upgrade(&self) -> bool {
+        self.state.has_grandma_upgrade
     }
 
     pub fn cost(&self) -> f64 {
@@ -259,14 +259,8 @@ impl fmt::Debug for BuildingInfo {
             .field("cost", &self.computed.cost)
             .field("sell_cost", &self.computed.sell_cost)
             .field("cookies_all_time", &self.state.cookies_all_time)
-            .field(
-                "simple_tiered_upgrade_count",
-                &self.state.simple_tiered_upgrade_count,
-            )
-            .field(
-                "has_grandma_co_tiered_upgrade",
-                &self.state.has_grandma_co_tiered_upgrade,
-            )
+            .field("tiered_upgrade_count", &self.state.tiered_upgrade_count)
+            .field("has_grandma_upgrade", &self.state.has_grandma_upgrade)
             .finish()
     }
 }
@@ -275,8 +269,8 @@ impl fmt::Debug for BuildingInfo {
 pub struct BuildingState {
     pub count: u16,
     pub cookies_all_time: f64,
-    pub simple_tiered_upgrade_count: u16,
-    pub has_grandma_co_tiered_upgrade: bool,
+    pub tiered_upgrade_count: u16,
+    pub has_grandma_upgrade: bool,
 }
 
 #[derive(Copy, Clone)]
@@ -340,32 +334,3 @@ make_building_map! {
     cortex_baker: CortexBaker,
     you: You,
 }
-
-macro_rules! all_the_buildings {
-    ($macro:ident) => {
-        $macro!(
-            Cursor,
-            Grandma,
-            Farm,
-            Mine,
-            Factory,
-            Bank,
-            Temple,
-            WizardTower,
-            Shipment,
-            AlchemyLab,
-            Portal,
-            TimeMachine,
-            AntimatterCondenser,
-            Prism,
-            Chancemaker,
-            FractalEngine,
-            RustPlayground,
-            Idleverse,
-            CortexBaker,
-            You,
-        )
-    };
-}
-
-pub(crate) use all_the_buildings;

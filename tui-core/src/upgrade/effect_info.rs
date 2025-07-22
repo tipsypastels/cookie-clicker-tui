@@ -1,8 +1,8 @@
 use crate::Building;
 
 pub enum UpgradeEffectInfo {
-    SimpleTiered(Building),
-    GrandmaCoTiered {
+    Tiered(Building),
+    Grandma {
         building: Building,
         num_req_for_1p: u16,
     },

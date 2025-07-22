@@ -17,8 +17,11 @@ pub use self::{
 };
 
 use self::{
-    achievement::Achievements, building::Buildings, cookies::Cookies, ticker::Ticker,
-    upgrade::Upgrades,
+    achievement::Achievements,
+    building::Buildings,
+    cookies::Cookies,
+    ticker::Ticker,
+    upgrade::{AvailableUpgrades, OwnedUpgrades},
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::{collections::BTreeSet, fmt};
@@ -75,8 +78,12 @@ impl Core {
         self.state.buildings.info_nth(index)
     }
 
-    pub fn upgrades(&self) -> &[Upgrade] {
-        &self.computed.upgrades
+    pub fn owned_upgrades(&self) -> &BTreeSet<Upgrade> {
+        self.state.owned_upgrades.as_set()
+    }
+
+    pub fn available_upgrades(&self) -> &[Upgrade] {
+        &self.computed.available_upgrades
     }
 
     pub fn owned_achievements(&self) -> &BTreeSet<Achievement> {
@@ -98,7 +105,7 @@ impl Core {
     pub fn give_free_building(&mut self, building: Building) {
         self.state.buildings.modify(building, |b| b.count += 1);
         self.computed.recalc_cps(&self.state);
-        self.computed.recalc_upgrades(&self.state);
+        self.computed.recalc_available_upgrades(&self.state);
     }
 
     pub fn buy_building(&mut self, building: Building) -> bool {
@@ -127,10 +134,14 @@ impl Core {
         true
     }
 
-    pub fn buy_upgrade(&mut self, index: usize) -> bool {
-        let Some(upgrade) = self.computed.upgrades.get(index) else {
+    pub fn buy_upgrade(&mut self, upgrade: Upgrade) -> bool {
+        if !self.computed.available_upgrades.contains(&upgrade) {
             return false;
         };
+
+        if self.state.owned_upgrades.has(upgrade) {
+            return false;
+        }
 
         let cost = upgrade.cost();
 
@@ -139,10 +150,12 @@ impl Core {
         }
 
         self.state.cookies.lose(cost);
+        self.state.owned_upgrades.add(upgrade);
+
         upgrade.buy(&mut self.state);
 
         self.computed.recalc_cps(&self.state);
-        self.computed.recalc_upgrades(&self.state);
+        self.computed.recalc_available_upgrades(&self.state);
 
         true
     }
@@ -160,8 +173,8 @@ impl Core {
         &self.state.buildings
     }
 
-    pub fn debug_upgrades(&self) -> impl fmt::Debug {
-        &self.computed.upgrades
+    pub fn debug_available_upgrades(&self) -> impl fmt::Debug {
+        &self.computed.available_upgrades
     }
 
     pub fn debug_achievements(&self) -> impl fmt::Debug {
@@ -201,6 +214,8 @@ struct State {
     milk: Milk,
     #[serde(default = "Achievements::new")]
     achievements: Achievements,
+    #[serde(default = "OwnedUpgrades::new")]
+    owned_upgrades: OwnedUpgrades,
     #[serde(default = "SugarLumps::new")]
     sugar_lumps: SugarLumps,
 }
@@ -212,6 +227,7 @@ impl State {
             buildings: Buildings::new(),
             milk: Milk::new(),
             achievements: Achievements::new(),
+            owned_upgrades: OwnedUpgrades::new(),
             sugar_lumps: SugarLumps::new(),
         }
     }
@@ -229,32 +245,32 @@ impl State {
 struct Computed {
     cps: f64,
     ticker: Ticker,
-    upgrades: Upgrades,
+    available_upgrades: AvailableUpgrades,
 }
 
 impl Computed {
     fn new(state: &State) -> Self {
         let cps = self::calc::cps(state);
         let ticker = Ticker::new(state);
-        let upgrades = Upgrades::new(state);
+        let available_upgrades = AvailableUpgrades::new(state);
 
         Self {
             cps,
             ticker,
-            upgrades,
+            available_upgrades,
         }
     }
 
     fn tick(&mut self, state: &State) {
         self.ticker.tick(state);
-        self.upgrades.tick(state);
+        self.available_upgrades.tick(state);
     }
 
     fn recalc_cps(&mut self, state: &State) {
         self.cps = self::calc::cps(state);
     }
 
-    fn recalc_upgrades(&mut self, state: &State) {
-        self.upgrades = Upgrades::new(state);
+    fn recalc_available_upgrades(&mut self, state: &State) {
+        self.available_upgrades = AvailableUpgrades::new(state);
     }
 }

@@ -95,9 +95,9 @@ impl App {
                             }
                         }
                     }
-                    Some((i, AppListPointee::Upgrade(_))) => {
-                        if !self.core.buy_upgrade(i) {
-                            self.iface.add_flash(AppFlash::CantAffordUpgrade(i));
+                    Some((_, AppListPointee::Upgrade(upgrade))) => {
+                        if !self.core.buy_upgrade(upgrade) {
+                            self.iface.add_flash(AppFlash::CantAffordUpgrade(upgrade));
                         }
                     }
                     None => {}

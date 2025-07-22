@@ -21,11 +21,8 @@ pub fn flash(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
             indefinite_article(building.name_lower())
         )
         .into(),
-        AppFlash::CantAffordUpgrade(index) => {
-            let Some(upgrade) = &app.core.upgrades().get(index) else {
-                return;
-            };
-            format!("• you can't afford {}", upgrade.label().to_lowercase()).into()
+        AppFlash::CantAffordUpgrade(upgrade) => {
+            format!("• you can't afford {}", upgrade.name_lower()).into()
         }
         AppFlash::CantSellUnownedBuilding(building) => format!(
             "• you don't have {} to sell",

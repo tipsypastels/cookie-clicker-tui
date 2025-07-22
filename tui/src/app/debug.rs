@@ -13,7 +13,8 @@ pub enum AppDebugView {
     #[default]
     Cookies,
     Buildings,
-    Upgrades,
+    AvailableUpgrades,
+    OwnedUpgrades,
     Achievements,
     Milk,
     SugarLumps,
@@ -55,8 +56,9 @@ impl AppDebugView {
     fn next(self) -> Self {
         match self {
             Self::Cookies => Self::Buildings,
-            Self::Buildings => Self::Upgrades,
-            Self::Upgrades => Self::Achievements,
+            Self::Buildings => Self::AvailableUpgrades,
+            Self::AvailableUpgrades => Self::OwnedUpgrades,
+            Self::OwnedUpgrades => Self::Achievements,
             Self::Achievements => Self::Milk,
             Self::Milk => Self::SugarLumps,
             Self::SugarLumps => Self::Ticker,

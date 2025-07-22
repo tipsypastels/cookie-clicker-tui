@@ -9,25 +9,26 @@ pub struct AppListState {
 }
 
 impl AppListState {
-    pub fn pointee<'a>(&self, core: &'a Core) -> Option<(usize, AppListPointee<'a>)> {
+    pub fn pointee(&self, core: &Core) -> Option<(usize, AppListPointee)> {
         let index = self.state.selected?;
         match self.pane {
             AppListPane::Buildings => {
                 Some((index, AppListPointee::Building(Building::nth(index)?)))
             }
-            AppListPane::Upgrades => {
-                Some((index, AppListPointee::Upgrade(core.upgrades().get(index)?)))
-            }
+            AppListPane::Upgrades => Some((
+                index,
+                AppListPointee::Upgrade(*core.available_upgrades().get(index)?),
+            )),
         }
     }
 
     pub fn debug(&self, core: &Core) -> impl fmt::Debug {
         #[allow(dead_code)]
         #[derive(Debug)]
-        struct AppListDebug<'list, 'core> {
-            state: &'list ListState,
+        struct AppListDebug<'a> {
+            state: &'a ListState,
             pane: AppListPane,
-            pointee: Option<(usize, AppListPointee<'core>)>,
+            pointee: Option<(usize, AppListPointee)>,
         }
         AppListDebug {
             state: &self.state,
@@ -75,9 +76,9 @@ impl AppListState {
 }
 
 #[derive(Debug)]
-pub enum AppListPointee<'a> {
+pub enum AppListPointee {
     Building(Building),
-    Upgrade(&'a Upgrade),
+    Upgrade(Upgrade),
 }
 
 #[derive(Default, Debug, Copy, Clone, PartialEq)]
@@ -91,7 +92,7 @@ impl AppListPane {
     fn available(self, core: &Core) -> bool {
         match self {
             Self::Buildings => true,
-            Self::Upgrades => !core.upgrades().is_empty(),
+            Self::Upgrades => !core.available_upgrades().is_empty(),
         }
     }
 

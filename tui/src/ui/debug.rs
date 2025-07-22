@@ -12,7 +12,8 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
     let text = match view {
         AppDebugView::Cookies => format!("{:?}", core.debug_cookies()),
         AppDebugView::Buildings => format!("{:?}", core.debug_buildings()),
-        AppDebugView::Upgrades => format!("{:?}", core.debug_upgrades()),
+        AppDebugView::AvailableUpgrades => format!("{:?}", core.debug_available_upgrades()),
+        AppDebugView::OwnedUpgrades => format!("{:?}", core.owned_upgrades()),
         AppDebugView::Achievements => format!("{:?}", core.debug_achievements()),
         AppDebugView::Milk => format!("{:?}", core.milk()),
         AppDebugView::SugarLumps => format!("{:?}", core.sugar_lumps()),

@@ -83,8 +83,8 @@ fn render_building(app: &mut UiApp, building: Building, area: Rect, buf: &mut Bu
     });
 }
 
-fn render_upgrade(upgrade: &Upgrade, area: Rect, buf: &mut Buffer) {
-    let title = format!(" {} ", upgrade.label());
+fn render_upgrade(upgrade: Upgrade, area: Rect, buf: &mut Buffer) {
+    let title = format!(" {} ", upgrade.name());
 
     render_outer(area, buf, title, |area, buf, block| {
         let mut lines = Vec::new();
@@ -99,10 +99,10 @@ fn render_upgrade(upgrade: &Upgrade, area: Rect, buf: &mut Buffer) {
         };
 
         match upgrade.effect_info() {
-            UpgradeEffectInfo::SimpleTiered(building) => {
+            UpgradeEffectInfo::Tiered(building) => {
                 lines.push(line_2x(building));
             }
-            UpgradeEffectInfo::GrandmaCoTiered {
+            UpgradeEffectInfo::Grandma {
                 building,
                 num_req_for_1p,
             } => {
