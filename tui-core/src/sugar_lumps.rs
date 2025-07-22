@@ -5,7 +5,7 @@ use crate::{
 use cookie_clicker_tui_utils::{frames::RefreshClock, num};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-const UNLOCK_REQ: Req = Req::Cookies(Comparator::AboveOrEq(1.0 * num::BILLION));
+const UNLOCK_REQ: Req = Req::CookiesAllTime(Comparator::AboveOrEq(1.0 * num::BILLION));
 
 pub fn tick(state: &mut State) {
     match &mut state.sugar_lumps.0 {
