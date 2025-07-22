@@ -1,6 +1,6 @@
 use super::{UiApp, utils::num::PrintFloat};
 use cookie_clicker_tui_core::AchievementReq;
-use cookie_clicker_tui_utils::pluralized;
+use cookie_clicker_tui_utils::str::pluralized;
 use ratatui::{
     prelude::*,
     widgets::{Block, Clear, Paragraph},

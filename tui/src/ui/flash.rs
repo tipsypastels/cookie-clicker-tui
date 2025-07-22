@@ -1,5 +1,6 @@
 use super::UiApp;
 use crate::app::AppFlash;
+use cookie_clicker_tui_utils::str::indefinite_article;
 use ratatui::{
     prelude::*,
     widgets::{Block, Clear, Paragraph},
@@ -15,9 +16,11 @@ pub fn flash(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 
     let text: Cow<str> = match flash {
         AppFlash::SugarLumpsUnlocked => "• sugar lumps unlocked".into(),
-        AppFlash::CantAffordBuilding(building) => {
-            format!("• you can't afford a {}", building.name_lower()).into()
-        }
+        AppFlash::CantAffordBuilding(building) => format!(
+            "• you can't afford {}",
+            indefinite_article(building.name_lower())
+        )
+        .into(),
         AppFlash::CantAffordUpgrade(index) => {
             let Some(upgrade) = &app.core.upgrades().get(index) else {
                 return;
