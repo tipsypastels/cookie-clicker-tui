@@ -18,11 +18,19 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let builder = ListBuilder::new(|ctx| {
         let selected = ctx.is_selected;
         let info = app.core.building_info_nth(ctx.index);
-        let affordable = info.cost() <= app.core.cookies();
+
+        let sell_mode = app.iface.sell_mode();
+        let affordable = if sell_mode {
+            info.count() > 0
+        } else {
+            info.cost() <= app.core.cookies()
+        };
+
+        let item = BuildingInfoShopItem { info, sell_mode };
         let widget = ShopItemWidget {
             selected,
             affordable,
-            item: info,
+            item,
         };
 
         (widget, ShopItemWidget::HEIGHT)
@@ -56,17 +64,26 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         .render_stateful_or_default_state(area, buf, list_state);
 }
 
-impl ShopItemRender for BuildingInfo {
+struct BuildingInfoShopItem {
+    info: BuildingInfo,
+    sell_mode: bool,
+}
+
+impl ShopItemRender for BuildingInfoShopItem {
     fn label(&self) -> Cow<'static, str> {
         format!(
             "{} {}",
-            self.count(),
-            self.building().name_pluralized(self.count() as _)
+            self.info.count(),
+            self.info.building().name_pluralized(self.info.count() as _)
         )
         .into()
     }
 
     fn cost(&self) -> f64 {
-        self.cost()
+        if self.sell_mode {
+            self.info.sell_cost()
+        } else {
+            self.info.cost()
+        }
     }
 }
