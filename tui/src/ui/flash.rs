@@ -27,9 +27,11 @@ pub fn flash(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
             };
             format!("• you can't afford {}", upgrade.label().to_lowercase()).into()
         }
-        AppFlash::CantSellUnownedBuilding(building) => {
-            format!("• you don't have a {} to sell", building.name_lower()).into()
-        }
+        AppFlash::CantSellUnownedBuilding(building) => format!(
+            "• you don't have {} to sell",
+            indefinite_article(building.name_lower())
+        )
+        .into(),
     };
 
     let style = flash.style();
