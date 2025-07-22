@@ -21,7 +21,7 @@ pub struct BuildingCps {
 
 pub enum BuildingCpsClass {
     Cursor,
-    Grandma { grandma_upgrade_count: u16 },
+    Grandma { grandma_job_upgrade_count: u16 },
     Other { grandma_count: Option<u16> },
 }
 
@@ -38,12 +38,12 @@ pub fn building_cps(
     let cps = match building_class {
         BuildingCpsClass::Cursor => cps,
         BuildingCpsClass::Grandma {
-            grandma_upgrade_count,
-        } => cps * 2.0f64.powi(grandma_upgrade_count as i32),
+            grandma_job_upgrade_count,
+        } => cps * 2.0f64.powi(grandma_job_upgrade_count as i32),
         BuildingCpsClass::Other {
             grandma_count: Some(grandma_count),
         } => {
-            let num_req_for_1p_increase = grandma_upgrade_num_req_for_1p(building);
+            let num_req_for_1p_increase = grandma_job_upgrade_num_req_for_1p(building);
 
             if grandma_count > num_req_for_1p_increase {
                 let ratio = grandma_count / num_req_for_1p_increase;
@@ -61,7 +61,7 @@ pub fn building_cps(
     cps
 }
 
-pub fn grandma_upgrade_num_req_for_1p(building: Building) -> u16 {
+pub fn grandma_job_upgrade_num_req_for_1p(building: Building) -> u16 {
     building as u16 - 1
 }
 

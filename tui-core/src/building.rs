@@ -162,10 +162,10 @@ impl Buildings {
             building_class: match building {
                 Building::Cursor => calc::BuildingCpsClass::Cursor,
                 Building::Grandma => calc::BuildingCpsClass::Grandma {
-                    grandma_upgrade_count: self.grandma_upgrade_count(),
+                    grandma_job_upgrade_count: self.grandma_job_upgrade_count(),
                 },
                 _ => calc::BuildingCpsClass::Other {
-                    grandma_count: if state.has_grandma_upgrade {
+                    grandma_count: if state.has_grandma_job_upgrade {
                         Some(self.states.grandma.count)
                     } else {
                         None
@@ -183,9 +183,9 @@ impl Buildings {
         }
     }
 
-    fn grandma_upgrade_count(&self) -> u16 {
+    fn grandma_job_upgrade_count(&self) -> u16 {
         Building::variants()
-            .map(|b| self.states.get(b).has_grandma_upgrade as u16)
+            .map(|b| self.states.get(b).has_grandma_job_upgrade as u16)
             .sum()
     }
 }
@@ -234,8 +234,8 @@ impl BuildingInfo {
         self.state.tiered_upgrade_count
     }
 
-    pub fn has_grandma_upgrade(&self) -> bool {
-        self.state.has_grandma_upgrade
+    pub fn has_grandma_job_upgrade(&self) -> bool {
+        self.state.has_grandma_job_upgrade
     }
 
     pub fn cost(&self) -> Cost {
@@ -260,7 +260,10 @@ impl fmt::Debug for BuildingInfo {
             .field("sell_cost", &self.computed.sell_cost)
             .field("cookies_all_time", &self.state.cookies_all_time)
             .field("tiered_upgrade_count", &self.state.tiered_upgrade_count)
-            .field("has_grandma_upgrade", &self.state.has_grandma_upgrade)
+            .field(
+                "has_grandma_job_upgrade",
+                &self.state.has_grandma_job_upgrade,
+            )
             .finish()
     }
 }
@@ -270,7 +273,7 @@ pub struct BuildingState {
     pub count: u16,
     pub cookies_all_time: f64,
     pub tiered_upgrade_count: u16,
-    pub has_grandma_upgrade: bool,
+    pub has_grandma_job_upgrade: bool,
 }
 
 #[derive(Copy, Clone)]

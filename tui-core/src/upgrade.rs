@@ -1,11 +1,11 @@
 mod effect_info;
-mod grandma;
+mod grandma_job;
 mod kitten;
 mod tiered;
 
 pub use effect_info::UpgradeEffectInfo;
 
-use self::{grandma::Grandma, kitten::Kitten, tiered::Tiered};
+use self::{grandma_job::GrandmaJob, kitten::Kitten, tiered::Tiered};
 use crate::{Building, Cost, State, req::Req};
 use cookie_clicker_tui_utils::{frames::RefreshClock, num};
 use enum_assoc::Assoc;
@@ -784,42 +784,42 @@ pub enum Upgrade {
     /* -------------------------------------------------------------------------- */
     /*                                   Grandma                                  */
     /* -------------------------------------------------------------------------- */
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Farm)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Farm)))]
     FarmerGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Mine)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Mine)))]
     MinerGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Factory)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Factory)))]
     WorkerGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Bank)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Bank)))]
     BankerGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Temple)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Temple)))]
     PriestessGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::WizardTower)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::WizardTower)))]
     WitchGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Shipment)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Shipment)))]
     CosmicGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::AlchemyLab)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::AlchemyLab)))]
     TransmutedGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Portal)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Portal)))]
     AlteredGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::TimeMachine)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::TimeMachine)))]
     #[name(base = "Grandma's Grandmas")]
     GrandmasGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::AntimatterCondenser)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::AntimatterCondenser)))]
     Antigrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Prism)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Prism)))]
     RainbowGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Chancemaker)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Chancemaker)))]
     LuckyGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::FractalEngine)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::FractalEngine)))]
     Metagrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::RustPlayground)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::RustPlayground)))]
     BinaryGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::Idleverse)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::Idleverse)))]
     AlternateGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::CortexBaker)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::CortexBaker)))]
     BrainyGrandmas,
-    #[assoc(class = UpgradeClass::Grandma(Grandma::new(Building::You)))]
+    #[assoc(class = UpgradeClass::GrandmaJob(GrandmaJob::new(Building::You)))]
     CloneGrandmas,
     /* -------------------------------------------------------------------------- */
     /*                                   Kitten                                   */
@@ -872,7 +872,7 @@ impl Upgrade {
 
 enum UpgradeClass {
     Tiered(Tiered),
-    Grandma(Grandma),
+    GrandmaJob(GrandmaJob),
     Kitten(Kitten),
 }
 
@@ -880,7 +880,7 @@ impl UpgradeClass {
     fn cost(&self) -> Cost {
         match self {
             Self::Tiered(u) => u.cost(),
-            Self::Grandma(u) => u.cost(),
+            Self::GrandmaJob(u) => u.cost(),
             Self::Kitten(u) => u.cost(),
         }
     }
@@ -888,7 +888,7 @@ impl UpgradeClass {
     fn req(&self) -> Req {
         match self {
             Self::Tiered(u) => u.req(),
-            Self::Grandma(u) => u.req(),
+            Self::GrandmaJob(u) => u.req(),
             Self::Kitten(u) => u.req(),
         }
     }
@@ -896,7 +896,7 @@ impl UpgradeClass {
     fn buy(&self, state: &mut State) {
         match self {
             Self::Tiered(u) => u.buy(state),
-            Self::Grandma(u) => u.buy(state),
+            Self::GrandmaJob(u) => u.buy(state),
             Self::Kitten(u) => u.buy(state),
         }
     }
@@ -904,7 +904,7 @@ impl UpgradeClass {
     fn effect_info(&self) -> UpgradeEffectInfo {
         match self {
             Self::Tiered(u) => u.effect_info(),
-            Self::Grandma(u) => u.effect_info(),
+            Self::GrandmaJob(u) => u.effect_info(),
             Self::Kitten(u) => u.effect_info(),
         }
     }
