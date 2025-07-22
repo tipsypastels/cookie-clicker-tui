@@ -1,5 +1,5 @@
 use super::effect_info::UpgradeEffectInfo;
-use crate::{Building, State, req::Req};
+use crate::{Building, Cost, State, req::Req};
 
 const COST_MULT: f64 = 50.0;
 
@@ -13,8 +13,8 @@ impl Grandma {
         Self { building }
     }
 
-    pub fn cost(&self) -> f64 {
-        self.building.base_cost() * COST_MULT
+    pub fn cost(&self) -> Cost {
+        Cost::Cookies(self.building.base_cost() * COST_MULT)
     }
 
     pub fn req(&self) -> Req {

@@ -1,6 +1,6 @@
 use super::effect_info::UpgradeEffectInfo;
 use crate::{
-    State,
+    Cost, State,
     req::{Comparator, Req},
 };
 
@@ -25,8 +25,8 @@ impl Kitten {
         }
     }
 
-    pub fn cost(&self) -> f64 {
-        self.cost
+    pub fn cost(&self) -> Cost {
+        Cost::Cookies(self.cost)
     }
 
     pub fn req(&self) -> Req {

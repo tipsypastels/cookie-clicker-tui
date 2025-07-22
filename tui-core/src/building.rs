@@ -1,4 +1,4 @@
-use crate::calc;
+use crate::{Cost, calc};
 use cookie_clicker_tui_utils::{frames::FPS, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Predicates, Variants};
@@ -238,12 +238,12 @@ impl BuildingInfo {
         self.state.has_grandma_upgrade
     }
 
-    pub fn cost(&self) -> f64 {
-        self.computed.cost
+    pub fn cost(&self) -> Cost {
+        Cost::Cookies(self.computed.cost)
     }
 
-    pub fn sell_cost(&self) -> f64 {
-        self.computed.sell_cost
+    pub fn sell_cost(&self) -> Cost {
+        Cost::Cookies(self.computed.sell_cost)
     }
 
     pub fn cps(&self) -> f64 {

@@ -6,7 +6,7 @@ use super::{
     },
 };
 use crate::app::AppListPane;
-use cookie_clicker_tui_core::{Building, BuildingInfo};
+use cookie_clicker_tui_core::{Building, BuildingInfo, Cost};
 use ratatui::{
     prelude::*,
     widgets::{Block, Padding},
@@ -23,7 +23,7 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         let affordable = if sell_mode {
             info.count() > 0
         } else {
-            info.cost() <= app.core.cookies()
+            app.core.affordable(info.cost())
         };
 
         let item = BuildingInfoShopItem { info, sell_mode };
@@ -79,7 +79,7 @@ impl ShopItemRender for BuildingInfoShopItem {
         .into()
     }
 
-    fn cost(&self) -> f64 {
+    fn cost(&self) -> Cost {
         if self.sell_mode {
             self.info.sell_cost()
         } else {

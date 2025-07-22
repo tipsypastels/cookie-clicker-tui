@@ -1,4 +1,4 @@
-use crate::Achievement;
+use crate::{Achievement, calc};
 use approx_eq_trait::ApproxEq;
 use cookie_clicker_tui_utils::frames::RefreshClock;
 use enum_fun::{Name, Variants};
@@ -20,7 +20,7 @@ impl Milk {
 
     fn from_state(state: MilkState) -> Self {
         let ratio = state.achievements as f64 / Achievement::VARIANT_COUNT as f64;
-        let cps = crate::calc::kitten_cps_mult(ratio, &state.kitten_mults);
+        let cps = calc::kitten_cps_mult(ratio, &state.kitten_mults);
         let flavor = MilkFlavor::find(state.achievements);
         let refresh = RefreshClock::new();
 
@@ -38,7 +38,7 @@ impl Milk {
             if achievements > self.state.achievements {
                 self.state.achievements = achievements;
                 self.ratio = achievements as f64 / Achievement::VARIANT_COUNT as f64;
-                self.cps_mult = crate::calc::kitten_cps_mult(self.ratio, &self.state.kitten_mults);
+                self.cps_mult = calc::kitten_cps_mult(self.ratio, &self.state.kitten_mults);
                 self.flavor = MilkFlavor::find(achievements);
             };
             self.refresh.restart();
@@ -47,7 +47,7 @@ impl Milk {
 
     pub(crate) fn add_kitten_mult(&mut self, mult: f64) {
         self.state.kitten_mults.push(mult);
-        self.cps_mult = crate::calc::kitten_cps_mult(self.ratio, &self.state.kitten_mults);
+        self.cps_mult = calc::kitten_cps_mult(self.ratio, &self.state.kitten_mults);
     }
 
     pub fn ratio(&self) -> f64 {

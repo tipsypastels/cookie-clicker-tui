@@ -6,7 +6,7 @@ use super::{
     },
 };
 use crate::app::AppListPane;
-use cookie_clicker_tui_core::Upgrade;
+use cookie_clicker_tui_core::{Cost, Upgrade};
 use ratatui::{
     prelude::*,
     widgets::{Block, Padding},
@@ -18,7 +18,7 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let builder = ListBuilder::new(|ctx| {
         let selected = ctx.is_selected;
         let upgrade = app.core.available_upgrades()[ctx.index];
-        let affordable = upgrade.cost() <= app.core.cookies();
+        let affordable = app.core.affordable(upgrade.cost());
         let widget = ShopItemWidget {
             selected,
             affordable,
@@ -46,7 +46,7 @@ impl ShopItemRender for Upgrade {
         self.name().into()
     }
 
-    fn cost(&self) -> f64 {
+    fn cost(&self) -> Cost {
         self.cost()
     }
 }

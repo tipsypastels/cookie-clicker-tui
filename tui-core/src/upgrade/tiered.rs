@@ -1,5 +1,5 @@
 use super::effect_info::UpgradeEffectInfo;
-use crate::{Building, State, req::Req};
+use crate::{Building, Cost, State, req::Req};
 use cookie_clicker_tui_utils::num;
 
 pub struct Tiered {
@@ -25,8 +25,8 @@ impl Tiered {
         }
     }
 
-    pub fn cost(&self) -> f64 {
-        self.building.base_cost() * self.cost_mult
+    pub fn cost(&self) -> Cost {
+        Cost::Cookies(self.building.base_cost() * self.cost_mult)
     }
 
     pub fn req(&self) -> Req {

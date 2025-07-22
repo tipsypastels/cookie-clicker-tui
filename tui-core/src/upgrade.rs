@@ -6,7 +6,7 @@ mod tiered;
 pub use effect_info::UpgradeEffectInfo;
 
 use self::{grandma::Grandma, kitten::Kitten, tiered::Tiered};
-use crate::{Building, State, req::Req};
+use crate::{Building, Cost, State, req::Req};
 use cookie_clicker_tui_utils::{frames::RefreshClock, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
@@ -47,7 +47,7 @@ impl AvailableUpgrades {
             .filter(|u| u.class().req().check(state))
             .collect::<Vec<_>>();
 
-        v.sort_by(|a, b| f64::total_cmp(&a.cost(), &b.cost()));
+        v.sort_by(|a, b| Cost::total_cmp(a.cost(), b.cost()));
 
         Self {
             list: v.into(),
@@ -857,7 +857,7 @@ pub enum Upgrade {
 }
 
 impl Upgrade {
-    pub fn cost(&self) -> f64 {
+    pub fn cost(&self) -> Cost {
         self.class().cost()
     }
 
@@ -877,7 +877,7 @@ enum UpgradeClass {
 }
 
 impl UpgradeClass {
-    fn cost(&self) -> f64 {
+    fn cost(&self) -> Cost {
         match self {
             Self::Tiered(u) => u.cost(),
             Self::Grandma(u) => u.cost(),

@@ -2,6 +2,7 @@ mod achievement;
 mod building;
 mod calc;
 mod cookies;
+mod cost;
 mod milk;
 mod req;
 mod sugar_lumps;
@@ -11,6 +12,7 @@ mod upgrade;
 pub use self::{
     achievement::{Achievement, AchievementReq},
     building::{Building, BuildingInfo},
+    cost::Cost,
     milk::{Milk, MilkFlavor},
     sugar_lumps::SugarLumps,
     upgrade::{Upgrade, UpgradeEffectInfo},
@@ -98,6 +100,10 @@ impl Core {
         self.computed.ticker.text()
     }
 
+    pub fn affordable(&self, cost: Cost) -> bool {
+        cost.affordable(&self.state)
+    }
+
     pub fn click_cookie(&mut self) {
         self.state.cookies.gain_from_clicking(1.0);
     }
@@ -111,13 +117,17 @@ impl Core {
     pub fn buy_building(&mut self, building: Building) -> bool {
         let cost = self.building_info(building).cost();
 
-        if cost > self.state.cookies.current() {
+        if !self.affordable(cost) {
             return false;
         }
 
-        self.state.cookies.lose(cost);
-        self.give_free_building(building);
+        match cost {
+            Cost::Cookies(cookies) => {
+                self.state.cookies.lose(cookies);
+            }
+        }
 
+        self.give_free_building(building);
         true
     }
 
@@ -128,9 +138,13 @@ impl Core {
             return false;
         };
 
-        self.state.cookies.gain(info.sell_cost());
-        self.state.buildings.modify(building, |b| b.count -= 1);
+        match info.sell_cost() {
+            Cost::Cookies(cookies) => {
+                self.state.cookies.gain(cookies);
+            }
+        }
 
+        self.state.buildings.modify(building, |b| b.count -= 1);
         true
     }
 
@@ -145,11 +159,16 @@ impl Core {
 
         let cost = upgrade.cost();
 
-        if cost > self.state.cookies.current() {
+        if !self.affordable(cost) {
             return false;
         }
 
-        self.state.cookies.lose(cost);
+        match cost {
+            Cost::Cookies(cookies) => {
+                self.state.cookies.lose(cookies);
+            }
+        }
+
         self.state.owned_upgrades.add(upgrade);
 
         upgrade.buy(&mut self.state);
