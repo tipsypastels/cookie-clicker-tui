@@ -4,6 +4,7 @@ use ratatui::{
     prelude::*,
     widgets::{Block, Paragraph},
 };
+use std::borrow::Cow;
 
 const LOGO_HEIGHT: usize = 15;
 const LOGO_PADDING_LEFT: usize = 2;
@@ -38,6 +39,7 @@ pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let block_area = block.inner(area);
 
     milk_wave(app, block_area, buf);
+    sugar_lump(app, block_area, buf);
 
     Paragraph::new(Text::from(lines))
         .centered()
@@ -121,4 +123,21 @@ fn milk_style(flavor: MilkFlavor) -> Style {
         MilkFlavor::Peach => Style::new().light_magenta().italic(),
         MilkFlavor::Hazelnut => Style::new().white().italic(),
     }
+}
+
+fn sugar_lump(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
+    let sugar_lumps = app.core.sugar_lumps();
+
+    if !sugar_lumps.unlocked() {
+        return;
+    }
+
+    let count = sugar_lumps.count();
+    let text: Cow<str> = if count == 0 {
+        "𖧋  ".into() // spaces used as padding :(
+    } else {
+        format!("{count} ●  ").into()
+    };
+
+    Line::raw(text).right_aligned().render(area, buf);
 }

@@ -16,13 +16,15 @@ pub fn tick(state: &mut State) {
         if UNLOCK_REQ.check(state) {
             state.sugar_lumps.state.unlocked = true;
             state.sugar_lumps.state.just_unlocked = true;
+            state.sugar_lumps.grow_refresh.restart();
         } else {
             state.sugar_lumps.unlock_refresh.restart();
         }
     }
 
-    if state.sugar_lumps.grow_refresh.finish()
-        && let Some(count) = state.sugar_lumps.state.count.checked_sub(1)
+    if state.sugar_lumps.state.unlocked
+        && state.sugar_lumps.grow_refresh.finish()
+        && let Some(count) = state.sugar_lumps.state.count.checked_add(1)
     {
         state.sugar_lumps.state.count = count;
         state.sugar_lumps.grow_refresh.restart();
@@ -33,7 +35,7 @@ pub fn tick(state: &mut State) {
 pub struct SugarLumps {
     state: SugarLumpState,
     unlock_refresh: RefreshClock<10>,
-    grow_refresh: RefreshClock<{ 4 * 60 * 60 }>,
+    grow_refresh: RefreshClock<{ 60 * 60 }>,
 }
 
 impl SugarLumps {
@@ -43,6 +45,10 @@ impl SugarLumps {
             unlock_refresh: RefreshClock::new(),
             grow_refresh: RefreshClock::new(),
         }
+    }
+
+    pub fn count(&self) -> u16 {
+        self.state.count
     }
 
     pub fn unlocked(&self) -> bool {
