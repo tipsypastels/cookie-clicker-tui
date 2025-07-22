@@ -1,11 +1,12 @@
 mod effect_info;
 mod grandma_job;
 mod kitten;
+mod research;
 mod tiered;
 
 pub use effect_info::UpgradeEffectInfo;
 
-use self::{grandma_job::GrandmaJob, kitten::Kitten, tiered::Tiered};
+use self::{grandma_job::GrandmaJob, kitten::Kitten, research::Research, tiered::Tiered};
 use crate::{Building, Cost, State, req::Req};
 use cookie_clicker_tui_utils::{frames::RefreshClock, num};
 use enum_assoc::Assoc;
@@ -854,6 +855,32 @@ pub enum Upgrade {
     KittenAdmins,
     #[assoc(class = UpgradeClass::Kitten(Kitten::new(1400.0, 0.105, 900.0 * num::QUINDECILLION)))]
     KittenStrategists,
+    /* -------------------------------------------------------------------------- */
+    /*                          Research/Grandmapocalyse                          */
+    /* -------------------------------------------------------------------------- */
+    #[assoc(class = UpgradeClass::Research(Research::BingoCenterResearchFacility))]
+    #[name(base = "Bingo Center/Research Facility")]
+    BingoCenterResearchFacility,
+    #[assoc(class = UpgradeClass::Research(Research::SpecializedChocolateChips))]
+    SpecializedChocolateChips,
+    #[assoc(class = UpgradeClass::Research(Research::DesignerCocoaBeans))]
+    DesignerCocoaBeans,
+    #[assoc(class = UpgradeClass::Research(Research::RitualRollingPins))]
+    RitualRollingPins,
+    #[assoc(class = UpgradeClass::Research(Research::UnderworldOvens))]
+    UnderworldOvens,
+    #[assoc(class = UpgradeClass::Research(Research::OneMind))]
+    OneMind,
+    #[assoc(class = UpgradeClass::Research(Research::ExoticNuts))]
+    ExoticNuts,
+    #[assoc(class = UpgradeClass::Research(Research::CommunalBrainsweep))]
+    CommunalBrainsweep,
+    #[assoc(class = UpgradeClass::Research(Research::ArcaneSugar))]
+    ArcaneSugar,
+    #[assoc(class = UpgradeClass::Research(Research::ElderPact))]
+    ElderPact,
+    #[assoc(class = UpgradeClass::Research(Research::SacrificialRollingPins))]
+    SacrificialRollingPins,
 }
 
 impl Upgrade {
@@ -874,6 +901,7 @@ enum UpgradeClass {
     Tiered(Tiered),
     GrandmaJob(GrandmaJob),
     Kitten(Kitten),
+    Research(Research),
 }
 
 impl UpgradeClass {
@@ -882,6 +910,7 @@ impl UpgradeClass {
             Self::Tiered(u) => u.cost(),
             Self::GrandmaJob(u) => u.cost(),
             Self::Kitten(u) => u.cost(),
+            Self::Research(u) => u.cost(),
         }
     }
 
@@ -890,6 +919,7 @@ impl UpgradeClass {
             Self::Tiered(u) => u.req(),
             Self::GrandmaJob(u) => u.req(),
             Self::Kitten(u) => u.req(),
+            Self::Research(u) => u.req(),
         }
     }
 
@@ -898,6 +928,7 @@ impl UpgradeClass {
             Self::Tiered(u) => u.buy(state),
             Self::GrandmaJob(u) => u.buy(state),
             Self::Kitten(u) => u.buy(state),
+            Self::Research(u) => u.buy(state),
         }
     }
 
@@ -906,6 +937,7 @@ impl UpgradeClass {
             Self::Tiered(u) => u.effect_info(),
             Self::GrandmaJob(u) => u.effect_info(),
             Self::Kitten(u) => u.effect_info(),
+            Self::Research(u) => u.effect_info(),
         }
     }
 }

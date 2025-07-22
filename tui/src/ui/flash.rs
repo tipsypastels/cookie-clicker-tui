@@ -15,6 +15,7 @@ pub fn flash(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     };
 
     let text: Cow<str> = match flash {
+        AppFlash::ResearchCompleted => "• research completed".into(),
         AppFlash::SugarLumpsUnlocked => "• sugar lumps unlocked".into(),
         AppFlash::CantAffordBuilding(building) => format!(
             "• you can't afford {}",

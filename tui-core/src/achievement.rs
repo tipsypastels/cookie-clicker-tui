@@ -313,11 +313,15 @@ pub enum Achievement {
     #[assoc(req = AchievementReq::Cps(100.0 * num::SEPTENDECILLION))]
     #[name(base = "Speed's The Name Of The Game")]
     SpeedsTheNameOfTheGame,
+    // TODO: Add other achievements for grandmas and all the other shit.
+    #[assoc(req = AchievementReq::GrandmaJobCount(7))]
+    Elder,
 }
 
 pub enum AchievementReq {
     CookiesBaked(f64),
     Cps(f64),
+    GrandmaJobCount(u16),
 }
 
 impl AchievementReq {
@@ -325,6 +329,7 @@ impl AchievementReq {
         match self {
             Self::CookiesBaked(v) => LateReq::CookiesAllTime(Comparator::AboveOrEq(*v)),
             Self::Cps(v) => LateReq::Cps(Comparator::AboveOrEq(*v)),
+            Self::GrandmaJobCount(v) => LateReq::GrandmaJobUpgradeCount(Comparator::AboveOrEq(*v)),
         }
     }
 }

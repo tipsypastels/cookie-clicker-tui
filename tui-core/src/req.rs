@@ -1,4 +1,4 @@
-use crate::{Building, Computed, State};
+use crate::{Achievement, Building, Computed, State};
 
 #[allow(unused)]
 pub enum Req {
@@ -7,6 +7,9 @@ pub enum Req {
     CookiesAllTimeFromClicking(Comparator<f64>),
     BuildingCountMin(Building, u16),
     MilkRatio(Comparator<f64>),
+    ResearchCompleted(Comparator<u8>),
+    Achievement(Achievement),
+    GrandmaJobUpgradeCount(Comparator<u16>),
     Custom(fn(&State) -> bool),
     Any(&'static [Req]),
     AnyBox(Box<[Req]>),
@@ -22,6 +25,9 @@ impl Req {
             Self::CookiesAllTimeFromClicking(c) => c.check(state.cookies.all_time_from_clicking()),
             Self::BuildingCountMin(b, c) => state.buildings.count(*b) >= *c,
             Self::MilkRatio(c) => c.check(state.milk.ratio()),
+            Self::ResearchCompleted(c) => c.check(state.research.completed()),
+            Self::Achievement(a) => state.achievements.owned().contains(&a),
+            Self::GrandmaJobUpgradeCount(c) => c.check(state.buildings.grandma_job_upgrade_count()),
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state)),
@@ -57,6 +63,9 @@ impl LateReq {
         CookiesAllTimeFromClicking(c: Comparator<f64>);
         BuildingCountMin(b: Building, c: u16);
         MilkRatio(c: Comparator<f64>);
+        ResearchCompleted(c: Comparator<u8>);
+        Achievement(a: Achievement);
+        GrandmaJobUpgradeCount(c: Comparator<u16>);
     }
 
     pub fn check(&self, state: &State, computed: &Computed) -> bool {

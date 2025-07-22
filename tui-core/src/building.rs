@@ -183,7 +183,7 @@ impl Buildings {
         }
     }
 
-    fn grandma_job_upgrade_count(&self) -> u16 {
+    pub fn grandma_job_upgrade_count(&self) -> u16 {
         Building::variants()
             .map(|b| self.states.get(b).has_grandma_job_upgrade as u16)
             .sum()

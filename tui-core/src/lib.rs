@@ -3,8 +3,10 @@ mod building;
 mod calc;
 mod cookies;
 mod cost;
+mod grandmapocalypse;
 mod milk;
 mod req;
+mod research;
 mod sugar_lumps;
 mod ticker;
 mod upgrade;
@@ -14,6 +16,7 @@ pub use self::{
     building::{Building, BuildingInfo},
     cost::Cost,
     milk::{Milk, MilkFlavor},
+    research::Research,
     sugar_lumps::SugarLumps,
     upgrade::{Upgrade, UpgradeEffectInfo},
 };
@@ -94,6 +97,10 @@ impl Core {
 
     pub fn queued_achievement(&self) -> Option<Achievement> {
         self.state.achievements.queued()
+    }
+
+    pub fn research(&self) -> &Research {
+        &self.state.research
     }
 
     pub fn ticker(&self) -> Option<&'static str> {
@@ -237,6 +244,8 @@ struct State {
     owned_upgrades: OwnedUpgrades,
     #[serde(default = "SugarLumps::new")]
     sugar_lumps: SugarLumps,
+    #[serde(default = "Research::new")]
+    research: Research,
 }
 
 impl State {
@@ -248,6 +257,7 @@ impl State {
             achievements: Achievements::new(),
             owned_upgrades: OwnedUpgrades::new(),
             sugar_lumps: SugarLumps::new(),
+            research: Research::new(),
         }
     }
 
@@ -255,6 +265,7 @@ impl State {
         self.cookies.tick(computed.cps);
         self.buildings.tick();
         self.milk.tick(self.achievements.owned().len() as _);
+        self.research.tick();
 
         achievement::tick(self, computed);
         sugar_lumps::tick(self);
@@ -283,6 +294,10 @@ impl Computed {
     fn tick(&mut self, state: &State) {
         self.ticker.tick(state);
         self.available_upgrades.tick(state);
+
+        if state.research.just_completed() {
+            self.recalc_available_upgrades(state);
+        }
     }
 
     fn recalc_cps(&mut self, state: &State) {

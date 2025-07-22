@@ -160,6 +160,10 @@ impl App {
             self.iface.add_flash(AppFlash::SugarLumpsUnlocked);
         }
 
+        if self.core.research().just_completed() {
+            self.iface.add_flash(AppFlash::ResearchCompleted);
+        }
+
         Ok(())
     }
 

@@ -17,6 +17,7 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
         AppDebugView::Achievements => format!("{:?}", core.debug_achievements()),
         AppDebugView::Milk => format!("{:?}", core.milk()),
         AppDebugView::SugarLumps => format!("{:?}", core.sugar_lumps()),
+        AppDebugView::Research => format!("{:?}", core.research()),
         AppDebugView::Ticker => format!("{:?}", core.debug_ticker()),
         AppDebugView::List => format!("{:?}", app.list.debug(core)),
         AppDebugView::Keypress => {

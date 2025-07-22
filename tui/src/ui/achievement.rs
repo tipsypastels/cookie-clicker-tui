@@ -1,5 +1,5 @@
 use super::{UiApp, utils::num::PrintFloat};
-use cookie_clicker_tui_core::AchievementReq;
+use cookie_clicker_tui_core::{AchievementReq, Building};
 use cookie_clicker_tui_utils::str::pluralized;
 use ratatui::{
     prelude::*,
@@ -31,6 +31,12 @@ pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
                 "• bake {} {} per second",
                 n.print_float(0, 0),
                 pluralized(n as _, "cookie", "cookies")
+            )
+        }
+        AchievementReq::GrandmaJobCount(n) => {
+            format!(
+                "• have {n} {} with jobs",
+                Building::Grandma.name_lower_pluralized(n as _)
             )
         }
     };

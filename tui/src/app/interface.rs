@@ -84,6 +84,8 @@ impl AppFlashes {
 pub enum AppFlash {
     #[assoc(class = AppFlashClass::Info)]
     SugarLumpsUnlocked,
+    #[assoc(class = AppFlashClass::Info)]
+    ResearchCompleted,
     #[assoc(class = AppFlashClass::Error)]
     CantAffordBuilding(Building),
     #[assoc(class = AppFlashClass::Error)]
