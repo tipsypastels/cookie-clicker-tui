@@ -7,14 +7,14 @@ mod ticker;
 mod upgrades;
 mod utils;
 
-use crate::app::{AppCountdownState, AppDebugState, AppListState, AppModalState};
+use crate::app::{AppDebugState, AppInterfaceState, AppListState, AppModalState};
 use cookie_clicker_tui_core::Core;
 use ratatui::prelude::*;
 
 pub struct UiApp<'a> {
     pub core: &'a Core,
     pub list: &'a mut AppListState,
-    pub countdown: &'a AppCountdownState,
+    pub iface: &'a AppInterfaceState,
     pub modal: AppModalState,
     pub debug: &'a AppDebugState,
 }

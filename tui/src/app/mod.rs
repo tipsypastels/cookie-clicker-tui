@@ -1,9 +1,11 @@
 mod debug;
+mod interface;
 mod list;
 mod modal;
 
 pub use self::{
     debug::{AppDebugState, AppDebugView},
+    interface::AppInterfaceState,
     list::{AppListPane, AppListPointee, AppListState},
     modal::AppModalState,
 };
@@ -13,8 +15,7 @@ use crate::{
     storage::Storage,
 };
 use anyhow::{Context, Result};
-use cookie_clicker_tui_core::{Building, Core};
-use cookie_clicker_tui_utils::countdown::{Countdown, CountdownOf};
+use cookie_clicker_tui_core::Core;
 use crossterm::event::KeyEvent;
 use ratatui::DefaultTerminal;
 
@@ -22,17 +23,11 @@ pub struct App {
     storage: Storage,
     core: Core,
     list: AppListState,
-    countdown: AppCountdownState,
     modal: AppModalState,
+    iface: AppInterfaceState,
     debug: AppDebugState,
     events: Events,
     quit: bool,
-}
-
-pub struct AppCountdownState {
-    just_pressed_cookie: Countdown<3>,
-    error_insufficient_cookies: Countdown<10>,
-    error_tried_to_sell_unowned_building: CountdownOf<Building, 10>,
 }
 
 impl App {
@@ -41,12 +36,8 @@ impl App {
             storage,
             core,
             list: AppListState::default(),
-            countdown: AppCountdownState {
-                just_pressed_cookie: Countdown::new(),
-                error_insufficient_cookies: Countdown::new(),
-                error_tried_to_sell_unowned_building: CountdownOf::new(),
-            },
             modal: AppModalState::default(),
+            iface: AppInterfaceState::default(),
             debug: AppDebugState::default(),
             events: Events::new(),
             quit: false,
@@ -92,9 +83,7 @@ impl App {
                 match self.list.pointee(&self.core) {
                     Some((_, AppListPointee::Building(building))) => {
                         if !self.core.sell_building(building) {
-                            self.countdown
-                                .error_tried_to_sell_unowned_building
-                                .run(building);
+                            self.iface.set_tried_to_sell_unowned_building(building);
                         }
                     }
                     Some((_, AppListPointee::Upgrade(_))) => {
@@ -107,12 +96,12 @@ impl App {
             KeyCode::Enter => match self.list.pointee(&self.core) {
                 Some((_, AppListPointee::Building(building))) => {
                     if !self.core.buy_building(building) {
-                        self.countdown.error_insufficient_cookies.run();
+                        self.iface.set_insufficient_cookies();
                     }
                 }
                 Some((i, AppListPointee::Upgrade(_))) => {
                     if !self.core.buy_upgrade(i) {
-                        self.countdown.error_insufficient_cookies.run();
+                        self.iface.set_insufficient_cookies();
                     }
                 }
                 None => {}
@@ -128,7 +117,7 @@ impl App {
             }
             KeyCode::Char(' ') => {
                 self.core.click_cookie();
-                self.countdown.just_pressed_cookie.run();
+                self.iface.set_pressed_cookie();
             }
             KeyCode::Char('q') => {
                 self.quit().await?;
@@ -150,7 +139,7 @@ impl App {
             let mut ui = crate::ui::UiApp {
                 core: &self.core,
                 list: &mut self.list,
-                countdown: &self.countdown,
+                iface: &self.iface,
                 modal: self.modal,
                 debug: &self.debug,
             };
@@ -162,27 +151,12 @@ impl App {
 
     async fn tick(&mut self) -> Result<()> {
         self.core.tick();
-        self.countdown.tick();
+        self.iface.tick();
         self.storage.tick(&self.core).await
     }
 
     async fn quit(&mut self) -> Result<()> {
         self.quit = true;
         self.storage.save(&self.core).await
-    }
-}
-
-impl AppCountdownState {
-    pub fn just_pressed_cookie(&self) -> bool {
-        self.just_pressed_cookie.is_running()
-    }
-
-    pub fn error_insufficient_cookies(&self) -> bool {
-        self.error_insufficient_cookies.is_running()
-    }
-
-    pub fn tick(&mut self) {
-        self.just_pressed_cookie.tick();
-        self.error_insufficient_cookies.tick();
     }
 }

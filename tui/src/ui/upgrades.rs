@@ -32,7 +32,7 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let list_state = app.list.state_matching_mut(AppListPane::Upgrades);
 
     let block = Block::bordered()
-        .title(Line::styled(" Upgrades ", Modifier::BOLD))
+        .title(Line::styled(" Upgrades ", Modifier::BOLD).centered())
         .title_bottom(Line::styled(" Buy <Enter> Inspect <I> ", Modifier::BOLD).centered())
         .padding(Padding::uniform(1));
 

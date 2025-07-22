@@ -47,7 +47,7 @@ pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 fn cookie_count(app: &mut UiApp, lines: &mut Vec<Line>) {
     let mut cookie_count_style = Style::new().add_modifier(Modifier::BOLD);
 
-    if app.countdown.error_insufficient_cookies() {
+    if app.iface.insufficient_cookies() {
         cookie_count_style = cookie_count_style.fg(Color::Red);
     }
 
@@ -66,7 +66,7 @@ fn cps_count(app: &mut UiApp, lines: &mut Vec<Line>) {
 
 fn logo(app: &mut UiApp, lines: &mut Vec<Line>) {
     for line_text in LOGO.lines() {
-        lines.push(if app.countdown.just_pressed_cookie() {
+        lines.push(if app.iface.pressed_cookie() {
             Line::styled(line_text, Color::Green)
         } else {
             Line::styled(line_text, Color::White)
