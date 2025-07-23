@@ -1,6 +1,9 @@
-use super::{UiApp, utils::num::PrintFloat};
+use super::{
+    UiApp,
+    utils::{num::PrintFloat, upgrade::print_upgrade_effect_info},
+};
 use crate::app::AppListPointee;
-use cookie_clicker_tui_core::{Building, Upgrade, UpgradeEffectInfo};
+use cookie_clicker_tui_core::{Building, Upgrade};
 use ratatui::{
     prelude::*,
     widgets::{Block, Clear, Paragraph},
@@ -88,49 +91,9 @@ fn render_upgrade(upgrade: Upgrade, area: Rect, buf: &mut Buffer) {
 
     render_outer(area, buf, title, |area, buf, block| {
         let mut lines = Vec::new();
+        let info = upgrade.effect_info();
 
-        let line_2x = |building: Building| {
-            Line::from(vec![
-                Span::raw("• "),
-                Span::styled("2x", Modifier::BOLD),
-                Span::raw(" cookies per second from "),
-                Span::styled(building.name_lower_plural(), Modifier::BOLD),
-            ])
-        };
-
-        match upgrade.effect_info() {
-            UpgradeEffectInfo::Tiered(building) => {
-                lines.push(line_2x(building));
-            }
-            UpgradeEffectInfo::Grandma {
-                building,
-                num_req_for_1p,
-            } => {
-                lines.push(line_2x(Building::Grandma));
-                lines.push(Line::from(vec![
-                    Span::raw("• "),
-                    Span::styled("+1%", Modifier::BOLD),
-                    Span::raw(" cookies per second from "),
-                    Span::styled(building.name_lower_plural(), Modifier::BOLD),
-                    Span::raw(" per "),
-                    Span::styled(
-                        format!(
-                            "{num_req_for_1p} {}",
-                            Building::Grandma.name_lower_pluralized(num_req_for_1p as _)
-                        ),
-                        Modifier::BOLD,
-                    ),
-                ]));
-            }
-            UpgradeEffectInfo::Kitten => {
-                lines.push(Line::from(vec![
-                    Span::raw("• you gain more cookies per second the more "),
-                    Span::styled("milk", Modifier::BOLD),
-                    Span::raw(" you have"),
-                ]));
-            }
-        }
-
+        print_upgrade_effect_info(info, &mut lines);
         Paragraph::new(lines).block(block).render(area, buf);
     });
 }

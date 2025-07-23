@@ -1,6 +1,7 @@
 pub mod num;
 pub mod shop;
 pub mod style;
+pub mod upgrade;
 pub mod widget;
 
 use ratatui::prelude::*;

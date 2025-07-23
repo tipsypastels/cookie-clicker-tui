@@ -18,7 +18,9 @@ pub use self::{
     milk::{Milk, MilkFlavor},
     research::Research,
     sugar_lumps::SugarLumps,
-    upgrade::{Upgrade, UpgradeEffectInfo},
+    upgrade::{
+        Upgrade, UpgradeEffectInfo, UpgradeInfoEffectResearch, UpgradeInfoEffectResearchWarning,
+    },
 };
 
 use self::{

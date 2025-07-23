@@ -4,7 +4,7 @@ mod kitten;
 mod research;
 mod tiered;
 
-pub use effect_info::UpgradeEffectInfo;
+pub use effect_info::*;
 
 use self::{grandma_job::GrandmaJob, kitten::Kitten, research::Research, tiered::Tiered};
 use crate::{Building, Cost, State, req::Req};

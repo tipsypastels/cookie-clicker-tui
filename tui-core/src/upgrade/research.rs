@@ -1,4 +1,6 @@
-use super::effect_info::UpgradeEffectInfo;
+use super::effect_info::{
+    UpgradeEffectInfo, UpgradeInfoEffectResearch, UpgradeInfoEffectResearchWarning,
+};
 use crate::{
     Achievement, Building, Cost, State,
     req::{Comparator, Req},
@@ -44,7 +46,7 @@ impl Research {
                 Req::Achievement(Achievement::Elder),
                 Req::BuildingCountMin(Building::Grandma, 6),
             ]),
-            other => Req::ResearchCompleted(Comparator::AboveOrEq(*other as u8)),
+            _ => Req::ResearchCompleted(Comparator::AboveOrEq(*self as u8)),
         }
     }
 
@@ -55,6 +57,55 @@ impl Research {
     }
 
     pub fn effect_info(&self) -> UpgradeEffectInfo {
-        todo!()
+        use UpgradeEffectInfo::Research as R;
+        use UpgradeInfoEffectResearch::*;
+        use UpgradeInfoEffectResearchWarning::*;
+
+        match self {
+            Self::BingoCenterResearchFacility => R {
+                effect: StartAndGrandmaCpsMult(4.0),
+                warning: None,
+            },
+            Self::SpecializedChocolateChips => R {
+                effect: CpsMultiplierPercent(0.01),
+                warning: None,
+            },
+            Self::DesignerCocoaBeans => R {
+                effect: CpsMultiplierPercent(0.02),
+                warning: None,
+            },
+            Self::RitualRollingPins => R {
+                effect: GrandmaCpsDouble,
+                warning: None,
+            },
+            Self::UnderworldOvens => R {
+                effect: CpsMultiplierPercent(0.03),
+                warning: None,
+            },
+            Self::OneMind => R {
+                effect: GrandmaGainsCpsPerBuilding(Building::Grandma, 0.02),
+                warning: Some(One),
+            },
+            Self::ExoticNuts => R {
+                effect: CpsMultiplierPercent(0.04),
+                warning: None,
+            },
+            Self::CommunalBrainsweep => R {
+                effect: GrandmaGainsCpsPerBuilding(Building::Grandma, 0.02),
+                warning: Some(Two),
+            },
+            Self::ArcaneSugar => R {
+                effect: CpsMultiplierPercent(0.05),
+                warning: None,
+            },
+            Self::ElderPact => R {
+                effect: GrandmaGainsCpsPerBuilding(Building::Portal, 0.05),
+                warning: Some(Three),
+            },
+            Self::SacrificialRollingPins => R {
+                effect: ElderPledgesLastTwiceAsLong,
+                warning: None,
+            },
+        }
     }
 }
