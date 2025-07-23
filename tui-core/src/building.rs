@@ -83,6 +83,7 @@ impl Building {
 pub struct Buildings {
     states: BuildingMap<BuildingState>,
     computeds: BuildingMap<BuildingComputed>,
+    flags: BuildingsFlags,
 }
 
 impl Buildings {
@@ -91,9 +92,15 @@ impl Buildings {
     }
 
     fn from_states(states: BuildingMap<BuildingState>) -> Self {
-        let computeds = BuildingMap::new(|building| BuildingComputed::new(&states, building));
+        let flags = BuildingsFlags::default();
+        let computeds =
+            BuildingMap::new(|building| BuildingComputed::new(&states, &flags, building));
 
-        Self { states, computeds }
+        Self {
+            states,
+            computeds,
+            flags,
+        }
     }
 
     pub fn tick(&mut self) {
@@ -128,17 +135,27 @@ impl Buildings {
         self.states.get(building)
     }
 
+    pub fn flags(&self) -> &BuildingsFlags {
+        &self.flags
+    }
+
     pub fn grandma_job_upgrade_count(&self) -> u16 {
         self.states.grandma_job_upgrade_count()
     }
 
     pub fn modify(&mut self, building: Building, f: impl FnOnce(&mut BuildingState)) {
         f(self.states.get_mut(building));
-        self.recalc_computed(building);
+        self.recompute(building);
     }
 
-    pub fn recalc_computed(&mut self, building: Building) {
-        *self.computeds.get_mut(building) = BuildingComputed::new(&self.states, building);
+    pub fn recompute(&mut self, building: Building) {
+        *self.computeds.get_mut(building) =
+            BuildingComputed::new(&self.states, &self.flags, building);
+    }
+
+    pub fn set_grandma_has_bingo_center_4x(&mut self, enable: bool) {
+        self.flags.grandma_has_bingo_center_4x = enable;
+        self.recompute(Building::Grandma);
     }
 }
 
@@ -233,7 +250,11 @@ pub struct BuildingComputed {
 }
 
 impl BuildingComputed {
-    fn new(states: &BuildingMap<BuildingState>, building: Building) -> Self {
+    fn new(
+        states: &BuildingMap<BuildingState>,
+        flags: &BuildingsFlags,
+        building: Building,
+    ) -> Self {
         let state = states.get(building);
         let cost = calc::building_cost(building, state.count);
         let sell_cost = calc::building_sell_cost(cost);
@@ -243,7 +264,8 @@ impl BuildingComputed {
             building_class: match building {
                 Building::Cursor => calc::BuildingCpsClass::Cursor,
                 Building::Grandma => calc::BuildingCpsClass::Grandma {
-                    grandma_job_upgrade_count: states.grandma_job_upgrade_count(),
+                    has_bingo_center_4x: flags.grandma_has_bingo_center_4x,
+                    job_upgrade_count: states.grandma_job_upgrade_count(),
                 },
                 _ => calc::BuildingCpsClass::Other {
                     grandma_count: if state.has_grandma_job_upgrade {
@@ -301,4 +323,9 @@ impl BuildingMap<BuildingState> {
             .map(|b| self.get(b).has_grandma_job_upgrade as u16)
             .sum()
     }
+}
+
+#[derive(Default, Debug)]
+pub struct BuildingsFlags {
+    grandma_has_bingo_center_4x: bool,
 }

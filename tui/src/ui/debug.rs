@@ -13,6 +13,7 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
         AppDebugView::Cookies => format!("{:?}", core.debug_cookies()),
         AppDebugView::Cps => format!("{:?}", core.cps()),
         AppDebugView::Buildings => format!("{:?}", core.debug_buildings()),
+        AppDebugView::BuildingsFlags => format!("{:?}", core.debug_buildings_flags()),
         AppDebugView::AvailableUpgrades => format!("{:?}", core.debug_available_upgrades()),
         AppDebugView::OwnedUpgrades => format!("{:?}", core.owned_upgrades()),
         AppDebugView::Achievements => format!("{:?}", core.debug_achievements()),

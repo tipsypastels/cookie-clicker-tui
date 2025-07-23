@@ -201,6 +201,10 @@ impl Core {
         &self.state.buildings
     }
 
+    pub fn debug_buildings_flags(&self) -> impl fmt::Debug {
+        self.state.buildings.flags()
+    }
+
     pub fn debug_available_upgrades(&self) -> impl fmt::Debug {
         &self.computed.available_upgrades
     }

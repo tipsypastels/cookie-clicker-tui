@@ -22,8 +22,13 @@ pub struct BuildingCps<AddlCpsPerOwnedBuildingCounts> {
 
 pub enum BuildingCpsClass {
     Cursor,
-    Grandma { grandma_job_upgrade_count: u16 },
-    Other { grandma_count: Option<u16> },
+    Grandma {
+        has_bingo_center_4x: bool,
+        job_upgrade_count: u16,
+    },
+    Other {
+        grandma_count: Option<u16>,
+    },
 }
 
 #[allow(clippy::let_and_return)]
@@ -43,8 +48,12 @@ where
     let cps = match building_class {
         BuildingCpsClass::Cursor => cps,
         BuildingCpsClass::Grandma {
-            grandma_job_upgrade_count,
-        } => cps * 2.0f64.powi(grandma_job_upgrade_count as i32),
+            has_bingo_center_4x,
+            job_upgrade_count,
+        } => {
+            cps * if has_bingo_center_4x { 4.0 } else { 1.0 }
+                * 2.0f64.powi(job_upgrade_count as i32)
+        }
         BuildingCpsClass::Other {
             grandma_count: Some(grandma_count),
         } => {

@@ -14,6 +14,7 @@ pub enum AppDebugView {
     Cookies,
     Cps,
     Buildings,
+    BuildingsFlags,
     AvailableUpgrades,
     OwnedUpgrades,
     Achievements,
@@ -59,7 +60,8 @@ impl AppDebugView {
         match self {
             Self::Cookies => Self::Cps,
             Self::Cps => Self::Buildings,
-            Self::Buildings => Self::AvailableUpgrades,
+            Self::Buildings => Self::BuildingsFlags,
+            Self::BuildingsFlags => Self::AvailableUpgrades,
             Self::AvailableUpgrades => Self::OwnedUpgrades,
             Self::OwnedUpgrades => Self::Achievements,
             Self::Achievements => Self::Milk,

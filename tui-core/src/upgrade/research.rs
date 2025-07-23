@@ -52,7 +52,9 @@ impl Research {
 
     pub fn buy(&self, state: &mut State) {
         match self {
-            Self::BingoCenterResearchFacility => {}
+            Self::BingoCenterResearchFacility => {
+                state.buildings.set_grandma_has_bingo_center_4x(true);
+            }
             Self::SpecializedChocolateChips => {}
             Self::DesignerCocoaBeans => {}
             Self::RitualRollingPins => {}
