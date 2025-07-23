@@ -14,6 +14,10 @@ struct Cli {
     #[clap(long)]
     dry_run: bool,
 
+    /// Make all purchases free
+    #[clap(long, requires = "dry_run")]
+    everything_free: bool,
+
     /// Give a free "You" building to start with
     #[clap(long, requires = "dry_run")]
     free_you: bool,
@@ -26,8 +30,12 @@ async fn main() -> Result<()> {
     let mut storage = Storage::new(cli.dry_run)?;
     let mut core = storage.core().await?;
 
+    if cli.everything_free {
+        core.make_everything_free();
+    }
+
     if cli.free_you {
-        core.give_free_building(Building::You);
+        core.give_building(Building::You);
     }
 
     let mut term = ratatui::init();

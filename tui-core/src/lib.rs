@@ -37,6 +37,7 @@ use std::{collections::BTreeSet, fmt};
 pub struct Core {
     state: State,
     computed: Computed,
+    everything_free: bool,
 }
 
 impl Core {
@@ -46,8 +47,13 @@ impl Core {
 
     fn from_state(state: State) -> Self {
         let computed = Computed::new(&state);
+        let everything_free = false;
 
-        Self { state, computed }
+        Self {
+            state,
+            computed,
+            everything_free,
+        }
     }
 
     pub fn cookies(&self) -> f64 {
@@ -115,15 +121,21 @@ impl Core {
     }
 
     pub fn affordable(&self, cost: Cost) -> bool {
-        cost.affordable(&self.state)
+        self.everything_free || cost.affordable(&self.state)
     }
 
     pub fn click_cookie(&mut self) {
         self.state.cookies.gain_from_clicking(1.0);
     }
 
-    pub fn give_free_building(&mut self, building: Building) {
+    pub fn give_building(&mut self, building: Building) {
         self.state.buildings.modify(building, |b| b.count += 1);
+        self.computed.recalc_cps(&self.state);
+        self.computed.recalc_available_upgrades(&self.state);
+    }
+
+    pub fn take_building(&mut self, building: Building) {
+        self.state.buildings.modify(building, |b| b.count -= 1);
         self.computed.recalc_cps(&self.state);
         self.computed.recalc_available_upgrades(&self.state);
     }
@@ -135,13 +147,15 @@ impl Core {
             return false;
         }
 
-        match cost {
-            Cost::Cookies(cookies) => {
-                self.state.cookies.lose(cookies);
+        if !self.everything_free {
+            match cost {
+                Cost::Cookies(cookies) => {
+                    self.state.cookies.lose(cookies);
+                }
             }
         }
 
-        self.give_free_building(building);
+        self.give_building(building);
         true
     }
 
@@ -152,13 +166,15 @@ impl Core {
             return false;
         };
 
-        match info.sell_cost() {
-            Cost::Cookies(cookies) => {
-                self.state.cookies.gain(cookies);
+        if !self.everything_free {
+            match info.sell_cost() {
+                Cost::Cookies(cookies) => {
+                    self.state.cookies.gain(cookies);
+                }
             }
         }
 
-        self.state.buildings.modify(building, |b| b.count -= 1);
+        self.take_building(building);
         true
     }
 
@@ -177,9 +193,11 @@ impl Core {
             return false;
         }
 
-        match cost {
-            Cost::Cookies(cookies) => {
-                self.state.cookies.lose(cookies);
+        if !self.everything_free {
+            match cost {
+                Cost::Cookies(cookies) => {
+                    self.state.cookies.lose(cookies);
+                }
             }
         }
 
@@ -191,6 +209,10 @@ impl Core {
         self.computed.recalc_available_upgrades(&self.state);
 
         true
+    }
+
+    pub fn make_everything_free(&mut self) {
+        self.everything_free = true;
     }
 
     pub fn tick(&mut self) {
