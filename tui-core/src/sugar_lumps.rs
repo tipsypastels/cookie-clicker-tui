@@ -121,12 +121,3 @@ enum Repr {
     Locked,
     Unlocked { count: u16 },
 }
-
-impl From<&Inner> for Repr {
-    fn from(inner: &Inner) -> Self {
-        match inner {
-            Inner::Locked { .. } => Self::Locked,
-            Inner::Unlocked { count, .. } => Self::Unlocked { count: *count },
-        }
-    }
-}

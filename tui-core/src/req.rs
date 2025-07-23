@@ -26,7 +26,7 @@ impl Req {
             Self::BuildingCountMin(b, c) => state.buildings.count(*b) >= *c,
             Self::MilkRatio(c) => c.check(state.milk.ratio()),
             Self::ResearchCompleted(c) => c.check(state.research.completed()),
-            Self::Achievement(a) => state.achievements.owned().contains(&a),
+            Self::Achievement(a) => state.achievements.owned().contains(a),
             Self::GrandmaJobUpgradeCount(c) => c.check(state.buildings.grandma_job_upgrade_count()),
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
