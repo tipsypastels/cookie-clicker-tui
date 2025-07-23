@@ -1,5 +1,5 @@
 use crate::{Cost, calc};
-use cookie_clicker_tui_utils::{frames::FPS, num};
+use cookie_clicker_tui_utils::{enum_map, frames::FPS, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Predicates, Variants};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -82,14 +82,25 @@ impl Building {
 
 pub struct Buildings {
     states: BuildingMap<BuildingState>,
-    computeds: BuildingMap<Option<BuildingComputed>>,
+    computeds: BuildingMap<BuildingComputed>,
 }
 
 impl Buildings {
     pub fn new() -> Self {
-        Self {
-            states: BuildingMap::new(),
-            computeds: BuildingMap::new(),
+        Self::from_states(BuildingMap::default())
+    }
+
+    fn from_states(states: BuildingMap<BuildingState>) -> Self {
+        let computeds = BuildingMap::new(|building| BuildingComputed::new(&states, building));
+
+        Self { states, computeds }
+    }
+
+    pub fn tick(&mut self) {
+        for building in Building::variants() {
+            let cps = self.computeds.get(building).cps;
+            let state = self.states.get_mut(building);
+            state.cookies_all_time += cps / FPS;
         }
     }
 
@@ -100,8 +111,8 @@ impl Buildings {
     pub fn info(&self, building: Building) -> BuildingInfo {
         BuildingInfo {
             building,
-            state: self.get_state(building),
-            computed: self.get_or_calc_computed(building),
+            state: self.states.get(building),
+            computed: self.computeds.get(building),
         }
     }
 
@@ -109,84 +120,25 @@ impl Buildings {
         self.info(Building::VARIANTS[index])
     }
 
-    pub fn modify(&mut self, building: Building, f: impl Fn(&mut BuildingState) + Clone) {
+    pub fn count(&self, building: Building) -> u16 {
+        self.state(building).count
+    }
+
+    pub fn state(&self, building: Building) -> &BuildingState {
+        self.states.get(building)
+    }
+
+    pub fn grandma_job_upgrade_count(&self) -> u16 {
+        self.states.grandma_job_upgrade_count()
+    }
+
+    pub fn modify(&mut self, building: Building, f: impl FnOnce(&mut BuildingState)) {
         f(self.states.get_mut(building));
         self.recalc_computed(building);
     }
 
-    pub fn tick(&mut self) {
-        for building in Building::variants() {
-            let cps = self.get_or_insert_computed(building).cps;
-            let state = self.states.get_mut(building);
-
-            state.cookies_all_time += cps / FPS;
-        }
-    }
-
-    pub fn count(&self, building: Building) -> u16 {
-        self.get_state(building).count
-    }
-
-    pub fn get_state(&self, building: Building) -> BuildingState {
-        *self.states.get(building)
-    }
-
-    fn get_or_calc_computed(&self, building: Building) -> BuildingComputed {
-        self.computeds
-            .get(building)
-            .unwrap_or_else(|| self.compute(building, self.get_state(building)))
-    }
-
-    fn get_or_insert_computed(&mut self, building: Building) -> BuildingComputed {
-        if let Some(&computed) = self.computeds.get(building).as_ref() {
-            return computed;
-        }
-
-        self.recalc_computed(building)
-    }
-
-    fn recalc_computed(&mut self, building: Building) -> BuildingComputed {
-        let state = self.get_state(building);
-        let computed = self.compute(building, state);
-
-        *self.computeds.get_mut(building) = Some(computed);
-        computed
-    }
-
-    fn compute(&self, building: Building, state: BuildingState) -> BuildingComputed {
-        let cost = calc::building_cost(building, state.count);
-        let sell_cost = calc::building_sell_cost(cost);
-
-        let cps = calc::building_cps(calc::BuildingCps {
-            building,
-            building_class: match building {
-                Building::Cursor => calc::BuildingCpsClass::Cursor,
-                Building::Grandma => calc::BuildingCpsClass::Grandma {
-                    grandma_job_upgrade_count: self.grandma_job_upgrade_count(),
-                },
-                _ => calc::BuildingCpsClass::Other {
-                    grandma_count: if state.has_grandma_job_upgrade {
-                        Some(self.states.grandma.count)
-                    } else {
-                        None
-                    },
-                },
-            },
-            count: state.count,
-            tiered_upgrade_count: state.tiered_upgrade_count,
-        });
-
-        BuildingComputed {
-            cost,
-            sell_cost,
-            cps,
-        }
-    }
-
-    pub fn grandma_job_upgrade_count(&self) -> u16 {
-        Building::variants()
-            .map(|b| self.states.get(b).has_grandma_job_upgrade as u16)
-            .sum()
+    pub fn recalc_computed(&mut self, building: Building) {
+        *self.computeds.get_mut(building) = BuildingComputed::new(&self.states, building);
     }
 }
 
@@ -204,20 +156,17 @@ impl Serialize for Buildings {
 
 impl<'de> Deserialize<'de> for Buildings {
     fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        let states = BuildingMap::deserialize(de)?;
-        let computeds = BuildingMap::new();
-        Ok(Self { states, computeds })
+        BuildingMap::deserialize(de).map(Self::from_states)
     }
 }
 
-#[derive(Copy, Clone)]
-pub struct BuildingInfo {
+pub struct BuildingInfo<'a> {
     building: Building,
-    state: BuildingState,
-    computed: BuildingComputed,
+    state: &'a BuildingState,
+    computed: &'a BuildingComputed,
 }
 
-impl BuildingInfo {
+impl BuildingInfo<'_> {
     pub fn building(&self) -> Building {
         self.building
     }
@@ -251,7 +200,7 @@ impl BuildingInfo {
     }
 }
 
-impl fmt::Debug for BuildingInfo {
+impl fmt::Debug for BuildingInfo<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct(self.building.name())
             .field("count", &self.state.count)
@@ -268,7 +217,7 @@ impl fmt::Debug for BuildingInfo {
     }
 }
 
-#[derive(Serialize, Deserialize, Default, Copy, Clone)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct BuildingState {
     pub count: u16,
     pub cookies_all_time: f64,
@@ -276,64 +225,75 @@ pub struct BuildingState {
     pub has_grandma_job_upgrade: bool,
 }
 
-#[derive(Copy, Clone)]
 pub struct BuildingComputed {
     pub cost: f64,
     pub sell_cost: f64,
     pub cps: f64,
 }
 
-macro_rules! make_building_map {
-    ($($field:ident: $variant:ident),*$(,)?) => {
-        #[derive(Serialize, Deserialize, Debug)]
-        struct BuildingMap<T> {
-            $(#[serde(default)] $field: T),*
+impl BuildingComputed {
+    fn new(states: &BuildingMap<BuildingState>, building: Building) -> Self {
+        let state = states.get(building);
+        let cost = calc::building_cost(building, state.count);
+        let sell_cost = calc::building_sell_cost(cost);
+
+        let cps = calc::building_cps(calc::BuildingCps {
+            building,
+            building_class: match building {
+                Building::Cursor => calc::BuildingCpsClass::Cursor,
+                Building::Grandma => calc::BuildingCpsClass::Grandma {
+                    grandma_job_upgrade_count: states.grandma_job_upgrade_count(),
+                },
+                _ => calc::BuildingCpsClass::Other {
+                    grandma_count: if state.has_grandma_job_upgrade {
+                        Some(states.grandma.count)
+                    } else {
+                        None
+                    },
+                },
+            },
+            count: state.count,
+            tiered_upgrade_count: state.tiered_upgrade_count,
+        });
+
+        Self {
+            cost,
+            sell_cost,
+            cps,
         }
-
-        impl<T> BuildingMap<T> {
-            fn new() -> Self
-            where
-                T: Default,
-            {
-                Self {
-                    $($field: Default::default()),*
-                }
-            }
-
-            fn get(&self, building: Building) -> &T {
-                match building {
-                    $(Building::$variant => &self.$field),*
-                }
-            }
-
-            fn get_mut(&mut self, building: Building) -> &mut T {
-                match building {
-                    $(Building::$variant => &mut self.$field),*
-                }
-            }
-        }
-    };
+    }
 }
 
-make_building_map! {
-    cursor: Cursor,
-    grandma: Grandma,
-    farm: Farm,
-    mine: Mine,
-    factory: Factory,
-    bank: Bank,
-    temple: Temple,
-    wizard_tower: WizardTower,
-    shipment: Shipment,
-    alchemy_lab: AlchemyLab,
-    portal: Portal,
-    time_machine: TimeMachine,
-    antimatter_condenser: AntimatterCondenser,
-    prism: Prism,
-    chancemaker: Chancemaker,
-    fractal_engine: FractalEngine,
-    rust_playground: RustPlayground,
-    idleverse: Idleverse,
-    cortex_baker: CortexBaker,
-    you: You,
+enum_map! {
+    #[derive(Serialize, Deserialize, Default, Debug)]
+    struct BuildingMap of Building {
+        cursor: Cursor,
+        grandma: Grandma,
+        farm: Farm,
+        mine: Mine,
+        factory: Factory,
+        bank: Bank,
+        temple: Temple,
+        wizard_tower: WizardTower,
+        shipment: Shipment,
+        alchemy_lab: AlchemyLab,
+        portal: Portal,
+        time_machine: TimeMachine,
+        antimatter_condenser: AntimatterCondenser,
+        prism: Prism,
+        chancemaker: Chancemaker,
+        fractal_engine: FractalEngine,
+        rust_playground: RustPlayground,
+        idleverse: Idleverse,
+        cortex_baker: CortexBaker,
+        you: You,
+    }
+}
+
+impl BuildingMap<BuildingState> {
+    fn grandma_job_upgrade_count(&self) -> u16 {
+        Building::variants()
+            .map(|b| self.get(b).has_grandma_job_upgrade as u16)
+            .sum()
+    }
 }

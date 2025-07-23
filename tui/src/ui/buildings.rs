@@ -64,12 +64,12 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         .render_stateful_or_default_state(area, buf, list_state);
 }
 
-struct BuildingInfoShopItem {
-    info: BuildingInfo,
+struct BuildingInfoShopItem<'a> {
+    info: BuildingInfo<'a>,
     sell_mode: bool,
 }
 
-impl ShopItemRender for BuildingInfoShopItem {
+impl ShopItemRender for BuildingInfoShopItem<'_> {
     fn label(&self) -> Cow<'static, str> {
         format!(
             "{} {}",
