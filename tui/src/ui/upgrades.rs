@@ -17,6 +17,7 @@ use tui_widget_list::{ListBuilder, ListView};
 pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let builder = ListBuilder::new(|ctx| {
         let selected = ctx.is_selected;
+        // TODO: This occasionally overflows by one. Why!
         let upgrade = app.core.available_upgrades()[ctx.index];
         let affordable = app.core.affordable(upgrade.cost());
         let widget = ShopItemWidget {
