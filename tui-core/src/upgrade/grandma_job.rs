@@ -28,6 +28,8 @@ impl GrandmaJob {
         state
             .buildings
             .modify(self.building, |b| b.has_grandma_job_upgrade = true);
+
+        state.buildings.recalc_computed(Building::Grandma);
     }
 
     pub fn effect_info(&self) -> UpgradeEffectInfo {

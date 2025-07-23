@@ -12,6 +12,7 @@ pub struct AppDebugState {
 pub enum AppDebugView {
     #[default]
     Cookies,
+    Cps,
     Buildings,
     AvailableUpgrades,
     OwnedUpgrades,
@@ -56,7 +57,8 @@ impl AppDebugState {
 impl AppDebugView {
     fn next(self) -> Self {
         match self {
-            Self::Cookies => Self::Buildings,
+            Self::Cookies => Self::Cps,
+            Self::Cps => Self::Buildings,
             Self::Buildings => Self::AvailableUpgrades,
             Self::AvailableUpgrades => Self::OwnedUpgrades,
             Self::OwnedUpgrades => Self::Achievements,

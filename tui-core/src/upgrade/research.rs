@@ -51,6 +51,34 @@ impl Research {
     }
 
     pub fn buy(&self, state: &mut State) {
+        match self {
+            Self::BingoCenterResearchFacility => {}
+            Self::SpecializedChocolateChips => {}
+            Self::DesignerCocoaBeans => {}
+            Self::RitualRollingPins => {}
+            Self::UnderworldOvens => {}
+            Self::OneMind => {
+                state.buildings.modify(Building::Grandma, |b| {
+                    b.addl_cps_per_owned_building
+                        .push((Building::Grandma, 0.02));
+                });
+            }
+            Self::ExoticNuts => {}
+            Self::CommunalBrainsweep => {
+                state.buildings.modify(Building::Grandma, |b| {
+                    b.addl_cps_per_owned_building
+                        .push((Building::Grandma, 0.02));
+                });
+            }
+            Self::ArcaneSugar => {}
+            Self::ElderPact => {
+                state.buildings.modify(Building::Grandma, |b| {
+                    b.addl_cps_per_owned_building.push((Building::Portal, 0.05));
+                });
+            }
+            Self::SacrificialRollingPins => {}
+        }
+
         if !matches!(self, Self::SacrificialRollingPins) {
             state.research.start();
         }

@@ -1,12 +1,18 @@
 use cookie_clicker_tui_utils::frames::RefreshClock;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
+#[cfg(debug_assertions)]
+const REFRESH: u32 = 5;
+
+#[cfg(not(debug_assertions))]
+const REFRESH: u32 = 30 * 60;
+
 #[derive(Debug)]
 pub struct Research {
     completed: u8,
     just_completed: bool,
     // TODO: Persist clocks.
-    refresh: Option<RefreshClock<{ 30 * 60 }>>,
+    refresh: Option<RefreshClock<REFRESH>>,
 }
 
 impl Research {

@@ -223,6 +223,7 @@ pub struct BuildingState {
     pub cookies_all_time: f64,
     pub tiered_upgrade_count: u16,
     pub has_grandma_job_upgrade: bool,
+    pub addl_cps_per_owned_building: Vec<(Building, f64)>,
 }
 
 pub struct BuildingComputed {
@@ -254,6 +255,10 @@ impl BuildingComputed {
             },
             count: state.count,
             tiered_upgrade_count: state.tiered_upgrade_count,
+            addl_cps_per_owned_building_counts: state
+                .addl_cps_per_owned_building
+                .iter()
+                .map(|(building, cps)| (states.get(*building).count, *cps)),
         });
 
         Self {

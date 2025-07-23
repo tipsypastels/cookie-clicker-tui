@@ -12,11 +12,12 @@ pub fn building_sell_cost(cost: f64) -> f64 {
     cost * (1.0 / 4.5)
 }
 
-pub struct BuildingCps {
+pub struct BuildingCps<AddlCpsPerOwnedBuildingCounts> {
     pub building: Building,
     pub building_class: BuildingCpsClass,
     pub count: u16,
     pub tiered_upgrade_count: u16,
+    pub addl_cps_per_owned_building_counts: AddlCpsPerOwnedBuildingCounts,
 }
 
 pub enum BuildingCpsClass {
@@ -26,14 +27,18 @@ pub enum BuildingCpsClass {
 }
 
 #[allow(clippy::let_and_return)]
-pub fn building_cps(
+pub fn building_cps<AddlCpsPerOwnedBuildingCounts>(
     BuildingCps {
         building,
         building_class,
         count,
         tiered_upgrade_count,
-    }: BuildingCps,
-) -> f64 {
+        addl_cps_per_owned_building_counts,
+    }: BuildingCps<AddlCpsPerOwnedBuildingCounts>,
+) -> f64
+where
+    AddlCpsPerOwnedBuildingCounts: Iterator<Item = (u16, f64)>,
+{
     let cps = building.base_cps() * count as f64 * 2.0f64.powi(tiered_upgrade_count as i32);
     let cps = match building_class {
         BuildingCpsClass::Cursor => cps,
@@ -57,6 +62,11 @@ pub fn building_cps(
             grandma_count: None,
         } => cps,
     };
+
+    let cps = cps
+        + addl_cps_per_owned_building_counts
+            .map(|(count, cps)| count as f64 * cps)
+            .sum::<f64>();
 
     cps
 }
