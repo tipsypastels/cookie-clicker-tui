@@ -6,7 +6,7 @@ use super::{
     },
 };
 use crate::app::AppListPane;
-use cookie_clicker_tui_core::{Building, BuildingInfo, Cost};
+use cookie_clicker_tui_core::{Building, BuildingInfo, Cost, GrandmapocalypsePhase};
 use ratatui::{
     prelude::*,
     widgets::{Block, Padding},
@@ -26,7 +26,18 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
             app.core.affordable(info.cost())
         };
 
-        let item = BuildingInfoShopItem { info, sell_mode };
+        let grandmapocalypse_phase = app
+            .core
+            .grandmapocalypse()
+            .phase()
+            .filter(|_| info.building().is_grandma());
+
+        let item = BuildingInfoShopItem {
+            info,
+            sell_mode,
+            grandmapocalypse_phase,
+        };
+
         let widget = ShopItemWidget {
             selected,
             affordable,
@@ -67,6 +78,7 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 struct BuildingInfoShopItem<'a> {
     info: BuildingInfo<'a>,
     sell_mode: bool,
+    grandmapocalypse_phase: Option<GrandmapocalypsePhase>,
 }
 
 impl ShopItemRender for BuildingInfoShopItem<'_> {
@@ -85,5 +97,13 @@ impl ShopItemRender for BuildingInfoShopItem<'_> {
         } else {
             self.info.cost()
         }
+    }
+
+    fn emoji(&self) -> Option<(&str, Style)> {
+        self.grandmapocalypse_phase.map(|phase| match phase {
+            GrandmapocalypsePhase::Awoken => (" :O", Style::new().yellow()),
+            GrandmapocalypsePhase::Displeased => (" >:(", Style::new().red()),
+            GrandmapocalypsePhase::Angered => (" >>>:((", Style::new().red()),
+        })
     }
 }

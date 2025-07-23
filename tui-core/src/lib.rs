@@ -15,6 +15,7 @@ pub use self::{
     achievement::{Achievement, AchievementReq},
     building::{Building, BuildingInfo},
     cost::Cost,
+    grandmapocalypse::{Grandmapocalypse, GrandmapocalypsePhase},
     milk::{Milk, MilkFlavor},
     research::Research,
     sugar_lumps::SugarLumps,
@@ -103,6 +104,10 @@ impl Core {
 
     pub fn research(&self) -> &Research {
         &self.state.research
+    }
+
+    pub fn grandmapocalypse(&self) -> &Grandmapocalypse {
+        &self.state.grandmapocalypse
     }
 
     pub fn ticker(&self) -> Option<&'static str> {
@@ -252,6 +257,8 @@ struct State {
     sugar_lumps: SugarLumps,
     #[serde(default = "Research::new")]
     research: Research,
+    #[serde(default = "Grandmapocalypse::new")]
+    grandmapocalypse: Grandmapocalypse,
 }
 
 impl State {
@@ -264,6 +271,7 @@ impl State {
             owned_upgrades: OwnedUpgrades::new(),
             sugar_lumps: SugarLumps::new(),
             research: Research::new(),
+            grandmapocalypse: Grandmapocalypse::new(),
         }
     }
 

@@ -12,6 +12,10 @@ pub struct ShopItemWidget<T> {
 pub trait ShopItemRender {
     fn label(&self) -> Cow<'static, str>;
     fn cost(&self) -> Cost;
+
+    fn emoji(&self) -> Option<(&str, Style)> {
+        None
+    }
 }
 
 impl ShopItemWidget<()> {
@@ -30,8 +34,13 @@ impl<T: ShopItemRender> Widget for ShopItemWidget<T> {
 
 impl<T: ShopItemRender> ShopItemWidget<T> {
     fn label_line(&self) -> Line {
-        Line::styled(
-            self.item.label(),
+        let mut v = vec![Span::raw(self.item.label())];
+
+        if let Some((emoji, emoji_style)) = self.item.emoji() {
+            v.push(Span::styled(emoji, emoji_style));
+        }
+
+        Line::from(v).style(
             Style::new()
                 .patch_if(self.selected, SELECTED_STYLE)
                 .fg_if(!self.affordable, Color::DarkGray),

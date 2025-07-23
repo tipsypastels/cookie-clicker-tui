@@ -20,6 +20,7 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
         AppDebugView::Milk => format!("{:?}", core.milk()),
         AppDebugView::SugarLumps => format!("{:?}", core.sugar_lumps()),
         AppDebugView::Research => format!("{:?}", core.research()),
+        AppDebugView::Grandmapocalypse => format!("{:?}", core.grandmapocalypse()),
         AppDebugView::Ticker => format!("{:?}", core.debug_ticker()),
         AppDebugView::List => format!("{:?}", app.list.debug(core)),
         AppDebugView::Keypress => {
