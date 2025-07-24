@@ -1,3 +1,4 @@
+mod bakery;
 mod debug;
 mod interface;
 mod list;
@@ -5,6 +6,7 @@ mod modal;
 mod tick;
 
 pub use self::{
+    bakery::AppBakery,
     debug::{AppDebugState, AppDebugView},
     interface::{AppFlash, AppInterfaceState},
     list::{AppListPane, AppListPointee, AppListState},
@@ -29,12 +31,13 @@ pub struct App {
     modal: AppModalState,
     iface: AppInterfaceState,
     debug: AppDebugState,
+    bakery: AppBakery,
     events: Events,
     quit: bool,
 }
 
 impl App {
-    pub fn new(save: Save, core: Core) -> Self {
+    pub fn new(save: Save, core: Core, name: Option<Box<str>>) -> Self {
         Self {
             save,
             core,
@@ -43,6 +46,7 @@ impl App {
             modal: AppModalState::default(),
             iface: AppInterfaceState::default(),
             debug: AppDebugState::default(),
+            bakery: AppBakery::new(name),
             events: Events::new(),
             quit: false,
         }
@@ -124,7 +128,10 @@ impl App {
                 self.quit().await?;
             }
             KeyCode::Char('i') => {
-                self.modal.toggle();
+                self.modal.toggle_list_item();
+            }
+            KeyCode::Char('r') => {
+                self.modal.set_renaming_bakery();
             }
             KeyCode::Char('s') => {
                 if self.list.is_pane_highlighted(AppListPane::Buildings) {
@@ -148,8 +155,9 @@ impl App {
                 tick: &self.tick,
                 list: &mut self.list,
                 iface: &self.iface,
-                modal: self.modal,
+                modal: &self.modal,
                 debug: &self.debug,
+                bakery: &self.bakery,
             };
             crate::ui::ui(&mut ui, frame);
         })
@@ -160,7 +168,7 @@ impl App {
     async fn tick(&mut self) -> Result<()> {
         self.core.tick();
         self.iface.tick();
-        self.save.tick(&self.core).await?;
+        self.save.tick(&self.core, self.bakery.name()).await?;
 
         if self.core.sugar_lumps().just_unlocked() {
             self.iface.add_flash(AppFlash::SugarLumpsUnlocked);
@@ -185,6 +193,6 @@ impl App {
 
     async fn quit(&mut self) -> Result<()> {
         self.quit = true;
-        self.save.save(&self.core).await
+        self.save.save(&self.core, self.bakery.name()).await
     }
 }

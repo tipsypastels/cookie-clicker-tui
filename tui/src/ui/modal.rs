@@ -2,7 +2,7 @@ use super::{
     UiApp,
     utils::{num::PrintFloat, upgrade::print_upgrade_effect_info},
 };
-use crate::app::AppListPointee;
+use crate::app::{AppListPointee, AppModalState};
 use cookie_clicker_tui_core::{Building, Upgrade};
 use ratatui::{
     prelude::*,
@@ -13,8 +13,10 @@ use std::borrow::Cow;
 const SCREEN_PERCENT: (u16, u16) = (60, 31);
 
 pub fn modal(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
-    if app.modal.is_list_item() {
-        render_list_item(app, area, buf);
+    match app.modal {
+        AppModalState::None => {}
+        AppModalState::ListItem => render_list_item(app, area, buf),
+        AppModalState::RenamingBakery(s) => render_renaming_bakery(app, s, area, buf),
     }
 }
 
@@ -95,6 +97,12 @@ fn render_upgrade(upgrade: Upgrade, area: Rect, buf: &mut Buffer) {
 
         print_upgrade_effect_info(info, &mut lines);
         Paragraph::new(lines).block(block).render(area, buf);
+    });
+}
+
+fn render_renaming_bakery(app: &mut UiApp, s: &str, area: Rect, buf: &mut Buffer) {
+    render_outer(area, buf, " Rename Bakery ", |area, buf, block| {
+        Paragraph::new("hi").block(block).render(area, buf);
     });
 }
 

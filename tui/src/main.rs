@@ -5,7 +5,7 @@ mod ui;
 
 use self::{
     app::App,
-    save::{Save, SaveOptions},
+    save::{Save, SaveData, SaveOptions},
 };
 use anyhow::Result;
 use clap::Parser;
@@ -48,7 +48,10 @@ async fn main() -> Result<()> {
     };
 
     let mut save = Save::new(save_options)?;
-    let mut core = save.data().await?.core;
+    let SaveData {
+        bakery_name,
+        mut core,
+    } = save.data().await?;
 
     if cli.everything_free {
         core.make_everything_free();
@@ -59,7 +62,7 @@ async fn main() -> Result<()> {
     }
 
     let mut term = ratatui::init();
-    let app = App::new(save, core);
+    let app = App::new(save, core, bakery_name);
     let res = app.run(&mut term).await;
 
     ratatui::restore();

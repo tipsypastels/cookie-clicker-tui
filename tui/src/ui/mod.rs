@@ -9,7 +9,7 @@ mod upgrades;
 mod utils;
 
 use crate::{
-    app::{AppDebugState, AppInterfaceState, AppListState, AppModalState, AppTickState},
+    app::{AppBakery, AppDebugState, AppInterfaceState, AppListState, AppModalState, AppTickState},
     save::Save,
 };
 use cookie_clicker_tui_core::Core;
@@ -21,8 +21,9 @@ pub struct UiApp<'a> {
     pub tick: &'a AppTickState,
     pub list: &'a mut AppListState,
     pub iface: &'a AppInterfaceState,
-    pub modal: AppModalState,
+    pub modal: &'a AppModalState,
     pub debug: &'a AppDebugState,
+    pub bakery: &'a AppBakery,
 }
 
 pub fn ui(app: &mut UiApp, frame: &mut Frame) {
