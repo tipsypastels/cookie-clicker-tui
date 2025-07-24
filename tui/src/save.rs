@@ -84,39 +84,75 @@ impl Save {
     }
 
     pub async fn data(&mut self) -> Result<SaveData> {
-        enum ErrorMode<'a> {
-            Context,
-            Outparam(&'a mut bool),
+        struct Context;
+        struct Swallow<'a>(&'a mut bool);
+
+        trait OpenHandler {
+            type Output;
+
+            fn open_file_fallback() -> Self::Output;
+
+            fn handle_parse_result(
+                &mut self,
+                path: &Path,
+                result: serde_json::Result<SaveData>,
+            ) -> Self::Output;
         }
 
-        async fn open(path: &Path, mode: ErrorMode<'_>) -> Result<SaveData> {
+        impl OpenHandler for Context {
+            type Output = Result<SaveData>;
+
+            fn open_file_fallback() -> Self::Output {
+                Ok(SaveData::default())
+            }
+
+            fn handle_parse_result(
+                &mut self,
+                path: &Path,
+                result: serde_json::Result<SaveData>,
+            ) -> Self::Output {
+                result.with_context(|| format!("failed to parse save file '{path:?}'"))
+            }
+        }
+
+        impl OpenHandler for Swallow<'_> {
+            type Output = SaveData;
+
+            fn open_file_fallback() -> Self::Output {
+                SaveData::default()
+            }
+
+            fn handle_parse_result(
+                &mut self,
+                _path: &Path,
+                result: serde_json::Result<SaveData>,
+            ) -> Self::Output {
+                match result {
+                    Ok(data) => data,
+                    Err(_) => {
+                        *self.0 = true;
+                        SaveData::default()
+                    }
+                }
+            }
+        }
+
+        async fn open<H: OpenHandler>(path: &Path, mut handler: H) -> H::Output {
             let text = match fs::read_to_string(path).await {
                 Ok(text) => text,
-                Err(_) => return Ok(SaveData::default()),
+                // TODO: Consider only doing this for nonexistant files,
+                // not all fs errors.
+                Err(_) => return H::open_file_fallback(),
             };
-
-            let serde_res = serde_json::from_str(&text);
-            let data = match mode {
-                ErrorMode::Context => {
-                    serde_res.with_context(|| format!("failed to parse save file '{path:?}'"))?
-                }
-                ErrorMode::Outparam(e) => {
-                    *e = serde_res.is_err();
-                    serde_res?
-                }
-            };
-
-            Ok(data)
+            handler.handle_parse_result(path, serde_json::from_str(&text))
         }
 
         match &mut self.0 {
             Inner::Dry => Ok(SaveData::default()),
             Inner::PersistedDefaultPath(shared, error) => {
-                Ok(open(&shared.path, ErrorMode::Outparam(error))
-                    .await
-                    .unwrap_or_default())
+                Ok(open(&shared.path, Swallow(error)).await)
             }
-            Inner::PersistedManualPath(shared) => open(&shared.path, ErrorMode::Context).await,
+            Inner::PersistedManualPath(shared) => open(&shared.path, Context).await,
         }
     }
 
