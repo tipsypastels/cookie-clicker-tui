@@ -63,7 +63,7 @@ fn cps_count(app: &mut UiApp, lines: &mut Vec<Line>) {
 
 fn logo(app: &mut UiApp, lines: &mut Vec<Line>) {
     for line_text in LOGO.lines() {
-        let line_text = if app.iface.pressed_cookie() && app.iface.even_frame() {
+        let line_text = if app.iface.pressed_cookie() && app.tick.tick_no() % 2 == 0 {
             &line_text[LOGO_PADDING_LEFT..]
         } else {
             line_text

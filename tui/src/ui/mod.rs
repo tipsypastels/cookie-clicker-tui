@@ -8,12 +8,17 @@ mod ticker;
 mod upgrades;
 mod utils;
 
-use crate::app::{AppDebugState, AppInterfaceState, AppListState, AppModalState};
+use crate::{
+    app::{AppDebugState, AppInterfaceState, AppListState, AppModalState, AppTickState},
+    save::Save,
+};
 use cookie_clicker_tui_core::Core;
 use ratatui::prelude::*;
 
 pub struct UiApp<'a> {
+    pub save: &'a Save,
     pub core: &'a Core,
+    pub tick: &'a AppTickState,
     pub list: &'a mut AppListState,
     pub iface: &'a AppInterfaceState,
     pub modal: AppModalState,

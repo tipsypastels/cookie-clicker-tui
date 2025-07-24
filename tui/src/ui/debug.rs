@@ -30,6 +30,7 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
                 "".to_string()
             }
         }
+        AppDebugView::Save => format!("{:?}", app.save),
     };
 
     let block = Block::bordered()

@@ -6,17 +6,12 @@ use std::collections::{HashSet, VecDeque};
 
 #[derive(Default)]
 pub struct AppInterfaceState {
-    even_frame: bool,
     sell_mode: bool,
     pressed_cookie: Countdown<3>,
     flashes: AppFlashes,
 }
 
 impl AppInterfaceState {
-    pub fn even_frame(&self) -> bool {
-        self.even_frame
-    }
-
     pub fn sell_mode(&self) -> bool {
         self.sell_mode
     }
@@ -42,7 +37,6 @@ impl AppInterfaceState {
     }
 
     pub(super) fn tick(&mut self) {
-        self.even_frame = !self.even_frame;
         self.pressed_cookie.tick();
         self.flashes.tick();
     }
@@ -83,6 +77,10 @@ impl AppFlashes {
 #[func(pub fn class(self) -> AppFlashClass)]
 pub enum AppFlash {
     #[assoc(class = AppFlashClass::Info)]
+    Saved,
+    #[assoc(class = AppFlashClass::Warning)]
+    WontSaveOverParseError,
+    #[assoc(class = AppFlashClass::Info)]
     SugarLumpsUnlocked,
     #[assoc(class = AppFlashClass::Info)]
     ResearchCompleted,
@@ -115,6 +113,8 @@ impl AppFlash {
 enum AppFlashClass {
     #[assoc(title = " Info ", style = Style::new().bg(Color::LightBlue), border_style = Style::new().white())]
     Info,
+    #[assoc(title = " Warning ", style = Style::new().bg(Color::Yellow), border_style = Style::new().black())]
+    Warning,
     #[assoc(title = " Error ", style = Style::new().bg(Color::LightRed), border_style = Style::new().black())]
     Error,
 }

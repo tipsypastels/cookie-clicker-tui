@@ -25,6 +25,7 @@ pub enum AppDebugView {
     Ticker,
     List,
     Keypress,
+    Save,
 }
 
 impl AppDebugState {
@@ -72,7 +73,8 @@ impl AppDebugView {
             Self::Grandmapocalypse => Self::Ticker,
             Self::Ticker => Self::List,
             Self::List => Self::Keypress,
-            Self::Keypress => Self::Cookies,
+            Self::Keypress => Self::Save,
+            Self::Save => Self::Cookies,
         }
     }
 }

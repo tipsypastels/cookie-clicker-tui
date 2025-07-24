@@ -15,6 +15,10 @@ pub fn flash(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     };
 
     let text: Cow<str> = match flash {
+        AppFlash::Saved => "• game saved!".into(),
+        AppFlash::WontSaveOverParseError => {
+            "• failed to parse save file; game will not save over it".into()
+        }
         AppFlash::ResearchCompleted => "• research completed".into(),
         AppFlash::SugarLumpsUnlocked => "• sugar lumps unlocked".into(),
         AppFlash::CantAffordBuilding(building) => format!(

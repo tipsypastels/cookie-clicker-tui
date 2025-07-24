@@ -2,17 +2,19 @@ mod debug;
 mod interface;
 mod list;
 mod modal;
+mod tick;
 
 pub use self::{
     debug::{AppDebugState, AppDebugView},
     interface::{AppFlash, AppInterfaceState},
     list::{AppListPane, AppListPointee, AppListState},
     modal::AppModalState,
+    tick::AppTickState,
 };
 
 use crate::{
     event::{Event, Events},
-    storage::Storage,
+    save::Save,
 };
 use anyhow::{Context, Result};
 use cookie_clicker_tui_core::Core;
@@ -20,8 +22,9 @@ use crossterm::event::KeyEvent;
 use ratatui::DefaultTerminal;
 
 pub struct App {
-    storage: Storage,
+    save: Save,
     core: Core,
+    tick: AppTickState,
     list: AppListState,
     modal: AppModalState,
     iface: AppInterfaceState,
@@ -31,10 +34,11 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(storage: Storage, core: Core) -> Self {
+    pub fn new(save: Save, core: Core) -> Self {
         Self {
-            storage,
+            save,
             core,
+            tick: AppTickState::default(),
             list: AppListState::default(),
             modal: AppModalState::default(),
             iface: AppInterfaceState::default(),
@@ -139,7 +143,9 @@ impl App {
     fn draw(&mut self, term: &mut DefaultTerminal) -> Result<()> {
         term.draw(|frame| {
             let mut ui = crate::ui::UiApp {
+                save: &self.save,
                 core: &self.core,
+                tick: &self.tick,
                 list: &mut self.list,
                 iface: &self.iface,
                 modal: self.modal,
@@ -154,7 +160,7 @@ impl App {
     async fn tick(&mut self) -> Result<()> {
         self.core.tick();
         self.iface.tick();
-        self.storage.tick(&self.core).await?;
+        self.save.tick(&self.core).await?;
 
         if self.core.sugar_lumps().just_unlocked() {
             self.iface.add_flash(AppFlash::SugarLumpsUnlocked);
@@ -164,11 +170,21 @@ impl App {
             self.iface.add_flash(AppFlash::ResearchCompleted);
         }
 
+        if self.save.notify_just_saved() {
+            self.iface.add_flash(AppFlash::Saved);
+        }
+
+        if self.save.notify_swallowed_parse_error() && self.tick.is_very_first() {
+            self.iface.add_flash(AppFlash::WontSaveOverParseError);
+        }
+
+        self.tick.tick();
+
         Ok(())
     }
 
     async fn quit(&mut self) -> Result<()> {
         self.quit = true;
-        self.storage.save(&self.core).await
+        self.save.save(&self.core).await
     }
 }
