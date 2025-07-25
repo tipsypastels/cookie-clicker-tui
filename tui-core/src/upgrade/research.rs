@@ -55,10 +55,16 @@ impl Research {
             Self::BingoCenterResearchFacility => {
                 state.buildings.set_grandma_has_bingo_center_4x(true);
             }
-            Self::SpecializedChocolateChips => {}
-            Self::DesignerCocoaBeans => {}
+            Self::SpecializedChocolateChips => {
+                state.grandmapocalypse.add_cps_mult(1.01);
+            }
+            Self::DesignerCocoaBeans => {
+                state.grandmapocalypse.add_cps_mult(1.02);
+            }
             Self::RitualRollingPins => {}
-            Self::UnderworldOvens => {}
+            Self::UnderworldOvens => {
+                state.grandmapocalypse.add_cps_mult(1.03);
+            }
             Self::OneMind => {
                 state.buildings.modify(Building::Grandma, |b| {
                     b.addl_cps_per_owned_building
@@ -69,7 +75,9 @@ impl Research {
                     .grandmapocalypse
                     .set_phase(GrandmapocalypsePhase::Awoken);
             }
-            Self::ExoticNuts => {}
+            Self::ExoticNuts => {
+                state.grandmapocalypse.add_cps_mult(1.04);
+            }
             Self::CommunalBrainsweep => {
                 state.buildings.modify(Building::Grandma, |b| {
                     b.addl_cps_per_owned_building
@@ -80,7 +88,9 @@ impl Research {
                     .grandmapocalypse
                     .set_phase(GrandmapocalypsePhase::Displeased);
             }
-            Self::ArcaneSugar => {}
+            Self::ArcaneSugar => {
+                state.grandmapocalypse.add_cps_mult(1.05);
+            }
             Self::ElderPact => {
                 state.buildings.modify(Building::Grandma, |b| {
                     b.addl_cps_per_owned_building.push((Building::Portal, 0.05));

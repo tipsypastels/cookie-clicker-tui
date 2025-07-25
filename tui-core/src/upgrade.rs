@@ -825,35 +825,35 @@ pub enum Upgrade {
     /* -------------------------------------------------------------------------- */
     /*                                   Kitten                                   */
     /* -------------------------------------------------------------------------- */
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(52.0, 0.1, 9.0 * num::MILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(13, 0.1, 9.0 * num::MILLION)))]
     KittenHelpers,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(100.0, 0.125, 9.0 * num::BILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(25, 0.125, 9.0 * num::BILLION)))]
     KittenWorkers,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(200.0, 0.15, 90.0 * num::TRILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(50, 0.15, 90.0 * num::TRILLION)))]
     KittenEngineers,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(300.0, 0.175, 90.0 * num::QUADRILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(75, 0.175, 90.0 * num::QUADRILLION)))]
     KittenOverseers,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(400.0, 0.2, 900.0 * num::QUINTILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(100, 0.2, 900.0 * num::QUINTILLION)))]
     KittenManagers,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(500.0, 0.2, 900.0 * num::SEXTILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(125, 0.2, 900.0 * num::SEXTILLION)))]
     KittenAccountants,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(600.0, 0.2, 900.0 * num::SEPTILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(150, 0.2, 900.0 * num::SEPTILLION)))]
     KittenSpecialists,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(700.0, 0.2, 900.0 * num::OCTILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(175, 0.2, 900.0 * num::OCTILLION)))]
     KittenExperts,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(800.0, 0.2, 900.0 * num::NONILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(200, 0.2, 900.0 * num::NONILLION)))]
     KittenConsulants,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(900.0, 0.175, 900.0 * num::DECILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(225, 0.175, 900.0 * num::DECILLION)))]
     KittenAssistantsToTheRegionalManager,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1000.0, 0.15, 900.0 * num::UNDECILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(250, 0.15, 900.0 * num::UNDECILLION)))]
     KittenMarketers,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1100.0, 0.125, 900.0 * num::DUODECILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(275, 0.125, 900.0 * num::DUODECILLION)))]
     KittenAnalysts,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1200.0, 0.115, 900.0 * num::TREDECILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(300, 0.115, 900.0 * num::TREDECILLION)))]
     KittenExecutives,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1300.0, 0.11, 900.0 * num::QUATTORDECILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(325, 0.11, 900.0 * num::QUATTORDECILLION)))]
     KittenAdmins,
-    #[assoc(class = UpgradeClass::Kitten(Kitten::new(1400.0, 0.105, 900.0 * num::QUINDECILLION)))]
+    #[assoc(class = UpgradeClass::Kitten(Kitten::new(350, 0.105, 900.0 * num::QUINDECILLION)))]
     KittenStrategists,
     /* -------------------------------------------------------------------------- */
     /*                          Research/Grandmapocalyse                          */

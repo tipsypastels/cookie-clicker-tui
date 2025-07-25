@@ -1,6 +1,7 @@
 pub mod addl;
 pub mod base;
 pub mod building;
+pub mod kittens;
 
 #[non_exhaustive]
 pub struct Cps {
