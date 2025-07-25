@@ -1,0 +1,7 @@
+[package]
+name = "cookie-clicker-tui-calc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+approx-eq-trait.workspace = true
