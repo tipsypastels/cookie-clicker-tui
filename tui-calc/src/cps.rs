@@ -1,0 +1,25 @@
+pub mod addl;
+pub mod base;
+pub mod building;
+
+#[non_exhaustive]
+pub struct Cps {
+    pub base: f64,
+    pub total: f64,
+}
+
+impl Cps {
+    pub fn new<BuildingCpses, GrandmapocalypseMults>(
+        base: base::Cps<BuildingCpses>,
+        addl: addl::Cps<GrandmapocalypseMults>,
+    ) -> Self
+    where
+        BuildingCpses: Iterator<Item = f64>,
+        GrandmapocalypseMults: Iterator<Item = f64>,
+    {
+        let base = base.calc();
+        let total = addl.calc(base);
+
+        Self { base, total }
+    }
+}
