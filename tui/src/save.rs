@@ -5,13 +5,17 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tokio::fs;
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Deserialize, Default)]
 pub struct SaveData {
+    #[serde(default)]
+    pub bakery_name: Option<Box<str>>,
     pub core: Core,
 }
 
 #[derive(Serialize)]
 struct SaveDataRef<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    bakery_name: Option<&'a str>,
     core: &'a Core,
 }
 
@@ -156,7 +160,7 @@ impl Save {
         }
     }
 
-    pub async fn tick(&mut self, core: &Core) -> Result<()> {
+    pub async fn tick(&mut self, core: &Core, bakery_name: Option<&str>) -> Result<()> {
         let Some(shared) = self.shared_mut() else {
             return Ok(());
         };
@@ -165,17 +169,17 @@ impl Save {
 
         if shared.refresh.finish() {
             shared.refresh.restart();
-            self._save(core, true).await
+            self._save(core, bakery_name, true).await
         } else {
             Ok(())
         }
     }
 
-    pub async fn save(&mut self, core: &Core) -> Result<()> {
-        self._save(core, false).await
+    pub async fn save(&mut self, core: &Core, bakery_name: Option<&str>) -> Result<()> {
+        self._save(core, bakery_name, false).await
     }
 
-    async fn _save(&mut self, core: &Core, auto: bool) -> Result<()> {
+    async fn _save(&mut self, core: &Core, bakery_name: Option<&str>, auto: bool) -> Result<()> {
         if self.notify_swallowed_parse_error() {
             return Ok(());
         }
@@ -184,7 +188,7 @@ impl Save {
             return Ok(());
         };
 
-        let data = SaveDataRef { core };
+        let data = SaveDataRef { bakery_name, core };
         #[cfg(debug_assertions)]
         let res = serde_json::to_string_pretty(&data);
         #[cfg(not(debug_assertions))]

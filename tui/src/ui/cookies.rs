@@ -32,9 +32,14 @@ pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     lines.push(Line::default());
     logo(app, &mut lines);
 
+    let title: Cow<str> = match app.bakery.name() {
+        Some(name) => format!(" {name} ").into(),
+        None => " Cookies ".into(),
+    };
+
     let block = Block::bordered()
-        .title(Line::styled(" Cookies ", Modifier::BOLD).centered())
-        .title_bottom(Line::styled(" Click <Space> ", Modifier::BOLD).centered());
+        .title(Line::styled(title, Modifier::BOLD).centered())
+        .title_bottom(Line::styled(" Click <Space> Rename <R> ", Modifier::BOLD).centered());
 
     let block_area = block.inner(area);
 

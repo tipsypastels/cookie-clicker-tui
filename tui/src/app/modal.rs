@@ -1,23 +1,33 @@
-// will probably become an enum with variants later
-#[derive(Default, Copy, Clone)]
-pub struct AppModalState {
-    list_item: bool,
+#[derive(Default)]
+pub enum AppModalState {
+    #[default]
+    None,
+    ListItem,
+    RenamingBakery(String),
 }
 
 impl AppModalState {
     pub fn is_open(&self) -> bool {
-        self.list_item
+        !matches!(self, Self::None)
     }
 
-    pub fn is_list_item(&self) -> bool {
-        self.list_item
+    pub(super) fn toggle_list_item(&mut self) {
+        match self {
+            Self::None => {
+                *self = Self::ListItem;
+            }
+            Self::ListItem => {
+                *self = Self::None;
+            }
+            _ => {}
+        }
     }
 
-    pub(super) fn toggle(&mut self) {
-        self.list_item = !self.list_item;
+    pub(super) fn set_renaming_bakery(&mut self) {
+        *self = Self::RenamingBakery(String::new());
     }
 
     pub(super) fn close(&mut self) {
-        self.list_item = false;
+        *self = Self::None;
     }
 }

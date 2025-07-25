@@ -1,3 +1,4 @@
+mod bakery;
 mod debug;
 mod interface;
 mod list;
@@ -5,6 +6,7 @@ mod modal;
 mod tick;
 
 pub use self::{
+    bakery::AppBakery,
     debug::{AppDebugState, AppDebugView},
     interface::{AppFlash, AppInterfaceState},
     list::{AppListPane, AppListPointee, AppListState},
@@ -18,7 +20,7 @@ use crate::{
 };
 use anyhow::{Context, Result};
 use cookie_clicker_tui_core::Core;
-use crossterm::event::KeyEvent;
+use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::DefaultTerminal;
 
 pub struct App {
@@ -29,12 +31,13 @@ pub struct App {
     modal: AppModalState,
     iface: AppInterfaceState,
     debug: AppDebugState,
+    bakery: AppBakery,
     events: Events,
     quit: bool,
 }
 
 impl App {
-    pub fn new(save: Save, core: Core) -> Self {
+    pub fn new(save: Save, core: Core, name: Option<Box<str>>) -> Self {
         Self {
             save,
             core,
@@ -43,6 +46,7 @@ impl App {
             modal: AppModalState::default(),
             iface: AppInterfaceState::default(),
             debug: AppDebugState::default(),
+            bakery: AppBakery::new(name),
             events: Events::new(),
             quit: false,
         }
@@ -57,7 +61,13 @@ impl App {
                     self.tick().await?;
                 }
                 Event::Term(crossterm::event::Event::Key(event)) if event.is_press() => {
-                    self.handle_key_event(event).await?;
+                    self.debug.set_latest_key_event(event);
+
+                    if let AppModalState::RenamingBakery(_) = self.modal {
+                        self.handle_renaming_bakery_key_event(event);
+                    } else {
+                        self.handle_key_event(event).await?;
+                    }
                 }
                 _ => {}
             }
@@ -65,11 +75,32 @@ impl App {
         Ok(())
     }
 
+    fn handle_renaming_bakery_key_event(&mut self, event: KeyEvent) {
+        // can't pass this as a parameter without cloning since we're borrowing from self
+        let name = match &mut self.modal {
+            AppModalState::RenamingBakery(name) => name,
+            _ => unreachable!(),
+        };
+
+        match event.code {
+            KeyCode::Enter => {
+                self.bakery.set_name(&**name);
+                self.modal.close();
+            }
+            KeyCode::Esc => {
+                self.modal.close();
+            }
+            KeyCode::Backspace => {
+                name.pop();
+            }
+            KeyCode::Char(char) => {
+                name.push(char);
+            }
+            _ => {}
+        }
+    }
+
     async fn handle_key_event(&mut self, event: KeyEvent) -> Result<()> {
-        use crossterm::event::KeyCode;
-
-        self.debug.set_latest_key_event(event);
-
         match event.code {
             KeyCode::Up => {
                 self.list.up();
@@ -124,7 +155,10 @@ impl App {
                 self.quit().await?;
             }
             KeyCode::Char('i') => {
-                self.modal.toggle();
+                self.modal.toggle_list_item();
+            }
+            KeyCode::Char('r') => {
+                self.modal.set_renaming_bakery();
             }
             KeyCode::Char('s') => {
                 if self.list.is_pane_highlighted(AppListPane::Buildings) {
@@ -148,8 +182,9 @@ impl App {
                 tick: &self.tick,
                 list: &mut self.list,
                 iface: &self.iface,
-                modal: self.modal,
+                modal: &self.modal,
                 debug: &self.debug,
+                bakery: &self.bakery,
             };
             crate::ui::ui(&mut ui, frame);
         })
@@ -160,7 +195,7 @@ impl App {
     async fn tick(&mut self) -> Result<()> {
         self.core.tick();
         self.iface.tick();
-        self.save.tick(&self.core).await?;
+        self.save.tick(&self.core, self.bakery.name()).await?;
 
         if self.core.sugar_lumps().just_unlocked() {
             self.iface.add_flash(AppFlash::SugarLumpsUnlocked);
@@ -185,6 +220,6 @@ impl App {
 
     async fn quit(&mut self) -> Result<()> {
         self.quit = true;
-        self.save.save(&self.core).await
+        self.save.save(&self.core, self.bakery.name()).await
     }
 }
