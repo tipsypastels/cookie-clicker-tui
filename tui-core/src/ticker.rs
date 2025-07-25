@@ -1,172 +1,168 @@
 use crate::{
     State,
-    req::{Comparator, Req},
+    grandmapocalypse::GrandmapocalypsePhase,
+    req::{Cmp, Req},
 };
 use cookie_clicker_tui_utils::{frames::RefreshClock, num};
-use rand::seq::IndexedRandom;
+use enum_assoc::Assoc;
+use enum_fun::Variants;
+use rand::{Rng, seq::IndexedRandom};
 
-static ENTRIES: &[(&str, Req)] = &[
-    (
-        "You feel like making cookies. But nobody wants to eat your cookies.",
-        Req::Cookies(Comparator::Below(5.0)),
-    ),
-    (
-        "Your first batch goes in the trash. The neighborhood raccoon barely touches it.",
-        Req::Cookies(Comparator::Range(5.0, 50.0)),
-    ),
-    (
-        "Your family accepts to try some of your cookies.",
-        Req::Cookies(Comparator::Range(50.0, 100.0)),
-    ),
-    (
-        "Your cookies are popular in the neighborhood.",
-        Req::Cookies(Comparator::Range(100.0, 500.0)),
-    ),
-    (
-        "People are starting to talk about your cookies.",
-        Req::Cookies(Comparator::Range(500.0, 1.0 * num::THOUSAND)),
-    ),
-    (
-        "Your cookies are talked about for miles around.",
-        Req::Cookies(Comparator::Range(1.0 * num::THOUSAND, 5.0 * num::THOUSAND)),
-    ),
-    (
-        "Your cookies are renowned in the whole town!",
-        Req::Cookies(Comparator::Range(5.0 * num::THOUSAND, 10.0 * num::THOUSAND)),
-    ),
-    (
-        "Your cookies bring all the boys to the yard.",
-        Req::Cookies(Comparator::Range(
-            10.0 * num::THOUSAND,
-            50.0 * num::THOUSAND,
-        )),
-    ),
-    (
-        "Your cookies now have their own website!",
-        Req::Cookies(Comparator::Range(
-            50.0 * num::THOUSAND,
-            100.0 * num::THOUSAND,
-        )),
-    ),
-    (
-        "Your cookies are worth a lot of money.",
-        Req::Cookies(Comparator::Range(
-            100.0 * num::THOUSAND,
-            500.0 * num::THOUSAND,
-        )),
-    ),
-    (
-        "Your cookies sell very well in distant countries.",
-        Req::Cookies(Comparator::Range(500.0 * num::THOUSAND, 1.0 * num::MILLION)),
-    ),
-    (
-        "People come from very far away to get a taste of your cookies.",
-        Req::Cookies(Comparator::Range(1.0 * num::MILLION, 5.0 * num::MILLION)),
-    ),
-    (
-        "Kings and queens from all over the world are enjoying your cookies.",
-        Req::Cookies(Comparator::Range(5.0 * num::MILLION, 10.0 * num::MILLION)),
-    ),
-    (
-        "There are now museums dedicated to your cookies.",
-        Req::Cookies(Comparator::Range(10.0 * num::MILLION, 50.0 * num::MILLION)),
-    ),
-    (
-        "A national day has been created in honor of your cookies.",
-        Req::Cookies(Comparator::Range(50.0 * num::MILLION, 100.0 * num::MILLION)),
-    ),
-    (
-        "Your cookies have been named a part of the world wonders.",
-        Req::Cookies(Comparator::Range(
-            100.0 * num::MILLION,
-            500.0 * num::MILLION,
-        )),
-    ),
-    (
-        "History books now include a whole chapter about your cookies.",
-        Req::Cookies(Comparator::Range(500.0 * num::MILLION, 1.0 * num::BILLION)),
-    ),
-    (
-        "Your cookies have been placed under government surveillance.",
-        Req::Cookies(Comparator::Range(1.0 * num::BILLION, 5.0 * num::BILLION)),
-    ),
-    (
-        "The whole planet is enjoying your cookies!",
-        Req::Cookies(Comparator::Range(5.0 * num::BILLION, 10.0 * num::BILLION)),
-    ),
-    (
-        "Strange creatures from neighboring planets wish to try your cookies.",
-        Req::Cookies(Comparator::Range(10.0 * num::BILLION, 50.0 * num::BILLION)),
-    ),
-    (
-        "Elder gods from the whole cosmos have awoken to taste your cookies.",
-        Req::Cookies(Comparator::Range(50.0 * num::BILLION, 100.0 * num::BILLION)),
-    ),
-    (
-        "Beings from other dimensions lapse into existence just to get a taste of your cookies.",
-        Req::Cookies(Comparator::Range(
-            100.0 * num::BILLION,
-            500.0 * num::BILLION,
-        )),
-    ),
-    (
-        "Your cookies have achieved sentience.",
-        Req::Cookies(Comparator::Range(500.0 * num::BILLION, 1.0 * num::TRILLION)),
-    ),
-    (
-        "The universe has now turned into cookie dough, to the molecular level.",
-        Req::Cookies(Comparator::Range(1.0 * num::TRILLION, 5.0 * num::TRILLION)),
-    ),
-    (
-        "Your cookies are rewriting the fundamental laws of the universe.",
-        Req::Cookies(Comparator::Range(5.0 * num::TRILLION, 10.0 * num::TRILLION)),
-    ),
-    (
-        "it's time to stop playing",
-        Req::Cookies(Comparator::Range(
-            10.0 * num::TRILLION,
-            100.0 * num::TRILLION,
-        )),
-    ),
-    (
-        "A local news station runs a 10-minute segment about your cookies. Success!",
-        Req::Cookies(Comparator::AboveOrEq(100.0 * num::TRILLION)),
-    ),
-];
+#[allow(non_camel_case_types)]
+#[derive(Assoc, Variants, Debug, Copy, Clone)]
+#[func(const fn req(&self) -> Req)]
+pub enum TickerEntry {
+    /* -------------------------------------------------------------------------- */
+    /*                                Cookie Based                                */
+    /* -------------------------------------------------------------------------- */
+    #[assoc(req = Req::CookiesAllTime(Cmp::Below(5.0)))]
+    CookiesAllTime_Below_5,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(5.0, 50.0)))]
+    CookiesAllTime_5_To_50,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(50.0, 100.0)))]
+    CookiesAllTime_50_To_100,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(100.0, 500.0)))]
+    CookiesAllTime_100_To_500,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(500.0, 1.0 * num::THOUSAND)))]
+    CookiesAllTime_500_To_1K,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(1.0 * num::THOUSAND, 5.0 * num::THOUSAND)))]
+    CookiesAllTime_1K_To_5K,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(5.0 * num::THOUSAND, 10.0 * num::THOUSAND)))]
+    CookiesAllTime_5K_To_10K,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(10.0 * num::THOUSAND, 50.0 * num::THOUSAND)))]
+    CookiesAllTime_10K_To_50K,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(50.0 * num::THOUSAND, 100.0 * num::THOUSAND)))]
+    CookiesAllTime_50K_To_100K,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(100.0 * num::THOUSAND, 500.0 * num::THOUSAND)))]
+    CookiesAllTime_100K_To_500K,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(500.0 * num::THOUSAND, 1.0 * num::MILLION)))]
+    CookiesAllTime_500K_To_1M,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(1.0 * num::MILLION, 5.0 * num::MILLION)))]
+    CookiesAllTime_1M_To_5M,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(5.0 * num::MILLION, 10.0 * num::MILLION)))]
+    CookiesAllTime_5M_To_10M,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(10.0 * num::MILLION, 50.0 * num::MILLION)))]
+    CookiesAllTime_10M_To_50M,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(50.0 * num::MILLION, 100.0 * num::MILLION)))]
+    CookiesAllTime_50M_To_100M,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(100.0 * num::MILLION, 500.0 * num::MILLION)))]
+    CookiesAllTime_100M_To_500M,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(500.0 * num::MILLION, 1.0 * num::BILLION)))]
+    CookiesAllTime_500M_To_1B,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(1.0 * num::BILLION, 5.0 * num::BILLION)))]
+    CookiesAllTime_1B_To_5B,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(5.0 * num::BILLION, 10.0 * num::BILLION)))]
+    CookiesAllTime_5B_To_10B,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(10.0 * num::BILLION, 50.0 * num::BILLION)))]
+    CookiesAllTime_10B_To_50B,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(50.0 * num::BILLION, 100.0 * num::BILLION)))]
+    CookiesAllTime_50B_To_100B,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(100.0 * num::BILLION, 500.0 * num::BILLION)))]
+    CookiesAllTime_100B_To_500B,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(500.0 * num::BILLION, 1.0 * num::TRILLION)))]
+    CookiesAllTime_500B_To_1T,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(1.0 * num::TRILLION, 5.0 * num::TRILLION)))]
+    CookiesAllTime_1T_To_5T,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(5.0 * num::TRILLION, 10.0 * num::TRILLION)))]
+    CookiesAllTime_5T_To_10T,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Range(10.0 * num::TRILLION, 100.0 * num::TRILLION)))]
+    CookiesAllTime_10T_To_100T,
+    #[assoc(req = Req::CookiesAllTime(Cmp::Above(100.0 * num::TRILLION)))]
+    CookiesAllTime_Above_100T,
+    /* -------------------------------------------------------------------------- */
+    /*                           Grandmapocalypse Based                           */
+    /* -------------------------------------------------------------------------- */
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
+    Grandmapocalypse_Awoken_1,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
+    Grandmapocalypse_Awoken_2,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
+    Grandmapocalypse_Awoken_3,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
+    Grandmapocalypse_Awoken_4,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
+    Grandmapocalypse_Awoken_5,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
+    Grandmapocalypse_Displeased_1,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
+    Grandmapocalypse_Displeased_2,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
+    Grandmapocalypse_Displeased_3,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
+    Grandmapocalypse_Displeased_4,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
+    Grandmapocalypse_Displeased_5,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
+    Grandmapocalypse_Angered_1,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
+    Grandmapocalypse_Angered_2,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
+    Grandmapocalypse_Angered_3,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
+    Grandmapocalypse_Angered_4,
+    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
+    Grandmapocalypse_Angered_5,
+    #[assoc(req = Req::GrandmapocalypseAppeased())]
+    Grandmapocalypse_Appeased_1,
+    #[assoc(req = Req::GrandmapocalypseAppeased())]
+    Grandmapocalypse_Appeased_2,
+    #[assoc(req = Req::GrandmapocalypseAppeased())]
+    Grandmapocalypse_Appeased_3,
+    #[assoc(req = Req::GrandmapocalypseAppeased())]
+    Grandmapocalypse_Appeased_4,
+    #[assoc(req = Req::GrandmapocalypseAppeased())]
+    Grandmapocalypse_Appeased_5,
+    #[assoc(req = Req::GrandmapocalypseAppeased())]
+    Grandmapocalypse_Appeased_6,
+    #[assoc(req = Req::GrandmapocalypseAppeased())]
+    Grandmapocalypse_Appeased_7,
+    #[assoc(req = Req::GrandmapocalypseAppeased())]
+    Grandmapocalypse_Appeased_8,
+}
 
 #[derive(Debug)]
 pub struct Ticker {
-    current_index: Option<usize>,
+    entry: Option<TickerEntry>,
+    seed1: u64,
+    seed2: u64,
     refresh: RefreshClock<30>,
 }
 
 impl Ticker {
-    pub fn new(state: &State) -> Self {
-        let enabled_indices = get_indices(state);
-        let current_index = enabled_indices.choose(&mut rand::rng()).copied();
-        let refresh = RefreshClock::new();
+    pub(crate) fn new(state: &State) -> Self {
+        let mut rng = rand::rng();
+        let entry = TickerEntry::variants()
+            .filter(|e| e.req().check(state))
+            .collect::<Vec<_>>()
+            .choose(&mut rng)
+            .copied();
+
+        let seed1 = rng.random();
+        let seed2 = rng.random();
 
         Self {
-            current_index,
-            refresh,
+            entry,
+            seed1,
+            seed2,
+            refresh: RefreshClock::new(),
         }
     }
 
-    pub fn text(&self) -> Option<&'static str> {
-        self.current_index.and_then(|i| ENTRIES.get(i).map(|e| e.0))
-    }
-
-    pub fn tick(&mut self, state: &State) {
+    pub(crate) fn tick(&mut self, state: &State) {
         if self.refresh.finish() {
             *self = Self::new(state);
         }
     }
-}
 
-fn get_indices(state: &State) -> Vec<usize> {
-    ENTRIES
-        .iter()
-        .enumerate()
-        .filter_map(|(i, (_, p))| p.check(state).then_some(i))
-        .collect()
+    pub fn entry(&self) -> Option<TickerEntry> {
+        self.entry
+    }
+
+    pub fn seed1(&self) -> u64 {
+        self.seed1
+    }
+
+    pub fn seed2(&self) -> u64 {
+        self.seed2
+    }
 }

@@ -19,6 +19,7 @@ pub use self::{
     milk::{Milk, MilkFlavor},
     research::Research,
     sugar_lumps::SugarLumps,
+    ticker::{Ticker, TickerEntry},
     upgrade::{
         Upgrade, UpgradeEffectInfo, UpgradeInfoEffectResearch, UpgradeInfoEffectResearchWarning,
     },
@@ -28,7 +29,6 @@ use self::{
     achievement::Achievements,
     building::Buildings,
     cookies::Cookies,
-    ticker::Ticker,
     upgrade::{AvailableUpgrades, OwnedUpgrades},
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -116,8 +116,8 @@ impl Core {
         &self.state.grandmapocalypse
     }
 
-    pub fn ticker(&self) -> Option<&'static str> {
-        self.computed.ticker.text()
+    pub fn ticker(&self) -> &Ticker {
+        &self.computed.ticker
     }
 
     pub fn affordable(&self, cost: Cost) -> bool {
@@ -238,10 +238,6 @@ impl Core {
 
     pub fn debug_achievements(&self) -> impl fmt::Debug {
         &self.state.achievements
-    }
-
-    pub fn debug_ticker(&self) -> impl fmt::Debug {
-        &self.computed.ticker
     }
 }
 

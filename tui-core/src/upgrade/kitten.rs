@@ -1,7 +1,7 @@
 use super::effect_info::UpgradeEffectInfo;
 use crate::{
     Cost, State,
-    req::{Comparator, Req},
+    req::{Cmp, Req},
 };
 
 pub struct Kitten {
@@ -24,7 +24,7 @@ impl Kitten {
     }
 
     pub fn req(&self) -> Req {
-        Req::AchievementCount(Comparator::AboveOrEq(self.achievement_req))
+        Req::AchievementCount(Cmp::AboveOrEq(self.achievement_req))
     }
 
     pub fn buy(&self, state: &mut State) {

@@ -1,15 +1,17 @@
-use crate::{Achievement, Building, Computed, State};
+use crate::{Achievement, Building, Computed, GrandmapocalypsePhase, State};
 
 #[allow(unused)]
 pub enum Req {
-    Cookies(Comparator<f64>),
-    CookiesAllTime(Comparator<f64>),
-    CookiesAllTimeFromClicking(Comparator<f64>),
+    Cookies(Cmp<f64>),
+    CookiesAllTime(Cmp<f64>),
+    CookiesAllTimeFromClicking(Cmp<f64>),
     BuildingCountMin(Building, u16),
-    ResearchCompleted(Comparator<u8>),
+    ResearchCompleted(Cmp<u8>),
     Achievement(Achievement),
-    AchievementCount(Comparator<usize>),
-    GrandmaJobUpgradeCount(Comparator<u16>),
+    AchievementCount(Cmp<usize>),
+    GrandmaJobUpgradeCount(Cmp<u16>),
+    GrandmapocalypsePhase(GrandmapocalypsePhase),
+    GrandmapocalypseAppeased(),
     Custom(fn(&State) -> bool),
     Any(&'static [Req]),
     AnyBox(Box<[Req]>),
@@ -28,6 +30,8 @@ impl Req {
             Self::Achievement(a) => state.achievements.owned().contains(a),
             Self::AchievementCount(c) => c.check(state.achievements.owned().len()),
             Self::GrandmaJobUpgradeCount(c) => c.check(state.buildings.grandma_job_upgrade_count()),
+            Self::GrandmapocalypsePhase(p) => state.grandmapocalypse.is_phase(*p),
+            Self::GrandmapocalypseAppeased() => state.grandmapocalypse.is_appeased(),
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state)),
@@ -40,7 +44,7 @@ impl Req {
 #[allow(unused)]
 pub enum LateReq {
     Req(Req),
-    Cps(Comparator<f64>),
+    Cps(Cmp<f64>),
     Custom(fn(&State, &Computed) -> bool),
     Any(&'static [LateReq]),
     AnyBox(Box<[LateReq]>),
@@ -58,14 +62,16 @@ macro_rules! delegated_late_variants {
 
 impl LateReq {
     delegated_late_variants! {
-        Cookies(c: Comparator<f64>);
-        CookiesAllTime(c: Comparator<f64>);
-        CookiesAllTimeFromClicking(c: Comparator<f64>);
+        Cookies(c: Cmp<f64>);
+        CookiesAllTime(c: Cmp<f64>);
+        CookiesAllTimeFromClicking(c: Cmp<f64>);
         BuildingCountMin(b: Building, c: u16);
-        ResearchCompleted(c: Comparator<u8>);
+        ResearchCompleted(c: Cmp<u8>);
         Achievement(a: Achievement);
-        AchievementCount(c: Comparator<usize>);
-        GrandmaJobUpgradeCount(c: Comparator<u16>);
+        AchievementCount(c: Cmp<usize>);
+        GrandmaJobUpgradeCount(c: Cmp<u16>);
+        GrandmapocalypsePhase(p: GrandmapocalypsePhase);
+        GrandmapocalypseAppeased();
     }
 
     pub fn check(&self, state: &State, computed: &Computed) -> bool {
@@ -83,7 +89,7 @@ impl LateReq {
 
 #[allow(unused)]
 #[derive(Copy, Clone)]
-pub enum Comparator<T> {
+pub enum Cmp<T> {
     Above(T),
     AboveOrEq(T),
     Below(T),
@@ -91,7 +97,7 @@ pub enum Comparator<T> {
     Range(T, T),
 }
 
-impl<T: PartialOrd> Comparator<T> {
+impl<T: PartialOrd> Cmp<T> {
     fn check(self, value: T) -> bool {
         match self {
             Self::Above(v) => value > v,

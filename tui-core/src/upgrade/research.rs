@@ -3,7 +3,7 @@ use super::effect_info::{
 };
 use crate::{
     Achievement, Building, Cost, GrandmapocalypsePhase, State,
-    req::{Comparator, Req},
+    req::{Cmp, Req},
 };
 use cookie_clicker_tui_utils::num;
 use enum_assoc::Assoc;
@@ -46,7 +46,7 @@ impl Research {
                 Req::Achievement(Achievement::Elder),
                 Req::BuildingCountMin(Building::Grandma, 6),
             ]),
-            _ => Req::ResearchCompleted(Comparator::AboveOrEq(*self as u8)),
+            _ => Req::ResearchCompleted(Cmp::AboveOrEq(*self as u8)),
         }
     }
 
