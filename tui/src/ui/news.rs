@@ -1,5 +1,6 @@
 use super::UiApp;
 use cookie_clicker_tui_core::NewsEntry as E;
+use rand::prelude::*;
 use ratatui::{
     prelude::*,
     widgets::{Block, Paragraph},
@@ -14,6 +15,8 @@ pub fn news(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 }
 
 fn line_text(entry: E) -> Line<'static> {
+    let mut rng = rand::rng();
+
     macro_rules! raw {
         ($s:expr) => {
             Line::raw($s)
@@ -39,6 +42,15 @@ fn line_text(entry: E) -> Line<'static> {
         ($quote:expr) => {
             sps!(sp!(concat!("\"", $quote, "\""), ITALIC), sp!(" -grandma"))
         };
+    }
+
+    macro_rules! pick {
+        ($($num:literal => $option:expr),*$(,)?) => {{
+            match [$($num),*].choose(&mut rng).copied().unwrap() {
+                $($num => $option,)*
+                _ => unreachable!(),
+            }
+        }};
     }
 
     match entry {
@@ -97,56 +109,36 @@ fn line_text(entry: E) -> Line<'static> {
         E::CookiesAllTime_Above_100T => {
             raw!("A local news station runs a 10-minute segment about your cookies. Success!")
         }
-        E::Grandmapocalypse_Awoken_1 => raw!("News: millions of old ladies reported missing!"),
-        E::Grandmapocalypse_Awoken_2 => {
-            raw!("News: doctors swarmed by cases of old women with glassy eyes and a foamy mouth!")
-        }
-        E::Grandmapocalypse_Awoken_3 => {
-            raw!("News: families around the continent report agitated, transfixed grandmothers!")
-        }
-        E::Grandmapocalypse_Awoken_4 => {
-            raw!("News: processions of old ladies sighted around cookie facilities!")
-        }
-        E::Grandmapocalypse_Awoken_5 => {
-            raw!("News: nurses report \"strange scent of cookie dough\" around elderly patients!")
-        }
-        E::Grandmapocalypse_Displeased_1 => {
-            raw!("News: whole continent undergoing mass exodus of old ladies!")
-        }
-        E::Grandmapocalypse_Displeased_2 => {
-            raw!("News: sightings of old ladies with glowing eyes terrify local population!")
-        }
-        E::Grandmapocalypse_Displeased_3 => raw!(
-            "News: towns in disarray as strange old ladies break into homes to steal infants and baking utensils!"
-        ),
-        E::Grandmapocalypse_Displeased_4 => raw!(
-            "News: retirement homes report \"female residents slowly congealing in their seats!\""
-        ),
-        E::Grandmapocalypse_Displeased_5 => {
-            raw!("News: old women freeze in place in streets, ooze warm sugary syrup!")
-        }
-        E::Grandmapocalypse_Angered_1 => {
-            raw!("News: wrinkled \"flesh tendrils\" visible from space!")
-        }
-        E::Grandmapocalypse_Angered_2 => raw!(
-            "News: remains of \"old ladies\" found frozen in the middle of growing fleshy structures!"
-        ),
-        E::Grandmapocalypse_Angered_3 => raw!(
-            "News: large \"flesh highways\" scar continent, stretch between various cookie facilities!"
-        ),
-        E::Grandmapocalypse_Angered_4 => {
-            raw!("News: all hope lost as writhing mass of flesh and dough engulfs whole city!")
-        }
-        E::Grandmapocalypse_Angered_5 => {
-            raw!("News: nightmare continues as wrinkled acres of flesh expand at alarming speeds!")
-        }
-        E::Grandmapocalypse_Appeased_1 => gquote!("shrivel"),
-        E::Grandmapocalypse_Appeased_2 => gquote!("writhe"),
-        E::Grandmapocalypse_Appeased_3 => gquote!("throb"),
-        E::Grandmapocalypse_Appeased_4 => gquote!("gnaw"),
-        E::Grandmapocalypse_Appeased_5 => gquote!("We will rise again."),
-        E::Grandmapocalypse_Appeased_6 => gquote!("A mere setback."),
-        E::Grandmapocalypse_Appeased_7 => gquote!("We are not satiated."),
-        E::Grandmapocalypse_Appeased_8 => gquote!("Too late."),
+        E::Grandmapocalypse_Awoken => pick! {
+            0 => raw!("News: millions of old ladies reported missing!"),
+            1 => raw!("News: doctors swarmed by cases of old women with glassy eyes and a foamy mouth!"),
+            2 => raw!("News: families around the continent report agitated, transfixed grandmothers!"),
+            3 => raw!("News: processions of old ladies sighted around cookie facilities!"),
+            4 => raw!("News: nurses report \"strange scent of cookie dough\" around elderly patients!"),
+        },
+        E::Grandmapocalypse_Displeased => pick! {
+            0 => raw!("News: whole continent undergoing mass exodus of old ladies!"),
+            1 => raw!("News: sightings of old ladies with glowing eyes terrify local population!"),
+            2 => raw!("News: towns in disarray as strange old ladies break into homes to steal infants and baking utensils!"),
+            3 => raw!("News: retirement homes report \"female residents slowly congealing in their seats!\""),
+            4 => raw!("News: old women freeze in place in streets, ooze warm sugary syrup!"),
+        },
+        E::Grandmapocalypse_Angered => pick! {
+            0 => raw!("News: wrinkled \"flesh tendrils\" visible from space!"),
+            1 => raw!("News: remains of \"old ladies\" found frozen in the middle of growing fleshy structures!"),
+            2 => raw!("News: large \"flesh highways\" scar continent, stretch between various cookie facilities!"),
+            3 => raw!("News: all hope lost as writhing mass of flesh and dough engulfs whole city!"),
+            4 => raw!("News: nightmare continues as wrinkled acres of flesh expand at alarming speeds!"),
+        },
+        E::Grandmapocalypse_Appeased => pick! {
+            0 => gquote!("shrivel"),
+            1 => gquote!("writhe"),
+            2 => gquote!("throb"),
+            3 => gquote!("gnaw"),
+            4 => gquote!("We will rise again."),
+            5 => gquote!("A mere setback."),
+            6 => gquote!("We are not satiated."),
+            7 => gquote!("Too late."),
+        },
     }
 }

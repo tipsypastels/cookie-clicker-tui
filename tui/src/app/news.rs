@@ -1,9 +1,8 @@
 use cookie_clicker_tui_core::{Core, NewsEntry};
 use cookie_clicker_tui_utils::frames::RefreshClock;
 use ratatui::{prelude::*, widgets::Paragraph};
-use std::cell::OnceCell;
+use std::{cell::OnceCell, fmt};
 
-#[derive(Debug)]
 pub struct AppNewsState {
     entry: Option<(NewsEntry, OnceCell<Paragraph<'static>>)>,
     refresh: RefreshClock<5>,
@@ -32,5 +31,14 @@ impl AppNewsState {
         if let Some((entry, cell)) = self.entry.as_mut() {
             cell.get_or_init(|| f(*entry)).render(area, buf);
         }
+    }
+}
+
+impl fmt::Debug for AppNewsState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("AppNewsState")
+            .field("entry", &self.entry.as_ref().map(|(e, _)| e))
+            .field("refresh", &self.refresh)
+            .finish()
     }
 }

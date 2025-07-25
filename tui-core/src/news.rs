@@ -73,51 +73,13 @@ pub enum NewsEntry {
     /*                           Grandmapocalypse Based                           */
     /* -------------------------------------------------------------------------- */
     #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
-    Grandmapocalypse_Awoken_1,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
-    Grandmapocalypse_Awoken_2,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
-    Grandmapocalypse_Awoken_3,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
-    Grandmapocalypse_Awoken_4,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Awoken))]
-    Grandmapocalypse_Awoken_5,
+    Grandmapocalypse_Awoken,
     #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
-    Grandmapocalypse_Displeased_1,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
-    Grandmapocalypse_Displeased_2,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
-    Grandmapocalypse_Displeased_3,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
-    Grandmapocalypse_Displeased_4,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Displeased))]
-    Grandmapocalypse_Displeased_5,
+    Grandmapocalypse_Displeased,
     #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
-    Grandmapocalypse_Angered_1,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
-    Grandmapocalypse_Angered_2,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
-    Grandmapocalypse_Angered_3,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
-    Grandmapocalypse_Angered_4,
-    #[assoc(req = Req::GrandmapocalypsePhase(GrandmapocalypsePhase::Angered))]
-    Grandmapocalypse_Angered_5,
+    Grandmapocalypse_Angered,
     #[assoc(req = Req::GrandmapocalypseAppeased())]
-    Grandmapocalypse_Appeased_1,
-    #[assoc(req = Req::GrandmapocalypseAppeased())]
-    Grandmapocalypse_Appeased_2,
-    #[assoc(req = Req::GrandmapocalypseAppeased())]
-    Grandmapocalypse_Appeased_3,
-    #[assoc(req = Req::GrandmapocalypseAppeased())]
-    Grandmapocalypse_Appeased_4,
-    #[assoc(req = Req::GrandmapocalypseAppeased())]
-    Grandmapocalypse_Appeased_5,
-    #[assoc(req = Req::GrandmapocalypseAppeased())]
-    Grandmapocalypse_Appeased_6,
-    #[assoc(req = Req::GrandmapocalypseAppeased())]
-    Grandmapocalypse_Appeased_7,
-    #[assoc(req = Req::GrandmapocalypseAppeased())]
-    Grandmapocalypse_Appeased_8,
+    Grandmapocalypse_Appeased,
 }
 
 pub fn get_entry(state: &State) -> Option<NewsEntry> {
