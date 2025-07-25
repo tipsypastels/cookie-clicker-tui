@@ -1,7 +1,7 @@
 use cookie_clicker_tui_core::{Building, Upgrade};
 use cookie_clicker_tui_utils::{countdown::Countdown, frames::RefreshClock};
 use enum_assoc::Assoc;
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Style, Stylize};
 use std::collections::{HashSet, VecDeque};
 
 #[derive(Default)]
