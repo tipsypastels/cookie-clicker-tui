@@ -165,8 +165,11 @@ impl App {
                     self.iface.toggle_sell_mode();
                 }
             }
+            KeyCode::Char('.') => {
+                self.debug.backward();
+            }
             KeyCode::Char('/') => {
-                self.debug.advance();
+                self.debug.forward();
             }
             _ => {}
         }

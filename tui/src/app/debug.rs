@@ -1,5 +1,5 @@
 use crossterm::event::KeyEvent;
-use enum_fun::Name;
+use enum_fun::{Name, Variants};
 
 #[derive(Default)]
 pub struct AppDebugState {
@@ -7,7 +7,7 @@ pub struct AppDebugState {
     latest_key: Option<KeyEvent>,
 }
 
-#[derive(Name, Default, Copy, Clone)]
+#[derive(Name, Variants, Default, Copy, Clone)]
 #[name(base = "title case")]
 pub enum AppDebugView {
     #[default]
@@ -49,7 +49,14 @@ impl AppDebugState {
         self.view = None;
     }
 
-    pub fn advance(&mut self) {
+    pub fn backward(&mut self) {
+        self.view = Some(match self.view {
+            Some(view) => view.prev(),
+            None => AppDebugView::default(),
+        })
+    }
+
+    pub fn forward(&mut self) {
         self.view = Some(match self.view {
             Some(view) => view.next(),
             None => AppDebugView::default(),
@@ -58,23 +65,19 @@ impl AppDebugState {
 }
 
 impl AppDebugView {
+    fn prev(self) -> Self {
+        Self::VARIANTS[if self as usize == 0 {
+            Self::VARIANT_COUNT - 1
+        } else {
+            self as usize - 1
+        }]
+    }
+
     fn next(self) -> Self {
-        match self {
-            Self::Cookies => Self::Cps,
-            Self::Cps => Self::Buildings,
-            Self::Buildings => Self::BuildingsFlags,
-            Self::BuildingsFlags => Self::AvailableUpgrades,
-            Self::AvailableUpgrades => Self::OwnedUpgrades,
-            Self::OwnedUpgrades => Self::Achievements,
-            Self::Achievements => Self::Milk,
-            Self::Milk => Self::SugarLumps,
-            Self::SugarLumps => Self::Research,
-            Self::Research => Self::Grandmapocalypse,
-            Self::Grandmapocalypse => Self::Ticker,
-            Self::Ticker => Self::List,
-            Self::List => Self::Keypress,
-            Self::Keypress => Self::Save,
-            Self::Save => Self::Cookies,
-        }
+        Self::VARIANTS[if self as usize + 1 == Self::VARIANT_COUNT {
+            0
+        } else {
+            self as usize + 1
+        }]
     }
 }
