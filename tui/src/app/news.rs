@@ -5,7 +5,7 @@ use std::{cell::OnceCell, fmt};
 
 pub struct AppNewsState {
     entry: Option<(NewsEntry, OnceCell<Paragraph<'static>>)>,
-    refresh: RefreshClock<5>,
+    refresh: RefreshClock<30>,
 }
 
 impl AppNewsState {
