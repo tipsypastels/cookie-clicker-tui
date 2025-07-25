@@ -259,29 +259,31 @@ impl BuildingComputed {
         let cost = calc::building_cost(building, state.count);
         let sell_cost = calc::building_sell_cost(cost);
 
-        let cps = calc::building_cps(calc::BuildingCps {
-            building,
-            building_class: match building {
-                Building::Cursor => calc::BuildingCpsClass::Cursor,
-                Building::Grandma => calc::BuildingCpsClass::Grandma {
-                    has_bingo_center_4x: flags.grandma_has_bingo_center_4x,
-                    job_upgrade_count: states.grandma_job_upgrade_count(),
-                },
-                _ => calc::BuildingCpsClass::Other {
-                    grandma_count: if state.has_grandma_job_upgrade {
-                        Some(states.grandma.count)
-                    } else {
-                        None
-                    },
-                },
+        let building_class = match building {
+            Building::Cursor => calc::BuildingCpsClass::Cursor,
+            Building::Grandma => calc::BuildingCpsClass::Grandma {
+                has_bingo_center_4x: flags.grandma_has_bingo_center_4x,
+                job_upgrade_count: states.grandma_job_upgrade_count(),
             },
-            count: state.count,
-            tiered_upgrade_count: state.tiered_upgrade_count,
-            addl_cps_per_owned_building_counts: state
-                .addl_cps_per_owned_building
-                .iter()
-                .map(|(building, cps)| (states.get(*building).count, *cps)),
-        });
+            _ => calc::BuildingCpsClass::Other {
+                grandma_count: state
+                    .has_grandma_job_upgrade
+                    .then_some(states.grandma.count),
+            },
+        };
+
+        let addl_cps_per_owned_building_counts = state
+            .addl_cps_per_owned_building
+            .iter()
+            .map(|(building, cps)| (states.get(*building).count, *cps));
+
+        let cps = calc::building_cps(
+            building,
+            building_class,
+            state.count,
+            state.tiered_upgrade_count,
+            addl_cps_per_owned_building_counts,
+        );
 
         Self {
             cost,

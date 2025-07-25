@@ -1,92 +1,43 @@
 use crate::{State, building::Building};
+use cookie_clicker_tui_calc as calc;
+
+pub use calc::cps::building::CpsClass as BuildingCpsClass;
 
 pub fn cps(state: &State) -> f64 {
-    state.buildings.infos().map(|i| i.cps()).sum::<f64>() * state.milk.cps_mult()
+    let base = calc::cps::base::Cps {
+        building_cpses: state.buildings.infos().map(|i| i.cps()),
+    };
+    let addl = calc::cps::addl::Cps {
+        grandmapocalypse_mults: state.grandmapocalypse.cps_mults().iter().copied(),
+    };
+    calc::cps::Cps::new(base, addl).total
 }
 
-pub fn building_cost(building: Building, count: u16) -> f64 {
-    building.base_cost() * 1.15f64.powi(count as _)
-}
-
-pub fn building_sell_cost(cost: f64) -> f64 {
-    cost * (1.0 / 4.5)
-}
-
-pub struct BuildingCps<AddlCpsPerOwnedBuildingCounts> {
-    pub building: Building,
-    pub building_class: BuildingCpsClass,
-    pub count: u16,
-    pub tiered_upgrade_count: u16,
-    pub addl_cps_per_owned_building_counts: AddlCpsPerOwnedBuildingCounts,
-}
-
-pub enum BuildingCpsClass {
-    Cursor,
-    Grandma {
-        has_bingo_center_4x: bool,
-        job_upgrade_count: u16,
-    },
-    Other {
-        grandma_count: Option<u16>,
-    },
-}
-
-#[allow(clippy::let_and_return)]
 pub fn building_cps<AddlCpsPerOwnedBuildingCounts>(
-    BuildingCps {
-        building,
-        building_class,
-        count,
-        tiered_upgrade_count,
-        addl_cps_per_owned_building_counts,
-    }: BuildingCps<AddlCpsPerOwnedBuildingCounts>,
+    building: Building,
+    building_class: BuildingCpsClass,
+    count: u16,
+    tiered_upgrade_count: u16,
+    addl_cps_per_owned_building_counts: AddlCpsPerOwnedBuildingCounts,
 ) -> f64
 where
     AddlCpsPerOwnedBuildingCounts: Iterator<Item = (u16, f64)>,
 {
-    let cps = building.base_cps() * count as f64 * 2.0f64.powi(tiered_upgrade_count as i32);
-    let cps = match building_class {
-        BuildingCpsClass::Cursor => cps,
-        BuildingCpsClass::Grandma {
-            has_bingo_center_4x,
-            job_upgrade_count,
-        } => {
-            cps * if has_bingo_center_4x { 4.0 } else { 1.0 }
-                * 2.0f64.powi(job_upgrade_count as i32)
-        }
-        BuildingCpsClass::Other {
-            grandma_count: Some(grandma_count),
-        } => {
-            let num_req_for_1p_increase = grandma_job_upgrade_num_req_for_1p(building);
-
-            if grandma_count > num_req_for_1p_increase {
-                let ratio = grandma_count / num_req_for_1p_increase;
-                let addl = ratio as f64 * 0.01;
-                cps + addl
-            } else {
-                cps
-            }
-        }
-        BuildingCpsClass::Other {
-            grandma_count: None,
-        } => cps,
-    };
-
-    let cps = cps
-        + addl_cps_per_owned_building_counts
-            .map(|(count, cps)| count as f64 * cps)
-            .sum::<f64>();
-
-    cps
+    calc::cps::building::Cps {
+        building_no: building as u16,
+        building_base_cps: building.base_cps(),
+        building_class,
+        count,
+        tiered_upgrade_count,
+        addl_cps_per_owned_building_counts,
+    }
+    .calc()
 }
 
-pub fn grandma_job_upgrade_num_req_for_1p(building: Building) -> u16 {
-    building as u16 - 1
+pub fn building_cost(building: Building, count: u16) -> f64 {
+    calc::cost::building(building.base_cost(), count)
 }
 
-pub fn kitten_cps_mult(milk_ratio: f64, kitten_mults: &[f64]) -> f64 {
-    kitten_mults
-        .iter()
-        .map(|mult| 1.0 + mult * milk_ratio)
-        .product()
+pub fn building_sell_cost(cost: f64) -> f64 {
+    calc::cost::building_sell(cost)
 }

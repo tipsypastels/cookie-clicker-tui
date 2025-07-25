@@ -1,53 +1,34 @@
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use crate::calc;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct Grandmapocalypse(Inner);
-
-#[derive(Debug)]
-enum Inner {
-    Off,
-    On { phase: GrandmapocalypsePhase },
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Grandmapocalypse {
+    phase: Option<GrandmapocalypsePhase>,
+    cps_mults: Vec<f64>,
 }
 
 impl Grandmapocalypse {
     pub(crate) fn new() -> Self {
-        Self(Inner::Off)
-    }
-
-    fn from_repr(repr: Repr) -> Self {
-        Self(match repr {
-            Repr::Off => Inner::Off,
-            Repr::On { phase } => Inner::On { phase },
-        })
-    }
-
-    fn as_repr(&self) -> Repr {
-        match &self.0 {
-            Inner::Off => Repr::Off,
-            Inner::On { phase } => Repr::On { phase: *phase },
+        Self {
+            phase: None,
+            cps_mults: Vec::new(),
         }
     }
 
     pub fn phase(&self) -> Option<GrandmapocalypsePhase> {
-        match &self.0 {
-            Inner::Off => None,
-            Inner::On { phase, .. } => Some(*phase),
-        }
+        self.phase
+    }
+
+    pub fn cps_mults(&self) -> &[f64] {
+        &self.cps_mults
     }
 
     pub(crate) fn set_phase(&mut self, phase: GrandmapocalypsePhase) {
-        self.0 = Inner::On { phase };
+        self.phase = Some(phase)
     }
-}
-impl Serialize for Grandmapocalypse {
-    fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        self.as_repr().serialize(ser)
-    }
-}
 
-impl<'de> Deserialize<'de> for Grandmapocalypse {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        Repr::deserialize(de).map(Self::from_repr)
+    pub(crate) fn add_cps_mult(&mut self, mult: f64) {
+        self.cps_mults.push(mult);
     }
 }
 
@@ -56,11 +37,4 @@ pub enum GrandmapocalypsePhase {
     Awoken,
     Displeased,
     Angered,
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(tag = "state")]
-enum Repr {
-    Off,
-    On { phase: GrandmapocalypsePhase },
 }
