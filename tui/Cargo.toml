@@ -13,6 +13,7 @@ dirs.workspace = true
 enum-assoc.workspace = true
 enum-fun.workspace = true
 futures.workspace = true
+rand.workspace = true
 ratatui.workspace = true
 serde.workspace = true
 serde_json.workspace = true

@@ -4,12 +4,15 @@ mod cookies;
 mod debug;
 mod flash;
 mod modal;
-mod ticker;
+mod news;
 mod upgrades;
 mod utils;
 
 use crate::{
-    app::{AppBakery, AppDebugState, AppInterfaceState, AppListState, AppModalState, AppTickState},
+    app::{
+        AppBakery, AppDebugState, AppInterfaceState, AppListState, AppModalState, AppNewsState,
+        AppTickState,
+    },
     save::Save,
 };
 use cookie_clicker_tui_core::Core;
@@ -22,6 +25,7 @@ pub struct UiApp<'a> {
     pub list: &'a mut AppListState,
     pub iface: &'a AppInterfaceState,
     pub modal: &'a AppModalState,
+    pub news: &'a mut AppNewsState,
     pub debug: &'a AppDebugState,
     pub bakery: &'a AppBakery,
 }
@@ -57,5 +61,5 @@ fn left_col(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         cookies::cookies(app, rows[0], buf);
     }
 
-    ticker::ticker(app, rows[1], buf);
+    news::news(app, rows[1], buf);
 }

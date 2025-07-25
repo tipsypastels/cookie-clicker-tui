@@ -1,27 +1,19 @@
 use super::UiApp;
-use cookie_clicker_tui_core::TickerEntry;
+use cookie_clicker_tui_core::NewsEntry as E;
 use ratatui::{
     prelude::*,
     widgets::{Block, Paragraph},
 };
 
-pub fn ticker(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
-    let ticker = app.core.ticker();
-    let Some(entry) = ticker.entry() else {
-        return;
-    };
-
-    let line = line_text(entry, ticker.seed1(), ticker.seed2());
-
-    Paragraph::new(line)
-        .centered()
-        .block(Block::bordered())
-        .render(area, buf);
+pub fn news(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
+    app.news.render(area, buf, |entry| {
+        Paragraph::new(line_text(entry))
+            .centered()
+            .block(Block::bordered())
+    });
 }
 
-fn line_text(entry: TickerEntry, seed1: u64, seed2: u64) -> Line<'static> {
-    let _ = (seed1, seed2); // until needed;
-
+fn line_text(entry: E) -> Line<'static> {
     macro_rules! raw {
         ($s:expr) => {
             Line::raw($s)
@@ -43,7 +35,12 @@ fn line_text(entry: TickerEntry, seed1: u64, seed2: u64) -> Line<'static> {
         };
     }
 
-    use TickerEntry as E;
+    macro_rules! gquote {
+        ($quote:expr) => {
+            sps!(sp!(concat!("\"", $quote, "\""), ITALIC), sp!(" -grandma"))
+        };
+    }
+
     match entry {
         E::CookiesAllTime_Below_5 => {
             raw!("You feel like making cookies. But nobody wants to eat your cookies.")
@@ -143,19 +140,13 @@ fn line_text(entry: TickerEntry, seed1: u64, seed2: u64) -> Line<'static> {
         E::Grandmapocalypse_Angered_5 => {
             raw!("News: nightmare continues as wrinkled acres of flesh expand at alarming speeds!")
         }
-        E::Grandmapocalypse_Appeased_1 => sps!(sp!("\"shrivel\"", ITALIC), sp!(" -grandma")),
-        E::Grandmapocalypse_Appeased_2 => sps!(sp!("\"writhe\"", ITALIC), sp!(" -grandma")),
-        E::Grandmapocalypse_Appeased_3 => sps!(sp!("\"throb\"", ITALIC), sp!(" -grandma")),
-        E::Grandmapocalypse_Appeased_4 => sps!(sp!("\"gnaw\"", ITALIC), sp!(" -grandma")),
-        E::Grandmapocalypse_Appeased_5 => {
-            sps!(sp!("\"We will rise again.\"", ITALIC), sp!(" -grandma"))
-        }
-        E::Grandmapocalypse_Appeased_6 => {
-            sps!(sp!("\"A mere setback.\"", ITALIC), sp!(" -grandma"))
-        }
-        E::Grandmapocalypse_Appeased_7 => {
-            sps!(sp!("\"We are not satiated.\"", ITALIC), sp!(" -grandma"))
-        }
-        E::Grandmapocalypse_Appeased_8 => sps!(sp!("\"Too late.\"", ITALIC), sp!(" -grandma")),
+        E::Grandmapocalypse_Appeased_1 => gquote!("shrivel"),
+        E::Grandmapocalypse_Appeased_2 => gquote!("writhe"),
+        E::Grandmapocalypse_Appeased_3 => gquote!("throb"),
+        E::Grandmapocalypse_Appeased_4 => gquote!("gnaw"),
+        E::Grandmapocalypse_Appeased_5 => gquote!("We will rise again."),
+        E::Grandmapocalypse_Appeased_6 => gquote!("A mere setback."),
+        E::Grandmapocalypse_Appeased_7 => gquote!("We are not satiated."),
+        E::Grandmapocalypse_Appeased_8 => gquote!("Too late."),
     }
 }

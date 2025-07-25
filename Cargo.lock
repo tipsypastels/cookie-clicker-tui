@@ -221,6 +221,7 @@ dependencies = [
  "enum-assoc",
  "enum-fun",
  "futures",
+ "rand",
  "ratatui",
  "serde",
  "serde_json",

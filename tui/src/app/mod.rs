@@ -3,6 +3,7 @@ mod debug;
 mod interface;
 mod list;
 mod modal;
+mod news;
 mod tick;
 
 pub use self::{
@@ -11,6 +12,7 @@ pub use self::{
     interface::{AppFlash, AppInterfaceState},
     list::{AppListPane, AppListPointee, AppListState},
     modal::AppModalState,
+    news::AppNewsState,
     tick::AppTickState,
 };
 
@@ -31,6 +33,7 @@ pub struct App {
     modal: AppModalState,
     iface: AppInterfaceState,
     debug: AppDebugState,
+    news: AppNewsState,
     bakery: AppBakery,
     events: Events,
     quit: bool,
@@ -38,6 +41,7 @@ pub struct App {
 
 impl App {
     pub fn new(save: Save, core: Core, name: Option<Box<str>>) -> Self {
+        let news = AppNewsState::new(&core);
         Self {
             save,
             core,
@@ -46,6 +50,7 @@ impl App {
             modal: AppModalState::default(),
             iface: AppInterfaceState::default(),
             debug: AppDebugState::default(),
+            news,
             bakery: AppBakery::new(name),
             events: Events::new(),
             quit: false,
@@ -186,6 +191,7 @@ impl App {
                 list: &mut self.list,
                 iface: &self.iface,
                 modal: &self.modal,
+                news: &mut self.news,
                 debug: &self.debug,
                 bakery: &self.bakery,
             };
@@ -198,6 +204,7 @@ impl App {
     async fn tick(&mut self) -> Result<()> {
         self.core.tick();
         self.iface.tick();
+        self.news.tick(&self.core);
         self.save.tick(&self.core, self.bakery.name()).await?;
 
         if self.core.sugar_lumps().just_unlocked() {

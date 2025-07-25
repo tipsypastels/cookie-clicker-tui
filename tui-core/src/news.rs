@@ -3,15 +3,15 @@ use crate::{
     grandmapocalypse::GrandmapocalypsePhase,
     req::{Cmp, Req},
 };
-use cookie_clicker_tui_utils::{frames::RefreshClock, num};
+use cookie_clicker_tui_utils::num;
 use enum_assoc::Assoc;
 use enum_fun::Variants;
-use rand::{Rng, seq::IndexedRandom};
+use rand::seq::IndexedRandom;
 
 #[allow(non_camel_case_types)]
 #[derive(Assoc, Variants, Debug, Copy, Clone)]
 #[func(const fn req(&self) -> Req)]
-pub enum TickerEntry {
+pub enum NewsEntry {
     /* -------------------------------------------------------------------------- */
     /*                                Cookie Based                                */
     /* -------------------------------------------------------------------------- */
@@ -120,49 +120,10 @@ pub enum TickerEntry {
     Grandmapocalypse_Appeased_8,
 }
 
-#[derive(Debug)]
-pub struct Ticker {
-    entry: Option<TickerEntry>,
-    seed1: u64,
-    seed2: u64,
-    refresh: RefreshClock<30>,
-}
-
-impl Ticker {
-    pub(crate) fn new(state: &State) -> Self {
-        let mut rng = rand::rng();
-        let entry = TickerEntry::variants()
-            .filter(|e| e.req().check(state))
-            .collect::<Vec<_>>()
-            .choose(&mut rng)
-            .copied();
-
-        let seed1 = rng.random();
-        let seed2 = rng.random();
-
-        Self {
-            entry,
-            seed1,
-            seed2,
-            refresh: RefreshClock::new(),
-        }
-    }
-
-    pub(crate) fn tick(&mut self, state: &State) {
-        if self.refresh.finish() {
-            *self = Self::new(state);
-        }
-    }
-
-    pub fn entry(&self) -> Option<TickerEntry> {
-        self.entry
-    }
-
-    pub fn seed1(&self) -> u64 {
-        self.seed1
-    }
-
-    pub fn seed2(&self) -> u64 {
-        self.seed2
-    }
+pub fn get_entry(state: &State) -> Option<NewsEntry> {
+    NewsEntry::variants()
+        .filter(|e| e.req().check(state))
+        .collect::<Vec<_>>()
+        .choose(&mut rand::rng())
+        .copied()
 }

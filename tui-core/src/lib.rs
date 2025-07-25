@@ -5,10 +5,10 @@ mod cookies;
 mod cost;
 mod grandmapocalypse;
 mod milk;
+mod news;
 mod req;
 mod research;
 mod sugar_lumps;
-mod ticker;
 mod upgrade;
 
 pub use self::{
@@ -17,9 +17,9 @@ pub use self::{
     cost::Cost,
     grandmapocalypse::{Grandmapocalypse, GrandmapocalypsePhase},
     milk::{Milk, MilkFlavor},
+    news::NewsEntry,
     research::Research,
     sugar_lumps::SugarLumps,
-    ticker::{Ticker, TickerEntry},
     upgrade::{
         Upgrade, UpgradeEffectInfo, UpgradeInfoEffectResearch, UpgradeInfoEffectResearchWarning,
     },
@@ -116,8 +116,8 @@ impl Core {
         &self.state.grandmapocalypse
     }
 
-    pub fn ticker(&self) -> &Ticker {
-        &self.computed.ticker
+    pub fn random_news_entry(&self) -> Option<NewsEntry> {
+        self::news::get_entry(&self.state)
     }
 
     pub fn affordable(&self, cost: Cost) -> bool {
@@ -306,25 +306,21 @@ impl State {
 
 struct Computed {
     cps: f64,
-    ticker: Ticker,
     available_upgrades: AvailableUpgrades,
 }
 
 impl Computed {
     fn new(state: &State) -> Self {
         let cps = self::calc::cps(state);
-        let ticker = Ticker::new(state);
         let available_upgrades = AvailableUpgrades::new(state);
 
         Self {
             cps,
-            ticker,
             available_upgrades,
         }
     }
 
     fn tick(&mut self, state: &State) {
-        self.ticker.tick(state);
         self.available_upgrades.tick(state);
 
         if state.research.just_completed() {

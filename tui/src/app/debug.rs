@@ -22,7 +22,7 @@ pub enum AppDebugView {
     SugarLumps,
     Research,
     Grandmapocalypse,
-    Ticker,
+    News,
     List,
     Keypress,
     Save,
