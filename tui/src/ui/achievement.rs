@@ -43,7 +43,7 @@ pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 
     let area = split_area(area);
     let block = Block::bordered()
-        .style(Style::new().bg(Color::DarkGray))
+        .style(Style::new().on_dark_gray())
         .border_style(Style::new().black())
         .title(title);
 

@@ -111,10 +111,10 @@ impl AppFlash {
 #[func(pub fn style(self) -> Style)]
 #[func(pub fn border_style(self) -> Style)]
 enum AppFlashClass {
-    #[assoc(title = " Info ", style = Style::new().bg(Color::LightBlue), border_style = Style::new().white())]
+    #[assoc(title = " Info ", style = Style::new().on_light_blue(), border_style = Style::new().white())]
     Info,
-    #[assoc(title = " Warning ", style = Style::new().bg(Color::Yellow), border_style = Style::new().black())]
+    #[assoc(title = " Warning ", style = Style::new().on_yellow(), border_style = Style::new().black())]
     Warning,
-    #[assoc(title = " Error ", style = Style::new().bg(Color::LightRed), border_style = Style::new().black())]
+    #[assoc(title = " Error ", style = Style::new().on_light_red(), border_style = Style::new().black())]
     Error,
 }
