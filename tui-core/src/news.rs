@@ -1,5 +1,6 @@
 use crate::{
     State,
+    building::Building,
     grandmapocalypse::GrandmapocalypsePhase,
     req::{Cmp, Req},
 };
@@ -69,6 +70,49 @@ pub enum NewsEntry {
     CookiesAllTime_10T_To_100T,
     #[assoc(req = Req::CookiesAllTime(Cmp::Above(100.0 * num::TRILLION)))]
     CookiesAllTime_Above_100T,
+    /* -------------------------------------------------------------------------- */
+    /*                               Building Based                               */
+    /* -------------------------------------------------------------------------- */
+    #[assoc(req = Req::BuildingCountMin(Building::Grandma, 1))]
+    Building_Grandma_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Grandma, 50))]
+    Building_Grandma_50,
+    #[assoc(req = Req::BuildingCountMin(Building::Farm, 1))]
+    Building_Farm_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Mine, 1))]
+    Building_Mine_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Factory, 1))]
+    Building_Factory_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Bank, 1))]
+    Building_Bank_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Temple, 1))]
+    Building_Temple_1,
+    #[assoc(req = Req::BuildingCountMin(Building::WizardTower, 1))]
+    Building_WizardTower_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Shipment, 1))]
+    Building_Shipment_1,
+    #[assoc(req = Req::BuildingCountMin(Building::AlchemyLab, 1))]
+    Building_AlchemyLab_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Portal, 1))]
+    Building_Portal_1,
+    #[assoc(req = Req::BuildingCountMin(Building::TimeMachine, 1))]
+    Building_TimeMachine_1,
+    #[assoc(req = Req::BuildingCountMin(Building::AntimatterCondenser, 1))]
+    Building_AntimatterCondenser_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Prism, 1))]
+    Building_Prism_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Chancemaker, 1))]
+    Building_Chancemaker_1,
+    #[assoc(req = Req::BuildingCountMin(Building::FractalEngine, 1))]
+    Building_FractalEngine_1,
+    #[assoc(req = Req::BuildingCountMin(Building::RustPlayground, 1))]
+    Building_RustPlayground_1,
+    #[assoc(req = Req::BuildingCountMin(Building::Idleverse, 1))]
+    Building_Idleverse_1,
+    #[assoc(req = Req::BuildingCountMin(Building::CortexBaker, 1))]
+    Building_CortexBaker_1,
+    #[assoc(req = Req::BuildingCountMin(Building::You, 1))]
+    Building_You_1,
     /* -------------------------------------------------------------------------- */
     /*                           Grandmapocalypse Based                           */
     /* -------------------------------------------------------------------------- */
