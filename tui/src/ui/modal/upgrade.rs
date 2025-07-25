@@ -1,8 +1,27 @@
-use super::num::PrintFloat;
-use cookie_clicker_tui_core::{Building, UpgradeEffectInfo};
-use ratatui::prelude::*;
+use super::{super::utils::num::PrintFloat, ModalImpl};
+use cookie_clicker_tui_core::{Building, Upgrade, UpgradeEffectInfo};
+use ratatui::{prelude::*, widgets::Paragraph};
 
-pub fn print_upgrade_effect_info(info: UpgradeEffectInfo, lines: &mut Vec<Line>) {
+pub fn upgrade(upgrade: Upgrade, area: Rect, buf: &mut Buffer) {
+    let title = format!(" {} ", upgrade.name());
+    let modal = ModalImpl {
+        area,
+        buf,
+        title: title.into(),
+        title_bottom: " Close <Esc> ".into(),
+        screen_percent: (60, 31),
+    };
+
+    modal.render(|area, buf, block| {
+        let mut lines = Vec::new();
+        let info = upgrade.effect_info();
+
+        print_info(info, &mut lines);
+        Paragraph::new(lines).block(block).render(area, buf);
+    });
+}
+
+pub fn print_info(info: UpgradeEffectInfo, lines: &mut Vec<Line>) {
     match info {
         UpgradeEffectInfo::Tiered(building) => {
             lines.push(line_2x_from_building(building));

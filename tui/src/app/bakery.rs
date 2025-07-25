@@ -12,6 +12,7 @@ impl AppBakery {
     }
 
     pub(super) fn set_name(&mut self, name: impl Into<Box<str>>) {
-        self.name = Some(name.into());
+        let name = name.into();
+        self.name = (!name.is_empty()).then_some(name);
     }
 }
