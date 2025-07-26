@@ -1,4 +1,5 @@
 use crate::spawner::Spawner;
+use cookie_clicker_tui_utils::refresh::Refresh;
 use enum_assoc::Assoc;
 use enum_fun::Variants;
 use rand::seq::IndexedRandom;
@@ -6,6 +7,7 @@ use std::collections::HashMap;
 
 const DEFAULT_TMIN_SECS: f64 = 300.0;
 const DEFAULT_TMAX_SECS: f64 = 900.0;
+const DEFAULT_DURATION_SECS: f64 = 13.0;
 
 #[derive(Debug)]
 pub struct GoldenCookies {
@@ -22,6 +24,8 @@ impl GoldenCookies {
     }
 
     pub(crate) fn tick(&mut self) {
+        self.list.tick();
+
         if self.spawner.spawn() {
             self.list.spawn();
         }
@@ -70,6 +74,10 @@ impl GoldenCookieList {
 
         self.map.insert(ch, GoldenCookie::new(ch));
     }
+
+    fn tick(&mut self) {
+        self.map.retain(|_, cookie| !cookie.refresh.finish());
+    }
 }
 
 #[derive(Debug)]
@@ -77,6 +85,7 @@ pub struct GoldenCookie {
     ch: GoldenCookieInputChar,
     x: f64,
     y: f64,
+    refresh: Refresh,
 }
 
 impl GoldenCookie {
@@ -85,6 +94,7 @@ impl GoldenCookie {
             ch,
             x: rand::random(),
             y: rand::random(),
+            refresh: Refresh::new(DEFAULT_DURATION_SECS),
         }
     }
 

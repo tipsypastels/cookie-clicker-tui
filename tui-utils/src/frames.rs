@@ -1,7 +1,10 @@
+#![allow(deprecated)]
+
 use std::fmt;
 
 pub const FPS: f64 = 30.0;
 
+#[deprecated]
 pub struct RefreshClock<const SECONDS: u32> {
     ticks_until_refresh: u32,
 }

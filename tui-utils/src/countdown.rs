@@ -1,3 +1,6 @@
+#![allow(deprecated)]
+
+#[deprecated]
 #[derive(Debug)]
 pub struct Countdown<const MAX: u16>(Option<u16>);
 
@@ -25,6 +28,7 @@ impl<const MAX: u16> Default for Countdown<MAX> {
     }
 }
 
+#[deprecated]
 #[derive(Debug)]
 pub struct CountdownOf<T, const MAX: u16>(Option<(u16, T)>);
 
