@@ -1,10 +1,12 @@
 mod app;
+mod audio;
 mod event;
 mod save;
 mod ui;
 
 use self::{
     app::App,
+    audio::Audio,
     save::{Save, SaveData, SaveOptions},
 };
 use anyhow::Result;
@@ -70,7 +72,9 @@ async fn main() -> Result<()> {
     }
 
     let mut term = ratatui::init();
-    let app = App::new(save, core, bakery_name);
+    let audio = Audio::new()?;
+
+    let app = App::new(save, core, bakery_name, audio);
     let res = app.run(&mut term).await;
 
     ratatui::restore();

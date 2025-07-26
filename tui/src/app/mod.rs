@@ -17,6 +17,7 @@ pub use self::{
 };
 
 use crate::{
+    audio::Audio,
     event::{Event, Events},
     save::Save,
 };
@@ -28,6 +29,7 @@ use ratatui::DefaultTerminal;
 pub struct App {
     save: Save,
     core: Core,
+    audio: Audio,
     tick: AppTickState,
     list: AppListState,
     modal: AppModalState,
@@ -40,11 +42,12 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(save: Save, core: Core, name: Option<Box<str>>) -> Self {
+    pub fn new(save: Save, core: Core, name: Option<Box<str>>, audio: Audio) -> Self {
         let news = AppNewsState::new(&core);
         Self {
             save,
             core,
+            audio,
             tick: AppTickState::default(),
             list: AppListState::default(),
             modal: AppModalState::default(),
@@ -157,7 +160,9 @@ impl App {
                 self.iface.set_pressed_cookie();
             }
             KeyCode::Char(ch @ '1'..='9') => {
-                self.core.click_golden_cookie(ch);
+                if self.core.click_golden_cookie(ch) {
+                    self.audio.golden_cookie_click();
+                }
             }
             KeyCode::Char('q') => {
                 self.quit().await?;

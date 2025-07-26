@@ -17,5 +17,6 @@ rand.workspace = true
 ratatui.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+soloud.workspace = true
 tokio.workspace = true
 tui-widget-list.workspace = true
