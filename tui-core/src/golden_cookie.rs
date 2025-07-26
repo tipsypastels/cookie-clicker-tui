@@ -1,8 +1,9 @@
-use crate::spawner::Spawner;
+use crate::{macros::impl_serde_from_state, spawner::Spawner};
 use cookie_clicker_tui_utils::refresh::Refresh;
 use enum_assoc::Assoc;
 use enum_fun::Variants;
 use rand::seq::IndexedRandom;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 const DEFAULT_TMIN_SECS: f64 = 300.0;
@@ -11,23 +12,28 @@ const DEFAULT_DURATION_SECS: f64 = 13.0;
 
 #[derive(Debug)]
 pub struct GoldenCookies {
+    state: GoldenCookieState,
     list: GoldenCookieList,
-    spawner: Spawner,
 }
 
 impl GoldenCookies {
     pub(crate) fn new() -> Self {
+        Self::from_state(GoldenCookieState::new())
+    }
+
+    fn from_state(state: GoldenCookieState) -> Self {
         Self {
+            state,
             list: GoldenCookieList::new(),
-            spawner: Spawner::new(DEFAULT_TMIN_SECS, DEFAULT_TMAX_SECS),
         }
     }
 
     pub(crate) fn tick(&mut self) {
-        self.list.tick();
+        let missed = self.list.remove_and_count_missed();
+        self.state.click_miss_count = self.state.click_miss_count.saturating_add(missed);
 
-        if self.spawner.spawn() {
-            self.list.spawn();
+        if self.state.spawner.spawn() {
+            self.list.spawn(self.state.cookie_duration_secs);
         }
     }
 
@@ -38,16 +44,37 @@ impl GoldenCookies {
         let Some(_cookie) = self.list.map.remove(&ch) else {
             return false;
         };
-
+        self.state.click_count = self.state.click_count.saturating_add(1);
         true
     }
 
     pub(crate) fn modify_spawning(&mut self, f: impl FnOnce(&mut f64, &mut f64)) {
-        self.spawner.modify(f);
+        self.state.spawner.modify(f);
     }
 
     pub fn iter(&self) -> impl Iterator<Item = &GoldenCookie> {
         self.list.map.values()
+    }
+}
+
+impl_serde_from_state!(GoldenCookies as state: GoldenCookieState);
+
+#[derive(Serialize, Deserialize, Debug)]
+struct GoldenCookieState {
+    click_count: usize,
+    click_miss_count: usize,
+    cookie_duration_secs: f64,
+    spawner: Spawner,
+}
+
+impl GoldenCookieState {
+    fn new() -> Self {
+        Self {
+            click_count: 0,
+            click_miss_count: 0,
+            cookie_duration_secs: DEFAULT_DURATION_SECS,
+            spawner: Spawner::new(DEFAULT_TMIN_SECS, DEFAULT_TMAX_SECS),
+        }
     }
 }
 
@@ -63,7 +90,7 @@ impl GoldenCookieList {
         }
     }
 
-    fn spawn(&mut self) {
+    fn spawn(&mut self, duration_secs: f64) {
         let available = GoldenCookieInputChar::variants()
             .filter(|ch| !self.map.contains_key(ch))
             .collect::<Vec<_>>();
@@ -71,12 +98,13 @@ impl GoldenCookieList {
         let Some(ch) = available.choose(&mut rand::rng()).copied() else {
             return;
         };
-
-        self.map.insert(ch, GoldenCookie::new(ch));
+        self.map.insert(ch, GoldenCookie::new(ch, duration_secs));
     }
 
-    fn tick(&mut self) {
-        self.map.retain(|_, cookie| !cookie.refresh.finish());
+    fn remove_and_count_missed(&mut self) -> usize {
+        self.map
+            .extract_if(|_, cookie| cookie.refresh.finish())
+            .count()
     }
 }
 
@@ -89,12 +117,12 @@ pub struct GoldenCookie {
 }
 
 impl GoldenCookie {
-    fn new(ch: GoldenCookieInputChar) -> Self {
+    fn new(ch: GoldenCookieInputChar, duration_secs: f64) -> Self {
         Self {
             ch,
             x: rand::random(),
             y: rand::random(),
-            refresh: Refresh::new(DEFAULT_DURATION_SECS),
+            refresh: Refresh::new(duration_secs),
         }
     }
 

@@ -5,6 +5,7 @@ mod cookies;
 mod cost;
 mod golden_cookie;
 mod grandmapocalypse;
+mod macros;
 mod milk;
 mod news;
 mod req;
@@ -32,6 +33,7 @@ use self::{
     achievement::Achievements,
     building::Buildings,
     cookies::Cookies,
+    macros::impl_serde_from_state,
     upgrade::{AvailableUpgrades, OwnedUpgrades},
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -120,7 +122,7 @@ impl Core {
     }
 
     pub fn golden_cookies(&self) -> &GoldenCookies {
-        &self.computed.golden_cookies
+        &self.state.golden_cookies
     }
 
     pub fn random_news_entry(&self) -> Option<NewsEntry> {
@@ -136,7 +138,7 @@ impl Core {
     }
 
     pub fn click_golden_cookie(&mut self, ch: char) -> bool {
-        self.computed.golden_cookies.click(ch)
+        self.state.golden_cookies.click(ch)
     }
 
     pub fn give_building(&mut self, building: Building) {
@@ -227,7 +229,7 @@ impl Core {
     }
 
     pub fn cheat_spawn_golden_cookies_fast(&mut self) {
-        self.computed.golden_cookies.modify_spawning(|min, max| {
+        self.state.golden_cookies.modify_spawning(|min, max| {
             *min = 5.0;
             *max = 10.0;
         });
@@ -265,17 +267,7 @@ impl Default for Core {
     }
 }
 
-impl Serialize for Core {
-    fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        self.state.serialize(ser)
-    }
-}
-
-impl<'de> Deserialize<'de> for Core {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        State::deserialize(de).map(Self::from_state)
-    }
-}
+impl_serde_from_state!(Core as state: State);
 
 #[derive(Serialize, Deserialize)]
 struct State {
@@ -295,6 +287,8 @@ struct State {
     research: Research,
     #[serde(default = "Grandmapocalypse::new")]
     grandmapocalypse: Grandmapocalypse,
+    #[serde(default = "GoldenCookies::new")]
+    golden_cookies: GoldenCookies,
 }
 
 impl State {
@@ -308,6 +302,7 @@ impl State {
             sugar_lumps: SugarLumps::new(),
             research: Research::new(),
             grandmapocalypse: Grandmapocalypse::new(),
+            golden_cookies: GoldenCookies::new(),
         }
     }
 
@@ -316,6 +311,7 @@ impl State {
         self.buildings.tick();
         self.milk.tick(self.achievements.owned().len() as _);
         self.research.tick();
+        self.golden_cookies.tick();
 
         achievement::tick(self, computed);
         sugar_lumps::tick(self);
@@ -325,25 +321,21 @@ impl State {
 struct Computed {
     cps: f64,
     available_upgrades: AvailableUpgrades,
-    golden_cookies: GoldenCookies,
 }
 
 impl Computed {
     fn new(state: &State) -> Self {
         let cps = self::calc::cps(state);
         let available_upgrades = AvailableUpgrades::new(state);
-        let golden_cookies = GoldenCookies::new();
 
         Self {
             cps,
             available_upgrades,
-            golden_cookies,
         }
     }
 
     fn tick(&mut self, state: &State) {
         self.available_upgrades.tick(state);
-        self.golden_cookies.tick();
 
         if state.research.just_completed() {
             self.recalc_available_upgrades(state);
