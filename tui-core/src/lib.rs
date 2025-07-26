@@ -8,6 +8,7 @@ mod milk;
 mod news;
 mod req;
 mod research;
+mod spawner;
 mod sugar_lumps;
 mod upgrade;
 
