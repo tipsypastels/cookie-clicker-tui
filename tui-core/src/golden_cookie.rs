@@ -27,6 +27,17 @@ impl GoldenCookies {
         }
     }
 
+    pub(crate) fn click(&mut self, ch: char) -> bool {
+        let Some(ch) = GoldenCookieInputChar::from_char(ch) else {
+            return false;
+        };
+        let Some(_cookie) = self.list.map.remove(&ch) else {
+            return false;
+        };
+
+        true
+    }
+
     pub(crate) fn modify_spawning(&mut self, f: impl FnOnce(&mut f64, &mut f64)) {
         self.spawner.modify(f);
     }

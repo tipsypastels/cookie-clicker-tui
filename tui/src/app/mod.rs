@@ -156,6 +156,9 @@ impl App {
                 self.core.click_cookie();
                 self.iface.set_pressed_cookie();
             }
+            KeyCode::Char(ch @ '1'..='9') => {
+                self.core.click_golden_cookie(ch);
+            }
             KeyCode::Char('q') => {
                 self.quit().await?;
             }
@@ -176,6 +179,7 @@ impl App {
             KeyCode::Char('/') => {
                 self.debug.forward();
             }
+
             _ => {}
         }
 

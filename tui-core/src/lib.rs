@@ -135,6 +135,10 @@ impl Core {
         self.state.cookies.gain_from_clicking(1.0);
     }
 
+    pub fn click_golden_cookie(&mut self, ch: char) -> bool {
+        self.computed.golden_cookies.click(ch)
+    }
+
     pub fn give_building(&mut self, building: Building) {
         self.state.buildings.modify(building, |b| b.count += 1);
         self.computed.recalc_cps(&self.state);
