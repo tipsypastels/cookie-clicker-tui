@@ -12,6 +12,9 @@ pub enum Req {
     GrandmaJobUpgradeCount(Cmp<u16>),
     GrandmapocalypsePhase(GrandmapocalypsePhase),
     GrandmapocalypseAppeased(),
+    GoldenCookieClicked(Cmp<usize>),
+    GoldenCookieClickedAtMost1sAfterSpawn(),
+    GoldenCookieClickedAtMost1sBeforeDespawn(),
     Custom(fn(&State) -> bool),
     Any(&'static [Req]),
     AnyBox(Box<[Req]>),
@@ -32,6 +35,13 @@ impl Req {
             Self::GrandmaJobUpgradeCount(c) => c.check(state.buildings.grandma_job_upgrade_count()),
             Self::GrandmapocalypsePhase(p) => state.grandmapocalypse.is_phase(*p),
             Self::GrandmapocalypseAppeased() => state.grandmapocalypse.is_appeased(),
+            Self::GoldenCookieClicked(c) => c.check(state.golden_cookies.click_count()),
+            Self::GoldenCookieClickedAtMost1sAfterSpawn() => {
+                state.golden_cookies.clicked_one_at_most_1s_after_spawn()
+            }
+            Self::GoldenCookieClickedAtMost1sBeforeDespawn() => {
+                state.golden_cookies.clicked_one_at_most_1s_before_despawn()
+            }
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state)),
@@ -72,6 +82,9 @@ impl LateReq {
         GrandmaJobUpgradeCount(c: Cmp<u16>);
         GrandmapocalypsePhase(p: GrandmapocalypsePhase);
         GrandmapocalypseAppeased();
+        GoldenCookieClicked(c: Cmp<usize>);
+        GoldenCookieClickedAtMost1sAfterSpawn();
+        GoldenCookieClickedAtMost1sBeforeDespawn();
     }
 
     pub fn check(&self, state: &State, computed: &Computed) -> bool {

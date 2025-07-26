@@ -14,6 +14,30 @@ impl Refresh {
         }
     }
 
+    pub fn cur(&self) -> f64 {
+        self.cur
+    }
+
+    pub fn cur_secs(&self) -> f64 {
+        self.cur / FPS
+    }
+
+    pub fn max(&self) -> f64 {
+        self.max
+    }
+
+    pub fn max_secs(&self) -> f64 {
+        self.max / FPS
+    }
+
+    pub fn until_finish(&self) -> f64 {
+        self.max - self.cur
+    }
+
+    pub fn until_finish_secs(&self) -> f64 {
+        self.until_finish() / FPS
+    }
+
     pub fn reset(&mut self) {
         self.cur = 0.0;
     }

@@ -41,15 +41,39 @@ impl GoldenCookies {
         let Some(ch) = GoldenCookieInputChar::from_char(ch) else {
             return false;
         };
-        let Some(_cookie) = self.list.map.remove(&ch) else {
+        let Some(cookie) = self.list.map.remove(&ch) else {
             return false;
         };
+
+        if cookie.refresh.cur_secs() <= 1.0 {
+            self.state.clicked_one_at_most_1s_after_spawn = true;
+        }
+        if cookie.refresh.until_finish_secs() <= 1.0 {
+            self.state.clicked_one_at_most_1s_before_despawn = true;
+        }
+
         self.state.click_count = self.state.click_count.saturating_add(1);
         true
     }
 
     pub(crate) fn modify_spawning(&mut self, f: impl FnOnce(&mut f64, &mut f64)) {
         self.state.spawner.modify(f);
+    }
+
+    pub fn click_count(&self) -> usize {
+        self.state.click_count
+    }
+
+    pub fn click_miss_count(&self) -> usize {
+        self.state.click_miss_count
+    }
+
+    pub fn clicked_one_at_most_1s_after_spawn(&self) -> bool {
+        self.state.clicked_one_at_most_1s_after_spawn
+    }
+
+    pub fn clicked_one_at_most_1s_before_despawn(&self) -> bool {
+        self.state.clicked_one_at_most_1s_before_despawn
     }
 
     pub fn iter(&self) -> impl Iterator<Item = &GoldenCookie> {
@@ -63,6 +87,8 @@ impl_serde_from_state!(GoldenCookies as state: GoldenCookieState);
 struct GoldenCookieState {
     click_count: usize,
     click_miss_count: usize,
+    clicked_one_at_most_1s_after_spawn: bool,
+    clicked_one_at_most_1s_before_despawn: bool,
     cookie_duration_secs: f64,
     spawner: Spawner,
 }
@@ -72,6 +98,8 @@ impl GoldenCookieState {
         Self {
             click_count: 0,
             click_miss_count: 0,
+            clicked_one_at_most_1s_after_spawn: false,
+            clicked_one_at_most_1s_before_despawn: false,
             cookie_duration_secs: DEFAULT_DURATION_SECS,
             spawner: Spawner::new(DEFAULT_TMIN_SECS, DEFAULT_TMAX_SECS),
         }

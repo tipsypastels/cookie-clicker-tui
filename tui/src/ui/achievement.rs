@@ -5,6 +5,7 @@ use ratatui::{
     prelude::*,
     widgets::{Block, Clear, Paragraph},
 };
+use std::borrow::Cow;
 
 const SCREEN_PERCENT: (u16, u16) = (33, 15);
 
@@ -18,26 +19,32 @@ pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         Modifier::BOLD,
     );
 
-    let req = match achievement.req() {
-        AchievementReq::CookiesBaked(n) => {
-            format!(
-                "• bake {} {}",
-                n.print_float(0, 0),
-                pluralized(n as _, "cookie", "cookies")
-            )
+    let req: Cow<str> = match achievement.req() {
+        AchievementReq::CookiesBaked(n) => format!(
+            "• bake {} {}",
+            n.print_float(0, 0),
+            pluralized(n as _, "cookie", "cookies")
+        )
+        .into(),
+        AchievementReq::Cps(n) => format!(
+            "• bake {} {} per second",
+            n.print_float(0, 0),
+            pluralized(n as _, "cookie", "cookies")
+        )
+        .into(),
+        AchievementReq::GrandmaJobCount(n) => format!(
+            "• have {n} {} with jobs",
+            Building::Grandma.name_lower_pluralized(n as _)
+        )
+        .into(),
+        AchievementReq::GoldenCookieClickedCount(n) => {
+            format!("• click {n} golden {}", pluralized(n, "cookie", "cookies")).into()
         }
-        AchievementReq::Cps(n) => {
-            format!(
-                "• bake {} {} per second",
-                n.print_float(0, 0),
-                pluralized(n as _, "cookie", "cookies")
-            )
+        AchievementReq::GoldenCookieClickedAtMost1sAfterSpawn => {
+            "• click a golden cookie within the first second".into()
         }
-        AchievementReq::GrandmaJobCount(n) => {
-            format!(
-                "• have {n} {} with jobs",
-                Building::Grandma.name_lower_pluralized(n as _)
-            )
+        AchievementReq::GoldenCookieClickedAtMost1sBeforeDespawn => {
+            "• click a golden cookie at the last second".into()
         }
     };
 

@@ -313,6 +313,25 @@ pub enum Achievement {
     #[assoc(req = AchievementReq::Cps(100.0 * num::SEPTENDECILLION))]
     #[name(base = "Speed's The Name Of The Game")]
     SpeedsTheNameOfTheGame,
+    /* -------------------------------------------------------------------------- */
+    /*                               Golden Cookies                               */
+    /* -------------------------------------------------------------------------- */
+    #[assoc(req = AchievementReq::GoldenCookieClickedCount(1))]
+    GoldenCookie,
+    #[assoc(req = AchievementReq::GoldenCookieClickedCount(7))]
+    LuckyCookie,
+    #[assoc(req = AchievementReq::GoldenCookieClickedCount(27))]
+    AStrokeOfLuck,
+    #[assoc(req = AchievementReq::GoldenCookieClickedCount(77))]
+    Fortune,
+    #[assoc(req = AchievementReq::GoldenCookieClickedCount(777))]
+    Leprechaun,
+    #[assoc(req = AchievementReq::GoldenCookieClickedCount(7_777))]
+    BlackCatsPaw,
+    #[assoc(req = AchievementReq::GoldenCookieClickedAtMost1sAfterSpawn)]
+    EarlyBird,
+    #[assoc(req = AchievementReq::GoldenCookieClickedAtMost1sBeforeDespawn)]
+    FadingLuck,
     // TODO: Add other achievements for grandmas and all the other shit.
     #[assoc(req = AchievementReq::GrandmaJobCount(7))]
     Elder,
@@ -322,6 +341,9 @@ pub enum AchievementReq {
     CookiesBaked(f64),
     Cps(f64),
     GrandmaJobCount(u16),
+    GoldenCookieClickedCount(usize),
+    GoldenCookieClickedAtMost1sAfterSpawn,
+    GoldenCookieClickedAtMost1sBeforeDespawn,
 }
 
 impl AchievementReq {
@@ -330,6 +352,13 @@ impl AchievementReq {
             Self::CookiesBaked(v) => LateReq::CookiesAllTime(Cmp::AboveOrEq(*v)),
             Self::Cps(v) => LateReq::Cps(Cmp::AboveOrEq(*v)),
             Self::GrandmaJobCount(v) => LateReq::GrandmaJobUpgradeCount(Cmp::AboveOrEq(*v)),
+            Self::GoldenCookieClickedCount(v) => LateReq::GoldenCookieClicked(Cmp::AboveOrEq(*v)),
+            Self::GoldenCookieClickedAtMost1sAfterSpawn => {
+                LateReq::GoldenCookieClickedAtMost1sAfterSpawn()
+            }
+            Self::GoldenCookieClickedAtMost1sBeforeDespawn => {
+                LateReq::GoldenCookieClickedAtMost1sBeforeDespawn()
+            }
         }
     }
 }
