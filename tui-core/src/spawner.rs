@@ -7,6 +7,10 @@ pub struct Spawner {
     tmin: f64,
     tmax: f64,
     n: f64,
+    #[cfg(debug_assertions)]
+    _n_last_hit: Option<f64>,
+    #[cfg(debug_assertions)]
+    _prob: f64,
 }
 
 impl Spawner {
@@ -17,23 +21,32 @@ impl Spawner {
             tmin: tmin_secs * FPS,
             tmax: tmax_secs * FPS,
             n: 0.0,
+            #[cfg(debug_assertions)]
+            _n_last_hit: None,
+            #[cfg(debug_assertions)]
+            _prob: 0.0,
         }
     }
 
     pub fn spawn(&mut self) -> bool {
-        self.spawn_and_report_prob().0
-    }
-
-    pub fn spawn_and_report_prob(&mut self) -> (bool, f64) {
         let prob = f64::max(0.0, (self.n - self.tmin) / (self.tmax - self.tmin)).powi(5);
-        let spawned = if rand::random::<f64>() < prob {
+
+        #[cfg(debug_assertions)]
+        {
+            self._prob = prob;
+        }
+
+        if rand::random::<f64>() < prob {
+            #[cfg(debug_assertions)]
+            {
+                self._n_last_hit = Some(self.n);
+            }
             self.n = 0.0;
             true
         } else {
             self.n += 1.0;
             false
-        };
-        (spawned, prob)
+        }
     }
 
     pub fn modify(&mut self, f: impl FnOnce(&mut f64, &mut f64)) {

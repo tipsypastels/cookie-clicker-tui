@@ -21,6 +21,7 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
         AppDebugView::SugarLumps => format!("{:?}", core.sugar_lumps()),
         AppDebugView::Research => format!("{:?}", core.research()),
         AppDebugView::Grandmapocalypse => format!("{:?}", core.grandmapocalypse()),
+        AppDebugView::GoldenCookies => format!("{:?}", core.golden_cookies()),
         AppDebugView::News => format!("{:?}", app.news),
         AppDebugView::List => format!("{:?}", app.list.debug(core)),
         AppDebugView::Keypress => {

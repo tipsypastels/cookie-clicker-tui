@@ -27,11 +27,15 @@ struct Cli {
 
     /// Make all purchases free
     #[clap(long, requires = "dry_run")]
-    everything_free: bool,
+    free_everything: bool,
 
     /// Give a free "You" building to start with
     #[clap(long, requires = "dry_run")]
     free_you: bool,
+
+    /// Greatly speeds up golden cookie spawning
+    #[clap(long, requires = "dry_run")]
+    fast_golden_cookies: bool,
 }
 
 #[tokio::main]
@@ -53,12 +57,16 @@ async fn main() -> Result<()> {
         mut core,
     } = save.data().await?;
 
-    if cli.everything_free {
-        core.make_everything_free();
+    if cli.free_everything {
+        core.cheat_make_everything_free();
     }
 
     if cli.free_you {
         core.give_building(Building::You);
+    }
+
+    if cli.fast_golden_cookies {
+        core.cheat_spawn_golden_cookies_fast();
     }
 
     let mut term = ratatui::init();

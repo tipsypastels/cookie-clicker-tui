@@ -3,6 +3,7 @@ mod buildings;
 mod cookies;
 mod debug;
 mod flash;
+mod golden_cookies;
 mod modal;
 mod news;
 mod upgrades;
@@ -50,6 +51,8 @@ pub fn ui(app: &mut UiApp, frame: &mut Frame) {
     flash::flash(app, area, buf);
     achievement::achievement(app, area, buf);
     modal::modal(app, area, buf);
+
+    golden_cookies::golden_cookies(app, area, buf);
 }
 
 fn left_col(app: &mut UiApp, area: Rect, buf: &mut Buffer) {

@@ -3,6 +3,7 @@ mod building;
 mod calc;
 mod cookies;
 mod cost;
+mod golden_cookie;
 mod grandmapocalypse;
 mod milk;
 mod news;
@@ -16,6 +17,7 @@ pub use self::{
     achievement::{Achievement, AchievementReq},
     building::{Building, BuildingInfo},
     cost::Cost,
+    golden_cookie::{GoldenCookie, GoldenCookies},
     grandmapocalypse::{Grandmapocalypse, GrandmapocalypsePhase},
     milk::{Milk, MilkFlavor},
     news::NewsEntry,
@@ -117,6 +119,10 @@ impl Core {
         &self.state.grandmapocalypse
     }
 
+    pub fn golden_cookies(&self) -> &GoldenCookies {
+        &self.computed.golden_cookies
+    }
+
     pub fn random_news_entry(&self) -> Option<NewsEntry> {
         self::news::get_entry(&self.state)
     }
@@ -212,8 +218,15 @@ impl Core {
         true
     }
 
-    pub fn make_everything_free(&mut self) {
+    pub fn cheat_make_everything_free(&mut self) {
         self.everything_free = true;
+    }
+
+    pub fn cheat_spawn_golden_cookies_fast(&mut self) {
+        self.computed.golden_cookies.modify_spawning(|min, max| {
+            *min = 5.0;
+            *max = 10.0;
+        });
     }
 
     pub fn tick(&mut self) {
@@ -308,21 +321,25 @@ impl State {
 struct Computed {
     cps: f64,
     available_upgrades: AvailableUpgrades,
+    golden_cookies: GoldenCookies,
 }
 
 impl Computed {
     fn new(state: &State) -> Self {
         let cps = self::calc::cps(state);
         let available_upgrades = AvailableUpgrades::new(state);
+        let golden_cookies = GoldenCookies::new();
 
         Self {
             cps,
             available_upgrades,
+            golden_cookies,
         }
     }
 
     fn tick(&mut self, state: &State) {
         self.available_upgrades.tick(state);
+        self.golden_cookies.tick();
 
         if state.research.just_completed() {
             self.recalc_available_upgrades(state);
