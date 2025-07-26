@@ -16,7 +16,7 @@ impl Spawner {
             tmax_secs,
             tmin: tmin_secs * FPS,
             tmax: tmax_secs * FPS,
-            n: tmin_secs * FPS,
+            n: 0.0,
         }
     }
 
