@@ -81,32 +81,28 @@ impl Building {
 }
 
 pub struct Buildings {
-    states: BuildingMap<BuildingState>,
-    computeds: BuildingMap<BuildingComputed>,
-    flags: BuildingsFlags,
+    state: BuildingsState,
+    computed: BuildingsComputed,
 }
 
 impl Buildings {
     pub fn new() -> Self {
-        Self::from_states(BuildingMap::default())
+        Self::from_state(BuildingsState::default())
     }
 
-    fn from_states(states: BuildingMap<BuildingState>) -> Self {
-        let flags = BuildingsFlags::default();
-        let computeds =
-            BuildingMap::new(|building| BuildingComputed::new(&states, &flags, building));
-
-        Self {
-            states,
-            computeds,
-            flags,
-        }
+    fn from_state(state: BuildingsState) -> Self {
+        let computed = BuildingsComputed {
+            buildings: BuildingMap::new(|b| {
+                BuildingComputed::new(&state.buildings, &state.flags, b)
+            }),
+        };
+        Self { state, computed }
     }
 
     pub fn tick(&mut self) {
         for building in Building::variants() {
-            let cps = self.computeds.get(building).cps;
-            let state = self.states.get_mut(building);
+            let cps = self.computed.buildings.get(building).cps;
+            let state = self.state.buildings.get_mut(building);
             state.cookies_all_time += cps / FPS;
         }
     }
@@ -118,8 +114,8 @@ impl Buildings {
     pub fn info(&self, building: Building) -> BuildingInfo {
         BuildingInfo {
             building,
-            state: self.states.get(building),
-            computed: self.computeds.get(building),
+            state: self.state.buildings.get(building),
+            computed: self.computed.buildings.get(building),
         }
     }
 
@@ -132,37 +128,37 @@ impl Buildings {
     }
 
     pub fn state(&self, building: Building) -> &BuildingState {
-        self.states.get(building)
+        self.state.buildings.get(building)
     }
 
-    pub fn flags(&self) -> &BuildingsFlags {
-        &self.flags
-    }
-
-    pub fn has_sold_a_grandma(&self) -> bool {
-        self.flags.has_sold_a_grandma
+    pub fn debug_flags(&self) -> impl fmt::Debug {
+        &self.state.flags
     }
 
     pub fn grandma_job_upgrade_count(&self) -> u16 {
-        self.states.grandma_job_upgrade_count()
+        self.state.buildings.grandma_job_upgrade_count()
+    }
+
+    pub fn has_sold_a_grandma(&self) -> bool {
+        self.state.flags.has_sold_a_grandma
     }
 
     pub fn modify(&mut self, building: Building, f: impl FnOnce(&mut BuildingState)) {
-        f(self.states.get_mut(building));
+        f(self.state.buildings.get_mut(building));
         self.recompute(building);
     }
 
     pub fn recompute(&mut self, building: Building) {
-        *self.computeds.get_mut(building) =
-            BuildingComputed::new(&self.states, &self.flags, building);
+        *self.computed.buildings.get_mut(building) =
+            BuildingComputed::new(&self.state.buildings, &self.state.flags, building);
     }
 
-    pub fn set_has_sold_a_grandma(&mut self) {
-        self.flags.has_sold_a_grandma = true;
+    pub fn set_has_sold_a_grandma(&mut self, enable: bool) {
+        self.state.flags.has_sold_a_grandma = enable;
     }
 
     pub fn set_grandma_has_bingo_center_4x(&mut self, enable: bool) {
-        self.flags.grandma_has_bingo_center_4x = enable;
+        self.state.flags.grandma_has_bingo_center_4x = enable;
         self.recompute(Building::Grandma);
     }
 }
@@ -173,8 +169,25 @@ impl fmt::Debug for Buildings {
     }
 }
 
-macros::serialize_via_state!(Buildings => BuildingMap<BuildingState> as |b| b.states);
-macros::deserialize_via_state!(Buildings => BuildingMap<BuildingState> as Buildings::from_states);
+macros::serialize_via_state!(Buildings => BuildingsState as |b| b.state);
+macros::deserialize_via_state!(Buildings => BuildingsState as Buildings::from_state);
+
+#[derive(Serialize, Deserialize, Default)]
+struct BuildingsState {
+    #[serde(flatten)]
+    buildings: BuildingMap<BuildingState>,
+    flags: BuildingsFlags,
+}
+
+struct BuildingsComputed {
+    buildings: BuildingMap<BuildingComputed>,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+struct BuildingsFlags {
+    grandma_has_bingo_center_4x: bool,
+    has_sold_a_grandma: bool,
+}
 
 pub struct BuildingInfo<'a> {
     building: Building,
@@ -250,11 +263,11 @@ pub struct BuildingComputed {
 
 impl BuildingComputed {
     fn new(
-        states: &BuildingMap<BuildingState>,
+        buildings: &BuildingMap<BuildingState>,
         flags: &BuildingsFlags,
         building: Building,
     ) -> Self {
-        let state = states.get(building);
+        let state = buildings.get(building);
         let cost = calc::building_cost(building, state.count);
         let sell_cost = calc::building_sell_cost(cost);
 
@@ -262,19 +275,19 @@ impl BuildingComputed {
             Building::Cursor => calc::BuildingCpsClass::Cursor,
             Building::Grandma => calc::BuildingCpsClass::Grandma {
                 has_bingo_center_4x: flags.grandma_has_bingo_center_4x,
-                job_upgrade_count: states.grandma_job_upgrade_count(),
+                job_upgrade_count: buildings.grandma_job_upgrade_count(),
             },
             _ => calc::BuildingCpsClass::Other {
                 grandma_count: state
                     .has_grandma_job_upgrade
-                    .then_some(states.grandma.count),
+                    .then_some(buildings.grandma.count),
             },
         };
 
         let addl_cps_per_owned_building_counts = state
             .addl_cps_per_owned_building
             .iter()
-            .map(|(building, cps)| (states.get(*building).count, *cps));
+            .map(|(building, cps)| (buildings.get(*building).count, *cps));
 
         let cps = calc::building_cps(
             building,
@@ -324,10 +337,4 @@ impl BuildingMap<BuildingState> {
             .map(|b| self.get(b).has_grandma_job_upgrade as u16)
             .sum()
     }
-}
-
-#[derive(Default, Debug)]
-pub struct BuildingsFlags {
-    grandma_has_bingo_center_4x: bool,
-    has_sold_a_grandma: bool,
 }

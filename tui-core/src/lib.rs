@@ -187,7 +187,7 @@ impl Core {
         }
 
         if building.is_grandma() {
-            self.state.buildings.set_has_sold_a_grandma();
+            self.state.buildings.set_has_sold_a_grandma(true);
         }
 
         self.take_building(building);
@@ -252,7 +252,7 @@ impl Core {
     }
 
     pub fn debug_buildings_flags(&self) -> impl fmt::Debug {
-        self.state.buildings.flags()
+        self.state.buildings.debug_flags()
     }
 
     pub fn debug_available_upgrades(&self) -> impl fmt::Debug {
