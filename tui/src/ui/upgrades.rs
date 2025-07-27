@@ -16,7 +16,6 @@ use tui_widget_list::{ListBuilder, ListView};
 
 pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let upgrades = app.core.available_upgrades();
-
     let builder = ListBuilder::new(|ctx| {
         let selected = ctx.is_selected;
         let upgrade = upgrades[ctx.index];
@@ -30,7 +29,7 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         (widget, ShopItemWidget::HEIGHT)
     });
 
-    let list_view = ListView::new(builder, app.core.available_upgrades().len());
+    let list_view = ListView::new(builder, upgrades.len());
     let mut list_state = app.list.state_matching_mut(AppListPane::Upgrades);
 
     // This force clamps the list to the upgrade length. It would be nice to not do this
