@@ -2,28 +2,30 @@ use crate::{
     State, macros,
     req::{Cmp, Req},
 };
-use cookie_clicker_tui_utils::{frames::RefreshClock, num};
+use cookie_clicker_tui_utils::{num, refresh::Refresh};
 use serde::{Deserialize, Serialize};
 
+const REFRESH_LOCKED: f64 = 10.0;
+const REFRESH_GROW: f64 = 10.0;
 const UNLOCK_REQ: Req = Req::CookiesAllTime(Cmp::AboveOrEq(1.0 * num::BILLION));
 
 pub fn tick(state: &mut State) {
     match &mut state.sugar_lumps.0 {
-        Inner::Locked { refresh } => {
+        SugarLumpsState::Locked { refresh } => {
             if refresh.finish() {
                 if UNLOCK_REQ.check(state) {
-                    state.sugar_lumps.0 = Inner::Unlocked {
+                    state.sugar_lumps.0 = SugarLumpsState::Unlocked {
                         count: 0,
                         unlocked_just_now: true,
-                        refresh: RefreshClock::new(),
+                        refresh: Refresh::new(REFRESH_GROW),
                     };
                     // borrow again to prevent errors
-                } else if let Inner::Locked { refresh } = &mut state.sugar_lumps.0 {
-                    refresh.restart()
+                } else if let SugarLumpsState::Locked { refresh } = &mut state.sugar_lumps.0 {
+                    refresh.reset()
                 }
             }
         }
-        Inner::Unlocked {
+        SugarLumpsState::Unlocked {
             count,
             unlocked_just_now,
             refresh,
@@ -34,81 +36,56 @@ pub fn tick(state: &mut State) {
                 && let Some(next_count) = count.checked_add(1)
             {
                 *count = next_count;
-                refresh.restart();
+                refresh.reset();
             }
         }
     }
 }
 
 #[derive(Debug)]
-pub struct SugarLumps(Inner);
+pub struct SugarLumps(SugarLumpsState);
 
-#[derive(Debug)]
-enum Inner {
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = "state")]
+enum SugarLumpsState {
     Locked {
-        refresh: RefreshClock<10>,
+        refresh: Refresh,
     },
     Unlocked {
         count: u16,
+        #[serde(default, skip_serializing)]
         unlocked_just_now: bool,
-        refresh: RefreshClock<{ 60 * 60 }>,
+        refresh: Refresh,
     },
 }
 
 impl SugarLumps {
     pub(super) fn new() -> Self {
-        Self(Inner::Locked {
-            refresh: RefreshClock::new(),
+        Self(SugarLumpsState::Locked {
+            refresh: Refresh::new(REFRESH_LOCKED),
         })
-    }
-
-    fn from_repr(repr: Repr) -> Self {
-        Self(match repr {
-            Repr::Locked => Inner::Locked {
-                refresh: RefreshClock::new(),
-            },
-            Repr::Unlocked { count } => Inner::Unlocked {
-                count,
-                unlocked_just_now: false,
-                refresh: RefreshClock::new(),
-            },
-        })
-    }
-
-    fn as_repr(&self) -> Repr {
-        match &self.0 {
-            Inner::Locked { .. } => Repr::Locked,
-            Inner::Unlocked { count, .. } => Repr::Unlocked { count: *count },
-        }
     }
 
     pub fn count(&self) -> u16 {
         match &self.0 {
-            Inner::Locked { .. } => 0,
-            Inner::Unlocked { count, .. } => *count,
+            SugarLumpsState::Locked { .. } => 0,
+            SugarLumpsState::Unlocked { count, .. } => *count,
         }
     }
 
     pub fn unlocked(&self) -> bool {
-        matches!(self.0, Inner::Unlocked { .. })
+        matches!(self.0, SugarLumpsState::Unlocked { .. })
     }
 
     pub fn just_unlocked(&self) -> bool {
         match &self.0 {
-            Inner::Locked { .. } => false,
-            Inner::Unlocked {
+            SugarLumpsState::Locked { .. } => false,
+            SugarLumpsState::Unlocked {
                 unlocked_just_now, ..
             } => *unlocked_just_now,
         }
     }
 }
 
-macros::serialize_via_state!(SugarLumps => Repr as |s| s.as_repr());
-macros::deserialize_via_state!(SugarLumps => Repr as SugarLumps::from_repr);
-
-#[derive(Serialize, Deserialize)]
-#[serde(tag = "state")]
-enum Repr {
-    Locked,
-    Unlocked { count: u16 },
-}
+macros::serialize_via_state!(SugarLumps => SugarLumpsState as |s| s.0);
+macros::deserialize_via_state!(SugarLumps => SugarLumpsState as SugarLumps);

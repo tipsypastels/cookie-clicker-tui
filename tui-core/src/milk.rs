@@ -1,5 +1,5 @@
 use crate::{Achievement, calc, macros};
-use cookie_clicker_tui_utils::frames::RefreshClock;
+use cookie_clicker_tui_utils::refresh::Refresh;
 use enum_fun::{Name, Variants};
 use serde::{Deserialize, Serialize};
 
@@ -9,7 +9,7 @@ const PERCENT_PER_ACHIEVEMENT: u16 = 4;
 pub struct Milk {
     state: MilkState,
     computed: MilkComputed,
-    refresh: RefreshClock<3>,
+    refresh: Refresh,
 }
 
 impl Milk {
@@ -19,7 +19,7 @@ impl Milk {
 
     fn from_state(state: MilkState) -> Self {
         let computed = MilkComputed::new(&state);
-        let refresh = RefreshClock::new();
+        let refresh = Refresh::new(3.0);
 
         Self {
             state,
@@ -34,7 +34,7 @@ impl Milk {
                 self.state.achievements = achievements;
                 self.computed = MilkComputed::new(&self.state);
             }
-            self.refresh.restart();
+            self.refresh.reset();
         }
     }
 

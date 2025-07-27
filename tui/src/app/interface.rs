@@ -1,13 +1,13 @@
 use cookie_clicker_tui_core::{Building, Upgrade};
-use cookie_clicker_tui_utils::{countdown::Countdown, frames::RefreshClock};
+use cookie_clicker_tui_utils::refresh::{Refresh, RefreshOptionExt};
 use enum_assoc::Assoc;
 use ratatui::style::{Style, Stylize};
 use std::collections::{HashSet, VecDeque};
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct AppInterfaceState {
     sell_mode: bool,
-    pressed_cookie: Countdown<3>,
+    pressed_cookie: Option<Refresh>,
     flashes: AppFlashes,
 }
 
@@ -17,7 +17,7 @@ impl AppInterfaceState {
     }
 
     pub fn pressed_cookie(&self) -> bool {
-        self.pressed_cookie.is_running()
+        self.pressed_cookie.is_some()
     }
 
     pub fn flash(&self) -> Option<AppFlash> {
@@ -29,7 +29,7 @@ impl AppInterfaceState {
     }
 
     pub(super) fn set_pressed_cookie(&mut self) {
-        self.pressed_cookie.run();
+        self.pressed_cookie = Some(Refresh::new_frames(3.0));
     }
 
     pub(super) fn add_flash(&mut self, flash: AppFlash) {
@@ -37,16 +37,16 @@ impl AppInterfaceState {
     }
 
     pub(super) fn tick(&mut self) {
-        self.pressed_cookie.tick();
+        self.pressed_cookie.finish_and_set_none();
         self.flashes.tick();
     }
 }
 
-#[derive(Default)]
+#[derive(Debug)]
 struct AppFlashes {
     queue: VecDeque<AppFlash>,
     contains: HashSet<AppFlash>,
-    refresh: RefreshClock<3>,
+    refresh: Refresh,
 }
 
 impl AppFlashes {
@@ -63,7 +63,7 @@ impl AppFlashes {
         }
 
         if self.refresh.finish() {
-            self.refresh.restart();
+            self.refresh.reset();
 
             if let Some(front) = self.queue.pop_front() {
                 self.contains.remove(&front);
@@ -72,8 +72,18 @@ impl AppFlashes {
     }
 }
 
+impl Default for AppFlashes {
+    fn default() -> Self {
+        Self {
+            queue: Default::default(),
+            contains: Default::default(),
+            refresh: Refresh::new(3.0),
+        }
+    }
+}
+
 #[allow(clippy::enum_variant_names)]
-#[derive(Assoc, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Assoc, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[func(pub fn class(self) -> AppFlashClass)]
 pub enum AppFlash {
     #[assoc(class = AppFlashClass::Info)]
@@ -107,9 +117,9 @@ impl AppFlash {
 }
 
 #[derive(Assoc, Copy, Clone)]
-#[func(pub fn title(self) -> &'static str)]
-#[func(pub fn style(self) -> Style)]
-#[func(pub fn border_style(self) -> Style)]
+#[func(fn title(self) -> &'static str)]
+#[func(fn style(self) -> Style)]
+#[func(fn border_style(self) -> Style)]
 enum AppFlashClass {
     #[assoc(title = " Info ", style = Style::new().on_light_blue(), border_style = Style::new().white())]
     Info,

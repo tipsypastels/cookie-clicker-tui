@@ -15,6 +15,10 @@ impl Refresh {
         }
     }
 
+    pub fn new_frames(max: f64) -> Self {
+        Self { cur: 0.0, max }
+    }
+
     pub fn cur(&self) -> f64 {
         self.cur
     }
@@ -56,5 +60,22 @@ impl Refresh {
 
     pub fn modify(&mut self, f: impl FnOnce(&mut f64)) {
         f(&mut self.max);
+    }
+}
+
+pub trait RefreshOptionExt {
+    fn finish_and_set_none(&mut self) -> bool;
+}
+
+impl RefreshOptionExt for Option<Refresh> {
+    fn finish_and_set_none(&mut self) -> bool {
+        if let Some(refresh) = self.as_mut()
+            && refresh.finish()
+        {
+            *self = None;
+            true
+        } else {
+            false
+        }
     }
 }

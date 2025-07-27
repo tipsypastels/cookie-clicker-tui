@@ -2,7 +2,7 @@ use crate::{
     Computed, State, macros,
     req::{Cmp, LateReq},
 };
-use cookie_clicker_tui_utils::{frames::RefreshClock, num};
+use cookie_clicker_tui_utils::{num, refresh::Refresh};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 use serde::{Deserialize, Serialize};
@@ -12,7 +12,7 @@ use std::collections::{BTreeSet, VecDeque};
 // but also &mut Achievements, which is a field of state
 pub fn tick(state: &mut State, computed: &Computed) {
     if state.achievements.refresh.finish() {
-        state.achievements.refresh.restart();
+        state.achievements.refresh.reset();
         state.achievements.display_queue.pop_front();
 
         for achievement in Achievement::variants() {
@@ -32,7 +32,7 @@ pub fn tick(state: &mut State, computed: &Computed) {
 pub struct Achievements {
     owned: BTreeSet<Achievement>,
     display_queue: VecDeque<Achievement>,
-    refresh: RefreshClock<10>,
+    refresh: Refresh,
 }
 
 impl Achievements {
@@ -44,7 +44,7 @@ impl Achievements {
         Self {
             owned,
             display_queue: VecDeque::new(),
-            refresh: RefreshClock::new(),
+            refresh: Refresh::new(10.0),
         }
     }
 

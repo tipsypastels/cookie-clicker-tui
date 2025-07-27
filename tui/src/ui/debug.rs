@@ -24,6 +24,7 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
         AppDebugView::GoldenCookies => format!("{:?}", core.golden_cookies()),
         AppDebugView::News => format!("{:?}", app.news),
         AppDebugView::List => format!("{:?}", app.list.debug(core)),
+        AppDebugView::Interface => format!("{:?}", app.iface),
         AppDebugView::Keypress => {
             if let Some(key) = app.debug.latest_key_event() {
                 format!("{key:?}")

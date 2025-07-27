@@ -1,17 +1,17 @@
 use cookie_clicker_tui_core::{Core, NewsEntry};
-use cookie_clicker_tui_utils::frames::RefreshClock;
+use cookie_clicker_tui_utils::refresh::Refresh;
 use ratatui::{prelude::*, widgets::Paragraph};
 use std::{cell::OnceCell, fmt};
 
 pub struct AppNewsState {
     entry: Option<(NewsEntry, OnceCell<Paragraph<'static>>)>,
-    refresh: RefreshClock<30>,
+    refresh: Refresh,
 }
 
 impl AppNewsState {
     pub(super) fn new(core: &Core) -> Self {
         let entry = core.random_news_entry().map(|e| (e, OnceCell::new()));
-        let refresh = RefreshClock::new();
+        let refresh = Refresh::new(30.0);
 
         Self { entry, refresh }
     }

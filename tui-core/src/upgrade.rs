@@ -8,7 +8,7 @@ pub use effect_info::*;
 
 use self::{grandma_job::GrandmaJob, kitten::Kitten, research::Research, tiered::Tiered};
 use crate::{Building, Cost, State, req::Req};
-use cookie_clicker_tui_utils::{frames::RefreshClock, num};
+use cookie_clicker_tui_utils::{num, refresh::Refresh};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
 use serde::{Deserialize, Serialize};
@@ -38,7 +38,7 @@ impl OwnedUpgrades {
 #[derive(Debug)]
 pub struct AvailableUpgrades {
     list: Box<[Upgrade]>,
-    refresh: RefreshClock<5>,
+    refresh: Refresh,
 }
 
 impl AvailableUpgrades {
@@ -52,7 +52,7 @@ impl AvailableUpgrades {
 
         Self {
             list: v.into(),
-            refresh: RefreshClock::new(),
+            refresh: Refresh::new(5.0),
         }
     }
 

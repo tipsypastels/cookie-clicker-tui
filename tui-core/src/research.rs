@@ -1,51 +1,52 @@
 use crate::macros;
-use cookie_clicker_tui_utils::frames::RefreshClock;
+use cookie_clicker_tui_utils::refresh::Refresh;
+use serde::{Deserialize, Serialize};
 
 #[cfg(debug_assertions)]
-const REFRESH: u32 = 5;
+const REFRESH: f64 = 5.0;
 
 #[cfg(not(debug_assertions))]
-const REFRESH: u32 = 30 * 60;
+const REFRESH: f64 = 30.0 * 60.0;
 
 #[derive(Debug)]
 pub struct Research {
-    completed: u8,
+    state: ResearchState,
     just_completed: bool,
-    // TODO: Persist clocks.
-    refresh: Option<RefreshClock<REFRESH>>,
 }
 
 impl Research {
     pub(crate) fn new() -> Self {
-        Self::from_completed(0)
+        Self::from_state(ResearchState {
+            completed: 0,
+            refresh: None,
+        })
     }
 
-    fn from_completed(completed: u8) -> Self {
+    fn from_state(state: ResearchState) -> Self {
         Self {
-            completed,
+            state,
             just_completed: false,
-            refresh: None,
         }
     }
 
     pub(crate) fn tick(&mut self) {
-        if let Some(refresh) = self.refresh.as_mut()
+        if let Some(refresh) = self.state.refresh.as_mut()
             && refresh.finish()
         {
-            self.completed = self.completed.saturating_add(1);
+            self.state.completed = self.state.completed.saturating_add(1);
             self.just_completed = true;
-            self.refresh = None;
+            self.state.refresh = None;
         } else if self.just_completed {
             self.just_completed = false;
         }
     }
 
     pub(crate) fn start(&mut self) {
-        self.refresh = Some(RefreshClock::new());
+        self.state.refresh = Some(Refresh::new(REFRESH));
     }
 
     pub fn completed(&self) -> u8 {
-        self.completed
+        self.state.completed
     }
 
     pub fn just_completed(&self) -> bool {
@@ -53,5 +54,11 @@ impl Research {
     }
 }
 
-macros::serialize_via_state!(Research => u8 as |r| r.completed);
-macros::deserialize_via_state!(Research => u8 as Research::from_completed);
+#[derive(Serialize, Deserialize, Debug)]
+struct ResearchState {
+    completed: u8,
+    refresh: Option<Refresh>,
+}
+
+macros::serialize_via_state!(Research => ResearchState as |r| r.state);
+macros::deserialize_via_state!(Research => ResearchState as Research::from_state);

@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use cookie_clicker_tui_core::Core;
-use cookie_clicker_tui_utils::frames::RefreshClock;
+use cookie_clicker_tui_utils::refresh::Refresh;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tokio::fs;
@@ -40,7 +40,7 @@ enum Inner {
 #[derive(Debug)]
 struct PersistedShared {
     path: Box<Path>,
-    refresh: RefreshClock<10>,
+    refresh: Refresh,
     notify_on_autosave: bool,
     notify_just_saved: bool,
 }
@@ -60,7 +60,7 @@ impl Save {
 
                 let shared = PersistedShared {
                     path,
-                    refresh: RefreshClock::new(),
+                    refresh: Refresh::new(10.0),
                     notify_on_autosave,
                     notify_just_saved: false,
                 };
@@ -168,7 +168,7 @@ impl Save {
         shared.notify_just_saved = false;
 
         if shared.refresh.finish() {
-            shared.refresh.restart();
+            shared.refresh.reset();
             self._save(core, bakery_name, true).await
         } else {
             Ok(())

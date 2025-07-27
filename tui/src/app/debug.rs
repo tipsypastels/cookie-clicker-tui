@@ -25,6 +25,7 @@ pub enum AppDebugView {
     GoldenCookies,
     News,
     List,
+    Interface,
     Keypress,
     Save,
 }
