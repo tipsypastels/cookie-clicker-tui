@@ -70,8 +70,8 @@ impl Buildings {
         self.state.buildings.grandma_job_upgrade_count()
     }
 
-    pub fn has_sold_a_grandma(&self) -> bool {
-        self.state.flags.has_sold_a_grandma
+    pub fn grandma_been_sold(&self) -> bool {
+        self.state.flags.grandma_been_sold
     }
 
     pub fn modify_count(&mut self, building: Building, f: impl FnOnce(&mut u16)) {
@@ -83,7 +83,7 @@ impl Buildings {
             self.recompute(Building::Cursor);
         }
 
-        if self.state.flags.grandma_has_0_05_per_portal && building.is_portal() {
+        if self.state.flags.grandma_has_elder_pact && building.is_portal() {
             self.recompute(Building::Grandma);
         }
 
@@ -114,28 +114,28 @@ impl Buildings {
         self.recompute(Building::Cursor);
     }
 
-    pub fn set_has_sold_a_grandma(&mut self, enable: bool) {
-        self.state.flags.has_sold_a_grandma = enable;
-    }
-
-    pub fn set_grandma_has_bingo_center_4x(&mut self, enable: bool) {
-        self.state.flags.grandma_has_bingo_center_4x = enable;
+    pub fn set_grandma_has_bingo_center(&mut self, enable: bool) {
+        self.state.flags.grandma_has_bingo_center = enable;
         self.recompute(Building::Grandma);
     }
 
-    pub fn set_grandma_has_0_02_per_grandma(&mut self, enable: bool) {
-        self.state.flags.grandma_has_0_02_per_grandma = enable;
+    pub fn set_grandma_has_one_mind(&mut self, enable: bool) {
+        self.state.flags.grandma_has_one_mind = enable;
         self.recompute(Building::Grandma);
     }
 
-    pub fn set_grandma_has_0_02_per_grandma_2(&mut self, enable: bool) {
-        self.state.flags.grandma_has_0_02_per_grandma_2 = enable;
+    pub fn set_grandma_has_communal_brainsweep(&mut self, enable: bool) {
+        self.state.flags.grandma_has_communal_brainsweep = enable;
         self.recompute(Building::Grandma);
     }
 
-    pub fn set_grandma_has_0_05_per_portal(&mut self, enable: bool) {
-        self.state.flags.grandma_has_0_05_per_portal = enable;
+    pub fn set_grandma_has_elder_pact(&mut self, enable: bool) {
+        self.state.flags.grandma_has_elder_pact = enable;
         self.recompute(Building::Grandma);
+    }
+
+    pub fn set_grandma_been_sold(&mut self, enable: bool) {
+        self.state.flags.grandma_been_sold = enable;
     }
 
     fn modify(&mut self, building: Building, f: impl FnOnce(&mut BuildingState)) {
@@ -186,11 +186,11 @@ impl BuildingsComputed {
 #[derive(Serialize, Deserialize, Default, Debug)]
 struct BuildingsFlags {
     thousand_fingers_mult: Option<f64>,
-    grandma_has_bingo_center_4x: bool,
-    grandma_has_0_02_per_grandma: bool,
-    grandma_has_0_02_per_grandma_2: bool,
-    grandma_has_0_05_per_portal: bool,
-    has_sold_a_grandma: bool,
+    grandma_has_bingo_center: bool,
+    grandma_has_one_mind: bool,
+    grandma_has_communal_brainsweep: bool,
+    grandma_has_elder_pact: bool,
+    grandma_been_sold: bool,
 }
 
 #[derive(
@@ -359,7 +359,12 @@ impl BuildingComputed {
                     }),
             },
             Building::Grandma => calc::BuildingCpsClass::Grandma {
-                has_bingo_center_4x: flags.grandma_has_bingo_center_4x,
+                has_bingo_center: flags.grandma_has_bingo_center,
+                has_one_mind: flags.grandma_has_one_mind,
+                has_communal_brainsweep: flags.grandma_has_communal_brainsweep,
+                elder_pact_portal_count: flags
+                    .grandma_has_elder_pact
+                    .then_some(buildings.portal.count),
                 job_upgrade_count: buildings.grandma_job_upgrade_count(),
             },
             _ => calc::BuildingCpsClass::Other {
@@ -369,34 +374,11 @@ impl BuildingComputed {
             },
         };
 
-        let addl_cps_per_owned_building_counts = if building.is_grandma() {
-            either::Left(
-                [0.02, 0.02, 0.05]
-                    .into_iter()
-                    .enumerate()
-                    .filter_map(|it| match it {
-                        (0, mult) if flags.grandma_has_0_02_per_grandma => {
-                            Some((state.count, mult))
-                        }
-                        (1, mult) if flags.grandma_has_0_02_per_grandma_2 => {
-                            Some((state.count, mult))
-                        }
-                        (2, mult) if flags.grandma_has_0_05_per_portal => {
-                            Some((buildings.portal.count, mult))
-                        }
-                        _ => None,
-                    }),
-            )
-        } else {
-            either::Right(std::iter::empty())
-        };
-
         let cps = calc::building_cps(
             building,
             building_class,
             state.count,
             state.tiered_upgrade_count,
-            addl_cps_per_owned_building_counts,
         );
 
         Self {

@@ -53,7 +53,7 @@ impl Research {
     pub fn buy(&self, state: &mut State) {
         match self {
             Self::BingoCenterResearchFacility => {
-                state.buildings.set_grandma_has_bingo_center_4x(true);
+                state.buildings.set_grandma_has_bingo_center(true);
             }
             Self::SpecializedChocolateChips => {
                 state.grandmapocalypse.add_cps_mult(1.01);
@@ -66,7 +66,7 @@ impl Research {
                 state.grandmapocalypse.add_cps_mult(1.03);
             }
             Self::OneMind => {
-                state.buildings.set_grandma_has_0_02_per_grandma(true);
+                state.buildings.set_grandma_has_one_mind(true);
                 state
                     .grandmapocalypse
                     .set_phase(GrandmapocalypsePhase::Awoken);
@@ -75,7 +75,7 @@ impl Research {
                 state.grandmapocalypse.add_cps_mult(1.04);
             }
             Self::CommunalBrainsweep => {
-                state.buildings.set_grandma_has_0_02_per_grandma_2(true);
+                state.buildings.set_grandma_has_communal_brainsweep(true);
                 state
                     .grandmapocalypse
                     .set_phase(GrandmapocalypsePhase::Displeased);
@@ -84,7 +84,7 @@ impl Research {
                 state.grandmapocalypse.add_cps_mult(1.05);
             }
             Self::ElderPact => {
-                state.buildings.set_grandma_has_0_05_per_portal(true);
+                state.buildings.set_grandma_has_elder_pact(true);
                 state
                     .grandmapocalypse
                     .set_phase(GrandmapocalypsePhase::Angered);

@@ -262,7 +262,6 @@ dependencies = [
  "approx-eq-trait",
  "cookie-clicker-tui-calc",
  "cookie-clicker-tui-utils",
- "either",
  "enum-assoc",
  "enum-fun",
  "rand",

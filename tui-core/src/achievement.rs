@@ -747,7 +747,7 @@ impl AchievementReq {
             Self::GoldenCookieClickedAtMost1sBeforeDespawn => {
                 LateReq::GoldenCookieClickedAtMost1sBeforeDespawn()
             }
-            Self::SellAGrandma => LateReq::Custom(|state, _| state.buildings.has_sold_a_grandma()),
+            Self::SellAGrandma => LateReq::Custom(|state, _| state.buildings.grandma_been_sold()),
         }
     }
 }

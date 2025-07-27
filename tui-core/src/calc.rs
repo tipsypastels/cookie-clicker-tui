@@ -14,23 +14,18 @@ pub fn cps(state: &State) -> f64 {
     calc::cps::Cps::new(base, addl).total
 }
 
-pub fn building_cps<AddlCpsPerOwnedBuildingCounts>(
+pub fn building_cps(
     building: Building,
     building_class: BuildingCpsClass,
     count: u16,
     tiered_upgrade_count: u16,
-    addl_cps_per_owned_building_counts: AddlCpsPerOwnedBuildingCounts,
-) -> f64
-where
-    AddlCpsPerOwnedBuildingCounts: Iterator<Item = (u16, f64)>,
-{
+) -> f64 {
     calc::cps::building::Cps {
         building_no: building as u16,
         building_base_cps: building.base_cps(),
         building_class,
         count,
         tiered_upgrade_count,
-        addl_cps_per_owned_building_counts,
     }
     .calc()
 }

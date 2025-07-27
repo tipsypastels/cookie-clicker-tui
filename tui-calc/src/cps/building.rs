@@ -1,12 +1,11 @@
 use crate::{thousand_fingers::ThousandFingers, upgrade::grandma_job_num_req_for_1p};
 
-pub struct Cps<AddlCpsPerOwnedBuildingCounts> {
+pub struct Cps {
     pub building_no: u16,
     pub building_base_cps: f64,
     pub building_class: CpsClass,
     pub count: u16,
     pub tiered_upgrade_count: u16,
-    pub addl_cps_per_owned_building_counts: AddlCpsPerOwnedBuildingCounts,
 }
 
 pub enum CpsClass {
@@ -14,7 +13,10 @@ pub enum CpsClass {
         thousand_fingers: Option<ThousandFingers>,
     },
     Grandma {
-        has_bingo_center_4x: bool,
+        has_bingo_center: bool,
+        has_one_mind: bool,
+        has_communal_brainsweep: bool,
+        elder_pact_portal_count: Option<u16>,
         job_upgrade_count: u16,
     },
     Other {
@@ -22,10 +24,7 @@ pub enum CpsClass {
     },
 }
 
-impl<AddlCpsPerOwnedBuildingCounts> Cps<AddlCpsPerOwnedBuildingCounts>
-where
-    AddlCpsPerOwnedBuildingCounts: Iterator<Item = (u16, f64)>,
-{
+impl Cps {
     pub fn calc(self) -> f64 {
         let Self {
             building_no,
@@ -33,7 +32,6 @@ where
             building_class,
             count,
             tiered_upgrade_count,
-            addl_cps_per_owned_building_counts,
         } = self;
 
         let cps = building_base_cps * count as f64 * 2.0f64.powi(tiered_upgrade_count as i32);
@@ -46,11 +44,29 @@ where
                 thousand_fingers: Some(thousand_fingers),
             } => cps + thousand_fingers.calc(),
             CpsClass::Grandma {
-                has_bingo_center_4x,
+                has_bingo_center,
+                has_one_mind,
+                has_communal_brainsweep,
+                elder_pact_portal_count,
                 job_upgrade_count,
             } => {
-                cps * if has_bingo_center_4x { 4.0 } else { 1.0 }
+                cps * if has_bingo_center { 4.0 } else { 1.0 }
                     * 2.0f64.powi(job_upgrade_count as i32)
+                    + if has_one_mind {
+                        0.02 * count as f64
+                    } else {
+                        0.0
+                    }
+                    + if has_communal_brainsweep {
+                        0.02 * count as f64
+                    } else {
+                        0.0
+                    }
+                    + if let Some(portal_count) = elder_pact_portal_count {
+                        0.05 * portal_count as f64
+                    } else {
+                        0.0
+                    }
             }
             CpsClass::Other {
                 grandma_count: None,
@@ -69,11 +85,6 @@ where
                 }
             }
         };
-
-        let cps = cps
-            + addl_cps_per_owned_building_counts
-                .map(|(count, cps)| count as f64 * cps)
-                .sum::<f64>();
 
         cps
     }

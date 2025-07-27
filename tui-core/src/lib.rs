@@ -192,8 +192,10 @@ impl Core {
             }
         }
 
+        // TODO: Consider implementing this into `modify_count`
+        // unless there are other ways to lose a grandma.
         if building.is_grandma() {
-            self.state.buildings.set_has_sold_a_grandma(true);
+            self.state.buildings.set_grandma_been_sold(true);
         }
 
         self.take_building(building);
