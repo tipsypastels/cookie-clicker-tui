@@ -186,6 +186,10 @@ impl Core {
             }
         }
 
+        if building.is_grandma() {
+            self.state.buildings.set_has_sold_a_grandma();
+        }
+
         self.take_building(building);
         true
     }

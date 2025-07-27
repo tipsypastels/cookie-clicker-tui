@@ -324,6 +324,8 @@ pub enum Achievement {
     #[assoc(req = AchievementReq::GoldenCookieClickedAtMost1sBeforeDespawn)]
     FadingLuck,
     // TODO: Add other achievements for grandmas and all the other shit.
+    #[assoc(req = AchievementReq::HasSoldAGrandma)]
+    JustWrong,
     #[assoc(req = AchievementReq::GrandmaJobCount(7))]
     Elder,
 }
@@ -335,6 +337,7 @@ pub enum AchievementReq {
     GoldenCookieClickedCount(usize),
     GoldenCookieClickedAtMost1sAfterSpawn,
     GoldenCookieClickedAtMost1sBeforeDespawn,
+    HasSoldAGrandma,
 }
 
 impl AchievementReq {
@@ -350,6 +353,7 @@ impl AchievementReq {
             Self::GoldenCookieClickedAtMost1sBeforeDespawn => {
                 LateReq::GoldenCookieClickedAtMost1sBeforeDespawn()
             }
+            Self::HasSoldAGrandma => LateReq::HasSoldAGrandma(),
         }
     }
 }

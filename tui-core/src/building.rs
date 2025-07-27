@@ -139,6 +139,10 @@ impl Buildings {
         &self.flags
     }
 
+    pub fn has_sold_a_grandma(&self) -> bool {
+        self.flags.has_sold_a_grandma
+    }
+
     pub fn grandma_job_upgrade_count(&self) -> u16 {
         self.states.grandma_job_upgrade_count()
     }
@@ -151,6 +155,10 @@ impl Buildings {
     pub fn recompute(&mut self, building: Building) {
         *self.computeds.get_mut(building) =
             BuildingComputed::new(&self.states, &self.flags, building);
+    }
+
+    pub fn set_has_sold_a_grandma(&mut self) {
+        self.flags.has_sold_a_grandma = true;
     }
 
     pub fn set_grandma_has_bingo_center_4x(&mut self, enable: bool) {
@@ -321,4 +329,5 @@ impl BuildingMap<BuildingState> {
 #[derive(Default, Debug)]
 pub struct BuildingsFlags {
     grandma_has_bingo_center_4x: bool,
+    has_sold_a_grandma: bool,
 }

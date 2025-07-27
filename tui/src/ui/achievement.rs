@@ -46,6 +46,7 @@ pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         AchievementReq::GoldenCookieClickedAtMost1sBeforeDespawn => {
             "• click a golden cookie at the last second".into()
         }
+        AchievementReq::HasSoldAGrandma => "• sell a grandma".into(),
     };
 
     let area = split_area(area);

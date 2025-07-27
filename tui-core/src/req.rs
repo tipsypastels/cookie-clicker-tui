@@ -15,6 +15,7 @@ pub enum Req {
     GoldenCookieClicked(Cmp<usize>),
     GoldenCookieClickedAtMost1sAfterSpawn(),
     GoldenCookieClickedAtMost1sBeforeDespawn(),
+    HasSoldAGrandma(),
     Custom(fn(&State) -> bool),
     Any(&'static [Req]),
     AnyBox(Box<[Req]>),
@@ -42,6 +43,7 @@ impl Req {
             Self::GoldenCookieClickedAtMost1sBeforeDespawn() => {
                 state.golden_cookies.clicked_one_at_most_1s_before_despawn()
             }
+            Self::HasSoldAGrandma() => state.buildings.has_sold_a_grandma(),
             Self::Custom(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state)),
@@ -85,6 +87,7 @@ impl LateReq {
         GoldenCookieClicked(c: Cmp<usize>);
         GoldenCookieClickedAtMost1sAfterSpawn();
         GoldenCookieClickedAtMost1sBeforeDespawn();
+        HasSoldAGrandma();
     }
 
     pub fn check(&self, state: &State, computed: &Computed) -> bool {
