@@ -6,6 +6,7 @@ pub enum Req {
     CookiesAllTime(Cmp<f64>),
     CookiesAllTimeFromClicking(Cmp<f64>),
     BuildingCount(Building, Cmp<u16>),
+    BuildingCookiesAllTime(Building, Cmp<f64>),
     ResearchCompleted(Cmp<u8>),
     Achievement(Achievement),
     AchievementCount(Cmp<usize>),
@@ -15,8 +16,8 @@ pub enum Req {
     GoldenCookieClicked(Cmp<usize>),
     GoldenCookieClickedAtMost1sAfterSpawn(),
     GoldenCookieClickedAtMost1sBeforeDespawn(),
-    HasSoldAGrandma(),
     Custom(fn(&State) -> bool),
+    CustomBox(Box<dyn Fn(&State) -> bool>),
     Any(&'static [Req]),
     AnyBox(Box<[Req]>),
     All(&'static [Req]),
@@ -30,6 +31,9 @@ impl Req {
             Self::CookiesAllTime(c) => c.check(state.cookies.all_time()),
             Self::CookiesAllTimeFromClicking(c) => c.check(state.cookies.all_time_from_clicking()),
             Self::BuildingCount(b, c) => c.check(state.buildings.count(*b)),
+            Self::BuildingCookiesAllTime(b, c) => {
+                c.check(state.buildings.state(*b).cookies_all_time)
+            }
             Self::ResearchCompleted(c) => c.check(state.research.completed()),
             Self::Achievement(a) => state.achievements.owned().contains(a),
             Self::AchievementCount(c) => c.check(state.achievements.owned().len()),
@@ -43,8 +47,8 @@ impl Req {
             Self::GoldenCookieClickedAtMost1sBeforeDespawn() => {
                 state.golden_cookies.clicked_one_at_most_1s_before_despawn()
             }
-            Self::HasSoldAGrandma() => state.buildings.has_sold_a_grandma(),
             Self::Custom(f) => f(state),
+            Self::CustomBox(f) => f(state),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state)),
             Self::All(reqs) => reqs.iter().all(|r| r.check(state)),
@@ -53,11 +57,12 @@ impl Req {
     }
 }
 
-#[allow(unused)]
+#[allow(unused, clippy::type_complexity)]
 pub enum LateReq {
     Req(Req),
     Cps(Cmp<f64>),
     Custom(fn(&State, &Computed) -> bool),
+    CustomBox(Box<dyn Fn(&State, &Computed) -> bool>),
     Any(&'static [LateReq]),
     AnyBox(Box<[LateReq]>),
     All(&'static [LateReq]),
@@ -78,6 +83,7 @@ impl LateReq {
         CookiesAllTime(c: Cmp<f64>);
         CookiesAllTimeFromClicking(c: Cmp<f64>);
         BuildingCount(b: Building, c: Cmp<u16>);
+        BuildingCookiesAllTime(b: Building, c: Cmp<f64>);
         ResearchCompleted(c: Cmp<u8>);
         Achievement(a: Achievement);
         AchievementCount(c: Cmp<usize>);
@@ -87,7 +93,6 @@ impl LateReq {
         GoldenCookieClicked(c: Cmp<usize>);
         GoldenCookieClickedAtMost1sAfterSpawn();
         GoldenCookieClickedAtMost1sBeforeDespawn();
-        HasSoldAGrandma();
     }
 
     pub fn check(&self, state: &State, computed: &Computed) -> bool {
@@ -95,6 +100,7 @@ impl LateReq {
             Self::Req(req) => req.check(state),
             Self::Cps(c) => c.check(computed.cps),
             Self::Custom(f) => f(state, computed),
+            Self::CustomBox(f) => f(state, computed),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state, computed)),
             Self::AnyBox(reqs) => reqs.iter().any(|r| r.check(state, computed)),
             Self::All(reqs) => reqs.iter().all(|r| r.check(state, computed)),

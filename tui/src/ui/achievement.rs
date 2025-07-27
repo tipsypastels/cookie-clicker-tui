@@ -26,6 +26,28 @@ pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
             pluralized(n as _, "cookie", "cookies")
         )
         .into(),
+        AchievementReq::CookiesBakedFromClicking(n) => format!(
+            "• bake {} {} from clicking",
+            n.print_float(0, 0),
+            pluralized(n as _, "cookie", "cookies")
+        )
+        .into(),
+        AchievementReq::BuildingCount(b, n) => {
+            format!("• have {n} {}", b.name_lower_pluralized(n as _)).into()
+        }
+        AchievementReq::BuildingCombinedCount(b1, b2, n) => format!(
+            "• have a total of {n} {} and {}",
+            b1.name_lower_pluralized(n as _),
+            b2.name_lower_pluralized(n as _)
+        )
+        .into(),
+        AchievementReq::BuildingCookiesBaked(b, n) => format!(
+            "• bake {} {} with {}",
+            n.print_float(0, 0),
+            pluralized(n as _, "cookie", "cookies"),
+            b.name_lower_plural()
+        )
+        .into(),
         AchievementReq::Cps(n) => format!(
             "• bake {} {} per second",
             n.print_float(0, 0),
@@ -46,7 +68,7 @@ pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         AchievementReq::GoldenCookieClickedAtMost1sBeforeDespawn => {
             "• click a golden cookie at the last second".into()
         }
-        AchievementReq::HasSoldAGrandma => "• sell a grandma".into(),
+        AchievementReq::SellAGrandma => "• sell a grandma".into(),
     };
 
     let area = split_area(area);

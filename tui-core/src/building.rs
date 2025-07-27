@@ -255,10 +255,10 @@ pub struct BuildingState {
     pub addl_cps_per_owned_building: Vec<(Building, f64)>,
 }
 
-pub struct BuildingComputed {
-    pub cost: f64,
-    pub sell_cost: f64,
-    pub cps: f64,
+struct BuildingComputed {
+    cost: f64,
+    sell_cost: f64,
+    cps: f64,
 }
 
 impl BuildingComputed {
