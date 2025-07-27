@@ -91,11 +91,7 @@ impl Buildings {
     }
 
     fn from_state(state: BuildingsState) -> Self {
-        let computed = BuildingsComputed {
-            buildings: BuildingMap::new(|b| {
-                BuildingComputed::new(&state.buildings, &state.flags, b)
-            }),
-        };
+        let computed = BuildingsComputed::new(&state);
         Self { state, computed }
     }
 
@@ -151,6 +147,7 @@ impl Buildings {
     pub fn recompute(&mut self, building: Building) {
         *self.computed.buildings.get_mut(building) =
             BuildingComputed::new(&self.state.buildings, &self.state.flags, building);
+        self.computed.buildings_count = self.state.buildings.count();
     }
 
     pub fn set_has_sold_a_grandma(&mut self, enable: bool) {
@@ -181,6 +178,18 @@ struct BuildingsState {
 
 struct BuildingsComputed {
     buildings: BuildingMap<BuildingComputed>,
+    buildings_count: u16,
+}
+
+impl BuildingsComputed {
+    fn new(state: &BuildingsState) -> Self {
+        Self {
+            buildings: BuildingMap::new(|b| {
+                BuildingComputed::new(&state.buildings, &state.flags, b)
+            }),
+            buildings_count: state.buildings.count(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
@@ -332,6 +341,10 @@ enum_map! {
 }
 
 impl BuildingMap<BuildingState> {
+    fn count(&self) -> u16 {
+        Building::variants().map(|b| self.get(b).count).sum()
+    }
+
     fn grandma_job_upgrade_count(&self) -> u16 {
         Building::variants()
             .map(|b| self.get(b).has_grandma_job_upgrade as u16)
