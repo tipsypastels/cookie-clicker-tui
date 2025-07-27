@@ -1,7 +1,7 @@
-use crate::{Achievement, calc};
+use crate::{Achievement, calc, macros};
 use cookie_clicker_tui_utils::frames::RefreshClock;
 use enum_fun::{Name, Variants};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 
 const PERCENT_PER_ACHIEVEMENT: u16 = 4;
 
@@ -64,17 +64,8 @@ impl Milk {
     }
 }
 
-impl Serialize for Milk {
-    fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        self.state.serialize(ser)
-    }
-}
-
-impl<'de> Deserialize<'de> for Milk {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        MilkState::deserialize(de).map(Self::from_state)
-    }
-}
+macros::serialize_via_state!(Milk => MilkState as |m| m.state);
+macros::deserialize_via_state!(Milk => MilkState as Milk::from_state);
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 struct MilkState {

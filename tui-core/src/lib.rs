@@ -33,10 +33,9 @@ use self::{
     achievement::Achievements,
     building::Buildings,
     cookies::Cookies,
-    macros::impl_serde_from_state,
     upgrade::{AvailableUpgrades, OwnedUpgrades},
 };
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use std::{collections::BTreeSet, fmt};
 
 pub struct Core {
@@ -267,7 +266,8 @@ impl Default for Core {
     }
 }
 
-impl_serde_from_state!(Core as state: State);
+macros::serialize_via_state!(Core => State as |c| c.state);
+macros::deserialize_via_state!(Core => State as Core::from_state);
 
 #[derive(Serialize, Deserialize)]
 struct State {

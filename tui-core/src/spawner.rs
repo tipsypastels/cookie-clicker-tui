@@ -1,7 +1,6 @@
+use crate::macros;
 use cookie_clicker_tui_utils::frames::FPS;
 use serde::{Deserialize, Serialize};
-
-use crate::macros::impl_serde_from_state;
 
 #[derive(Debug)]
 pub struct Spawner {
@@ -33,7 +32,8 @@ impl Spawner {
     }
 }
 
-impl_serde_from_state!(Spawner as state: SpawnerState);
+macros::serialize_via_state!(Spawner => SpawnerState as |s| s.state);
+macros::deserialize_via_state!(Spawner => SpawnerState as Spawner::from_state);
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SpawnerState {

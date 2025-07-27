@@ -1,8 +1,8 @@
-use crate::{Cost, calc};
+use crate::{Cost, calc, macros};
 use cookie_clicker_tui_utils::{enum_map, frames::FPS, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Predicates, Variants};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 #[derive(
@@ -165,17 +165,8 @@ impl fmt::Debug for Buildings {
     }
 }
 
-impl Serialize for Buildings {
-    fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        self.states.serialize(ser)
-    }
-}
-
-impl<'de> Deserialize<'de> for Buildings {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        BuildingMap::deserialize(de).map(Self::from_states)
-    }
-}
+macros::serialize_via_state!(Buildings => BuildingMap<BuildingState> as |b| b.states);
+macros::deserialize_via_state!(Buildings => BuildingMap<BuildingState> as Buildings::from_states);
 
 pub struct BuildingInfo<'a> {
     building: Building,

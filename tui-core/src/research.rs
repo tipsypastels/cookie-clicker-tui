@@ -1,5 +1,5 @@
+use crate::macros;
 use cookie_clicker_tui_utils::frames::RefreshClock;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[cfg(debug_assertions)]
 const REFRESH: u32 = 5;
@@ -53,14 +53,5 @@ impl Research {
     }
 }
 
-impl Serialize for Research {
-    fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        self.completed.serialize(ser)
-    }
-}
-
-impl<'de> Deserialize<'de> for Research {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        u8::deserialize(de).map(Self::from_completed)
-    }
-}
+macros::serialize_via_state!(Research => u8 as |r| r.completed);
+macros::deserialize_via_state!(Research => u8 as Research::from_completed);

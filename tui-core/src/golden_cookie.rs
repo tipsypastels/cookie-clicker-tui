@@ -1,4 +1,4 @@
-use crate::{macros::impl_serde_from_state, spawner::Spawner};
+use crate::{macros, spawner::Spawner};
 use cookie_clicker_tui_utils::refresh::Refresh;
 use enum_assoc::Assoc;
 use enum_fun::Variants;
@@ -81,7 +81,8 @@ impl GoldenCookies {
     }
 }
 
-impl_serde_from_state!(GoldenCookies as state: GoldenCookieState);
+macros::serialize_via_state!(GoldenCookies => GoldenCookieState as |gc| gc.state);
+macros::deserialize_via_state!(GoldenCookies => GoldenCookieState as GoldenCookies::from_state);
 
 #[derive(Serialize, Deserialize, Debug)]
 struct GoldenCookieState {

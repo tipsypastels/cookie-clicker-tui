@@ -271,6 +271,9 @@ dependencies = [
 [[package]]
 name = "cookie-clicker-tui-utils"
 version = "0.1.0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "crossterm"

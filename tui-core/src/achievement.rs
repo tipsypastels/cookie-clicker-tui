@@ -1,11 +1,11 @@
 use crate::{
-    Computed, State,
+    Computed, State, macros,
     req::{Cmp, LateReq},
 };
 use cookie_clicker_tui_utils::{frames::RefreshClock, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use std::collections::{BTreeSet, VecDeque};
 
 // can't be a method since we need to access &state
@@ -57,17 +57,8 @@ impl Achievements {
     }
 }
 
-impl Serialize for Achievements {
-    fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        self.owned.serialize(ser)
-    }
-}
-
-impl<'de> Deserialize<'de> for Achievements {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        BTreeSet::deserialize(de).map(Self::from_owned)
-    }
-}
+macros::serialize_via_state!(Achievements => BTreeSet<Achievement> as |a| a.owned);
+macros::deserialize_via_state!(Achievements => BTreeSet<Achievement> as Achievements::from_owned);
 
 #[derive(
     Assoc,

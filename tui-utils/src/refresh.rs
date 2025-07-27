@@ -1,6 +1,7 @@
 use crate::frames::FPS;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Refresh {
     cur: f64,
     max: f64,

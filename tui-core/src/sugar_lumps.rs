@@ -1,9 +1,9 @@
 use crate::{
-    State,
+    State, macros,
     req::{Cmp, Req},
 };
 use cookie_clicker_tui_utils::{frames::RefreshClock, num};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 
 const UNLOCK_REQ: Req = Req::CookiesAllTime(Cmp::AboveOrEq(1.0 * num::BILLION));
 
@@ -103,17 +103,8 @@ impl SugarLumps {
     }
 }
 
-impl Serialize for SugarLumps {
-    fn serialize<S: Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        self.as_repr().serialize(ser)
-    }
-}
-
-impl<'de> Deserialize<'de> for SugarLumps {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> Result<Self, D::Error> {
-        Repr::deserialize(de).map(Self::from_repr)
-    }
-}
+macros::serialize_via_state!(SugarLumps => Repr as |s| s.as_repr());
+macros::deserialize_via_state!(SugarLumps => Repr as SugarLumps::from_repr);
 
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "state")]
