@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct Click {
     state: ClickState,
     cpc: f64,
-    buildings_count: Option<u16>,
+    non_cursor_buildings_count: Option<u16>,
 }
 
 impl Click {
@@ -17,7 +17,7 @@ impl Click {
         Self {
             state,
             cpc: 1.0,
-            buildings_count: None,
+            non_cursor_buildings_count: None,
         }
     }
 
@@ -25,8 +25,8 @@ impl Click {
         self.cpc
     }
 
-    pub fn set_buildings_count(&mut self, count: u16) {
-        self.buildings_count = Some(count);
+    pub fn set_non_cursor_buildings_count(&mut self, count: u16) {
+        self.non_cursor_buildings_count = Some(count);
         self.recalc_cpc();
     }
 
@@ -36,7 +36,10 @@ impl Click {
     }
 
     fn recalc_cpc(&mut self) {
-        self.cpc = calc::cpc(self.buildings_count.zip(self.state.thousand_fingers_mult));
+        self.cpc = calc::cpc(
+            self.non_cursor_buildings_count
+                .zip(self.state.thousand_fingers_mult),
+        );
     }
 }
 

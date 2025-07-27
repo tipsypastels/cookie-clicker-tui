@@ -332,7 +332,9 @@ impl State {
 
     fn tick(&mut self, computed: &Computed) {
         if self.buildings.total_count_just_changed() {
-            self.click.set_buildings_count(self.buildings.total_count());
+            self.click.set_non_cursor_buildings_count(
+                self.buildings.total_count() - self.buildings.count(Building::Cursor),
+            );
         }
 
         self.cookies.tick(computed.cps);

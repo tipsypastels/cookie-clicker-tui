@@ -45,9 +45,9 @@ pub fn kitten_cps_mult(milk_percentage: u16, kitten_factors: &[f64]) -> f64 {
 
 pub fn cpc(thousand_fingers: Option<(u16, f64)>) -> f64 {
     match thousand_fingers {
-        Some((buildings_count, mult)) => {
+        Some((non_cursor_buildings_count, mult)) => {
             calc::cpc::Cpc::ThousandFingers(calc::thousand_fingers::ThousandFingers {
-                buildings_count,
+                non_cursor_buildings_count,
                 mult,
             })
         }
