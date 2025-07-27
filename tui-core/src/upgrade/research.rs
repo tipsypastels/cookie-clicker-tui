@@ -66,10 +66,11 @@ impl Research {
                 state.grandmapocalypse.add_cps_mult(1.03);
             }
             Self::OneMind => {
-                state.buildings.modify(Building::Grandma, |b| {
-                    b.addl_cps_per_owned_building
-                        .push((Building::Grandma, 0.02));
-                });
+                state
+                    .buildings
+                    .modify_addl_cps_per_owned_building(Building::Grandma, |addl| {
+                        addl.push((Building::Grandma, 0.02));
+                    });
 
                 state
                     .grandmapocalypse
@@ -79,10 +80,11 @@ impl Research {
                 state.grandmapocalypse.add_cps_mult(1.04);
             }
             Self::CommunalBrainsweep => {
-                state.buildings.modify(Building::Grandma, |b| {
-                    b.addl_cps_per_owned_building
-                        .push((Building::Grandma, 0.02));
-                });
+                state
+                    .buildings
+                    .modify_addl_cps_per_owned_building(Building::Grandma, |addl| {
+                        addl.push((Building::Grandma, 0.02));
+                    });
 
                 state
                     .grandmapocalypse
@@ -92,9 +94,11 @@ impl Research {
                 state.grandmapocalypse.add_cps_mult(1.05);
             }
             Self::ElderPact => {
-                state.buildings.modify(Building::Grandma, |b| {
-                    b.addl_cps_per_owned_building.push((Building::Portal, 0.05));
-                });
+                state
+                    .buildings
+                    .modify_addl_cps_per_owned_building(Building::Grandma, |addl| {
+                        addl.push((Building::Portal, 0.05));
+                    });
 
                 state
                     .grandmapocalypse

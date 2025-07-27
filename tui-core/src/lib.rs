@@ -147,13 +147,13 @@ impl Core {
     }
 
     pub fn give_building(&mut self, building: Building) {
-        self.state.buildings.modify(building, |b| b.count += 1);
+        self.state.buildings.modify_count(building, |c| *c += 1);
         self.computed.recalc_cps(&self.state);
         self.computed.recalc_available_upgrades(&self.state);
     }
 
     pub fn take_building(&mut self, building: Building) {
-        self.state.buildings.modify(building, |b| b.count -= 1);
+        self.state.buildings.modify_count(building, |c| *c -= 1);
         self.computed.recalc_cps(&self.state);
         self.computed.recalc_available_upgrades(&self.state);
     }

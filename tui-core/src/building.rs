@@ -27,7 +27,7 @@ impl Buildings {
             state.cookies_all_time += cps / FPS;
         }
 
-        self.computed.buildings_count_just_changed = false;
+        self.computed.total_count_just_changed = false;
     }
 
     pub fn infos(&self) -> impl Iterator<Item = BuildingInfo> {
@@ -55,11 +55,11 @@ impl Buildings {
     }
 
     pub fn total_count(&self) -> u16 {
-        self.computed.buildings_count
+        self.computed.total_count
     }
 
     pub fn total_count_just_changed(&self) -> bool {
-        self.computed.buildings_count_just_changed
+        self.computed.total_count_just_changed
     }
 
     pub fn debug_flags(&self) -> impl fmt::Debug {
@@ -74,27 +74,45 @@ impl Buildings {
         self.state.flags.has_sold_a_grandma
     }
 
-    pub fn modify(&mut self, building: Building, f: impl FnOnce(&mut BuildingState)) {
-        let state = self.state.buildings.get_mut(building);
-        let count = state.count;
+    pub fn modify_count(&mut self, building: Building, f: impl FnOnce(&mut u16)) {
+        self.modify(building, |state| f(&mut state.count));
+        self.computed.total_count = self.state.buildings.count();
+        self.computed.total_count_just_changed = true;
 
-        f(state);
+        if self.state.flags.thousand_fingers_mult.is_some() && !building.is_cursor() {
+            self.recompute(Building::Cursor);
+        }
 
-        self.recompute(building);
-
-        if count != self.state.buildings.get(building).count {
-            self.computed.buildings_count = self.state.buildings.count();
-            self.computed.buildings_count_just_changed = true;
-
-            if !building.is_cursor() && self.state.flags.thousand_fingers_mult.is_some() {
-                self.recompute(Building::Cursor);
+        if building.is_grandma() {
+            for building in Building::variants() {
+                if self.state.buildings.get(building).has_grandma_job_upgrade {
+                    self.recompute(building);
+                }
             }
         }
     }
 
-    pub fn recompute(&mut self, building: Building) {
-        *self.computed.buildings.get_mut(building) =
-            BuildingComputed::new(&self.state.buildings, &self.state.flags, building);
+    pub fn modify_tiered_upgrade_count(&mut self, building: Building, f: impl FnOnce(&mut u16)) {
+        self.modify(building, |state| f(&mut state.tiered_upgrade_count));
+    }
+
+    pub fn modify_has_grandma_job_upgrade(
+        &mut self,
+        building: Building,
+        f: impl FnOnce(&mut bool),
+    ) {
+        self.modify(building, |state| f(&mut state.has_grandma_job_upgrade));
+        self.recompute(Building::Grandma);
+    }
+
+    pub fn modify_addl_cps_per_owned_building(
+        &mut self,
+        building: Building,
+        f: impl FnOnce(&mut Vec<(Building, f64)>),
+    ) {
+        // TODO: This doesn't recompute when the target building changed.
+        // Make it less generic and use specific flags instead of doing an ON^2 search?
+        self.modify(building, |state| f(&mut state.addl_cps_per_owned_building));
     }
 
     pub fn set_thousand_fingers_mult(&mut self, mult: Option<f64>) {
@@ -109,6 +127,16 @@ impl Buildings {
     pub fn set_grandma_has_bingo_center_4x(&mut self, enable: bool) {
         self.state.flags.grandma_has_bingo_center_4x = enable;
         self.recompute(Building::Grandma);
+    }
+
+    fn modify(&mut self, building: Building, f: impl FnOnce(&mut BuildingState)) {
+        f(self.state.buildings.get_mut(building));
+        self.recompute(building);
+    }
+
+    fn recompute(&mut self, building: Building) {
+        *self.computed.buildings.get_mut(building) =
+            BuildingComputed::new(&self.state.buildings, &self.state.flags, building);
     }
 }
 
@@ -130,8 +158,8 @@ struct BuildingsState {
 
 struct BuildingsComputed {
     buildings: BuildingMap<BuildingComputed>,
-    buildings_count: u16,
-    buildings_count_just_changed: bool,
+    total_count: u16,
+    total_count_just_changed: bool,
 }
 
 impl BuildingsComputed {
@@ -140,8 +168,8 @@ impl BuildingsComputed {
             buildings: BuildingMap::new(|b| {
                 BuildingComputed::new(&state.buildings, &state.flags, b)
             }),
-            buildings_count: state.buildings.count(),
-            buildings_count_just_changed: true,
+            total_count: state.buildings.count(),
+            total_count_just_changed: true,
         }
     }
 }
@@ -315,9 +343,7 @@ impl BuildingComputed {
                 thousand_fingers: flags
                     .thousand_fingers_mult
                     .map(|mult| calc::ThousandFingers {
-                        non_cursor_buildings_count: dbg!(
-                            buildings.count() - buildings.cursor.count
-                        ),
+                        non_cursor_buildings_count: buildings.count() - buildings.cursor.count,
                         mult,
                     }),
             },

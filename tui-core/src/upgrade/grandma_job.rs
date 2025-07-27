@@ -30,9 +30,7 @@ impl GrandmaJob {
     pub fn buy(&self, state: &mut State) {
         state
             .buildings
-            .modify(self.building, |b| b.has_grandma_job_upgrade = true);
-
-        state.buildings.recompute(Building::Grandma);
+            .modify_has_grandma_job_upgrade(self.building, |b| *b = true);
     }
 
     pub fn effect_info(&self) -> UpgradeEffectInfo {

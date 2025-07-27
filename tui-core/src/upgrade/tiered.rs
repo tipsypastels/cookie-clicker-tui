@@ -34,7 +34,7 @@ impl Tiered {
     pub fn buy(&self, state: &mut State) {
         state
             .buildings
-            .modify(self.building, |b| b.tiered_upgrade_count += 1);
+            .modify_tiered_upgrade_count(self.building, |c| *c += 1);
     }
 
     pub fn effect_info(&self) -> UpgradeEffectInfo {

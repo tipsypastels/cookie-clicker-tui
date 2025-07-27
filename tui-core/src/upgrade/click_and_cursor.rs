@@ -39,7 +39,7 @@ impl ClickAndCursor {
             ClickAndCursorMode::Double => {
                 state
                     .buildings
-                    .modify(Building::Cursor, |b| b.tiered_upgrade_count += 1);
+                    .modify_tiered_upgrade_count(Building::Cursor, |c| *c += 1);
             }
             ClickAndCursorMode::ThousandFingers => {
                 state
