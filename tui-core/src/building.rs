@@ -194,6 +194,7 @@ impl BuildingsComputed {
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 struct BuildingsFlags {
+    thousand_fingers_mult: Option<f64>,
     grandma_has_bingo_center_4x: bool,
     has_sold_a_grandma: bool,
 }
