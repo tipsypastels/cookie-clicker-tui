@@ -83,6 +83,10 @@ impl Buildings {
             self.recompute(Building::Cursor);
         }
 
+        if self.state.flags.grandma_has_0_05_per_portal && building.is_portal() {
+            self.recompute(Building::Grandma);
+        }
+
         if building.is_grandma() {
             for building in Building::variants() {
                 if self.state.buildings.get(building).has_grandma_job_upgrade {
@@ -105,16 +109,6 @@ impl Buildings {
         self.recompute(Building::Grandma);
     }
 
-    pub fn modify_addl_cps_per_owned_building(
-        &mut self,
-        building: Building,
-        f: impl FnOnce(&mut Vec<(Building, f64)>),
-    ) {
-        // TODO: This doesn't recompute when the target building changed.
-        // Make it less generic and use specific flags instead of doing an ON^2 search?
-        self.modify(building, |state| f(&mut state.addl_cps_per_owned_building));
-    }
-
     pub fn set_thousand_fingers_mult(&mut self, mult: Option<f64>) {
         self.state.flags.thousand_fingers_mult = mult;
         self.recompute(Building::Cursor);
@@ -126,6 +120,21 @@ impl Buildings {
 
     pub fn set_grandma_has_bingo_center_4x(&mut self, enable: bool) {
         self.state.flags.grandma_has_bingo_center_4x = enable;
+        self.recompute(Building::Grandma);
+    }
+
+    pub fn set_grandma_has_0_02_per_grandma(&mut self, enable: bool) {
+        self.state.flags.grandma_has_0_02_per_grandma = enable;
+        self.recompute(Building::Grandma);
+    }
+
+    pub fn set_grandma_has_0_02_per_grandma_2(&mut self, enable: bool) {
+        self.state.flags.grandma_has_0_02_per_grandma_2 = enable;
+        self.recompute(Building::Grandma);
+    }
+
+    pub fn set_grandma_has_0_05_per_portal(&mut self, enable: bool) {
+        self.state.flags.grandma_has_0_05_per_portal = enable;
         self.recompute(Building::Grandma);
     }
 
@@ -178,6 +187,12 @@ impl BuildingsComputed {
 struct BuildingsFlags {
     thousand_fingers_mult: Option<f64>,
     grandma_has_bingo_center_4x: bool,
+    #[serde(default)]
+    grandma_has_0_02_per_grandma: bool,
+    #[serde(default)]
+    grandma_has_0_02_per_grandma_2: bool,
+    #[serde(default)]
+    grandma_has_0_05_per_portal: bool,
     has_sold_a_grandma: bool,
 }
 
@@ -319,7 +334,6 @@ pub struct BuildingState {
     pub cookies_all_time: f64,
     pub tiered_upgrade_count: u16,
     pub has_grandma_job_upgrade: bool,
-    pub addl_cps_per_owned_building: Vec<(Building, f64)>,
 }
 
 struct BuildingComputed {
@@ -358,10 +372,27 @@ impl BuildingComputed {
             },
         };
 
-        let addl_cps_per_owned_building_counts = state
-            .addl_cps_per_owned_building
-            .iter()
-            .map(|(building, cps)| (buildings.get(*building).count, *cps));
+        let addl_cps_per_owned_building_counts = if building.is_grandma() {
+            either::Left(
+                [0.02, 0.02, 0.05]
+                    .into_iter()
+                    .enumerate()
+                    .filter_map(|it| match it {
+                        (0, mult) if flags.grandma_has_0_02_per_grandma => {
+                            Some((state.count, mult))
+                        }
+                        (1, mult) if flags.grandma_has_0_02_per_grandma_2 => {
+                            Some((state.count, mult))
+                        }
+                        (2, mult) if flags.grandma_has_0_05_per_portal => {
+                            Some((buildings.portal.count, mult))
+                        }
+                        _ => None,
+                    }),
+            )
+        } else {
+            either::Right(std::iter::empty())
+        };
 
         let cps = calc::building_cps(
             building,
