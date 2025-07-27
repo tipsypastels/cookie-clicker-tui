@@ -184,7 +184,6 @@ impl App {
             KeyCode::Char('/') => {
                 self.debug.forward();
             }
-
             _ => {}
         }
 
