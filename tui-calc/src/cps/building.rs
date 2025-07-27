@@ -1,4 +1,4 @@
-use crate::upgrade::grandma_job_num_req_for_1p;
+use crate::{thousand_fingers::ThousandFingers, upgrade::grandma_job_num_req_for_1p};
 
 pub struct Cps<AddlCpsPerOwnedBuildingCounts> {
     pub building_no: u16,
@@ -10,7 +10,9 @@ pub struct Cps<AddlCpsPerOwnedBuildingCounts> {
 }
 
 pub enum CpsClass {
-    Cursor,
+    Cursor {
+        thousand_fingers: Option<ThousandFingers>,
+    },
     Grandma {
         has_bingo_center_4x: bool,
         job_upgrade_count: u16,
@@ -37,7 +39,12 @@ where
         let cps = building_base_cps * count as f64 * 2.0f64.powi(tiered_upgrade_count as i32);
 
         let cps = match building_class {
-            CpsClass::Cursor => cps,
+            CpsClass::Cursor {
+                thousand_fingers: None,
+            } => cps,
+            CpsClass::Cursor {
+                thousand_fingers: Some(thousand_fingers),
+            } => cps + thousand_fingers.calc(),
             CpsClass::Grandma {
                 has_bingo_center_4x,
                 job_upgrade_count,
@@ -45,6 +52,9 @@ where
                 cps * if has_bingo_center_4x { 4.0 } else { 1.0 }
                     * 2.0f64.powi(job_upgrade_count as i32)
             }
+            CpsClass::Other {
+                grandma_count: None,
+            } => cps,
             CpsClass::Other {
                 grandma_count: Some(grandma_count),
             } => {
@@ -58,9 +68,6 @@ where
                     cps
                 }
             }
-            CpsClass::Other {
-                grandma_count: None,
-            } => cps,
         };
 
         let cps = cps

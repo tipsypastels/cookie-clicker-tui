@@ -85,6 +85,10 @@ impl Buildings {
         if count != self.state.buildings.get(building).count {
             self.computed.buildings_count = self.state.buildings.count();
             self.computed.buildings_count_just_changed = true;
+
+            if !building.is_cursor() && self.state.flags.thousand_fingers_mult.is_some() {
+                self.recompute(Building::Cursor);
+            }
         }
     }
 
@@ -307,8 +311,16 @@ impl BuildingComputed {
         let sell_cost = calc::building_sell_cost(cost);
 
         let building_class = match building {
-            // TODO: Implement thousand fingers.
-            Building::Cursor => calc::BuildingCpsClass::Cursor,
+            Building::Cursor => calc::BuildingCpsClass::Cursor {
+                thousand_fingers: flags
+                    .thousand_fingers_mult
+                    .map(|mult| calc::ThousandFingers {
+                        non_cursor_buildings_count: dbg!(
+                            buildings.count() - buildings.cursor.count
+                        ),
+                        mult,
+                    }),
+            },
             Building::Grandma => calc::BuildingCpsClass::Grandma {
                 has_bingo_center_4x: flags.grandma_has_bingo_center_4x,
                 job_upgrade_count: buildings.grandma_job_upgrade_count(),

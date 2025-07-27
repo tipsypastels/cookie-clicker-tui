@@ -1,7 +1,7 @@
 use crate::{State, building::Building};
 use cookie_clicker_tui_calc as calc;
 
-pub use calc::cps::building::CpsClass as BuildingCpsClass;
+pub use calc::{cps::building::CpsClass as BuildingCpsClass, thousand_fingers::ThousandFingers};
 
 pub fn cps(state: &State) -> f64 {
     let base = calc::cps::base::Cps {
