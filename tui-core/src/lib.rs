@@ -289,27 +289,16 @@ macros::deserialize_via_state!(Core => State as Core::from_state);
 
 #[derive(Serialize, Deserialize)]
 struct State {
-    #[serde(default = "Cookies::new")]
     cookies: Cookies,
-    #[serde(default = "Buildings::new")]
     buildings: Buildings,
-    #[serde(default = "Click::new")]
     click: Click,
-    #[serde(default = "Milk::new")]
     milk: Milk,
-    #[serde(default = "Achievements::new")]
     achievements: Achievements,
-    #[serde(default = "OwnedUpgrades::new")]
     owned_upgrades: OwnedUpgrades,
-    #[serde(default = "ThousandFingers::new")]
     thousand_fingers: ThousandFingers,
-    #[serde(default = "SugarLumps::new")]
     sugar_lumps: SugarLumps,
-    #[serde(default = "Research::new")]
     research: Research,
-    #[serde(default = "Grandmapocalypse::new")]
     grandmapocalypse: Grandmapocalypse,
-    #[serde(default = "GoldenCookies::new")]
     golden_cookies: GoldenCookies,
 }
 

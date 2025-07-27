@@ -187,11 +187,8 @@ impl BuildingsComputed {
 struct BuildingsFlags {
     thousand_fingers_mult: Option<f64>,
     grandma_has_bingo_center_4x: bool,
-    #[serde(default)]
     grandma_has_0_02_per_grandma: bool,
-    #[serde(default)]
     grandma_has_0_02_per_grandma_2: bool,
-    #[serde(default)]
     grandma_has_0_05_per_portal: bool,
     has_sold_a_grandma: bool,
 }
