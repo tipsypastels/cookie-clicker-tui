@@ -13,14 +13,9 @@ pub struct Tiered {
 
 impl Tiered {
     pub const fn new(index: usize, building: Building) -> Self {
-        let templates = if building.is_cursor() {
-            TEMPLATES_CURSOR
-        } else {
-            TEMPLATES_NON_CURSOR
-        };
+        debug_assert!(!building.is_cursor());
 
-        let (building_req, cost_mult) = templates[index];
-
+        let (building_req, cost_mult) = TEMPLATES[index];
         Self {
             building,
             building_req,
@@ -47,27 +42,7 @@ impl Tiered {
     }
 }
 
-const TEMPLATES_COUNT: usize = 15;
-
-const TEMPLATES_CURSOR: [(u16, f64); TEMPLATES_COUNT] = [
-    (1, num::SIX_REPEATING),
-    (1, num::THREE_THREE_REPEATING),
-    (10, num::SIX_SIX_SIX_REPEATING),
-    (25, num::SIX_REPEATING * num::THOUSAND),
-    (50, num::SIX_SIX_SIX_REPEATING * num::THOUSAND),
-    (100, num::SIX_REPEATING * num::MILLION),
-    (150, num::SIX_SIX_REPEATING * num::MILLION),
-    (200, num::SIX_SIX_SIX_REPEATING * num::MILLION),
-    (250, num::SIX_SIX_SIX_REPEATING * num::BILLION),
-    (300, num::SIX_SIX_SIX_REPEATING * num::TRILLION),
-    (350, num::SIX_SIX_SIX_REPEATING * num::QUADRILLION),
-    (400, num::SIX_SIX_SIX_REPEATING * num::QUINTILLION),
-    (450, num::SIX_SIX_SIX_REPEATING * num::SEXTILLION),
-    (500, num::SIX_SIX_SIX_REPEATING * num::SEPTILLION),
-    (550, num::SIX_SIX_SIX_REPEATING * num::OCTILLION),
-];
-
-const TEMPLATES_NON_CURSOR: [(u16, f64); TEMPLATES_COUNT] = [
+const TEMPLATES: [(u16, f64); 15] = [
     (1, 10.0),
     (5, 50.0),
     (25, 500.0),

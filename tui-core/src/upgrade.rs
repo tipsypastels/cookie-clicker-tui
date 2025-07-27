@@ -1,3 +1,4 @@
+mod click_and_cursor;
 mod effect_info;
 mod grandma_job;
 mod kitten;
@@ -6,7 +7,13 @@ mod tiered;
 
 pub use effect_info::*;
 
-use self::{grandma_job::GrandmaJob, kitten::Kitten, research::Research, tiered::Tiered};
+use self::{
+    click_and_cursor::{ClickAndCursor, ClickAndCursorMode},
+    grandma_job::GrandmaJob,
+    kitten::Kitten,
+    research::Research,
+    tiered::Tiered,
+};
 use crate::{Building, Cost, State, req::Req};
 use cookie_clicker_tui_utils::{num, refresh::Refresh};
 use enum_assoc::Assoc;
@@ -93,35 +100,35 @@ pub enum Upgrade {
     /* -------------------------------------------------------------------------- */
     /*                               Tiered: Cursor                               */
     /* -------------------------------------------------------------------------- */
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(0, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(0, ClickAndCursorMode::Double)))]
     ReinforcedIndexFinger,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(1, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(1, ClickAndCursorMode::Double)))]
     CarpalTunnelPreventionCream,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(2, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(2, ClickAndCursorMode::Double)))]
     Ambidextrous,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(3, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(3, ClickAndCursorMode::ThousandFingers)))]
     ThousandFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(4, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(4, ClickAndCursorMode::ThousandFingersMult(5.0))))]
     MillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(5, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(5, ClickAndCursorMode::ThousandFingersMult(10.0))))]
     BillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(6, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(6, ClickAndCursorMode::ThousandFingersMult(20.0))))]
     TrillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(7, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(7, ClickAndCursorMode::ThousandFingersMult(20.0))))]
     QuadrillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(8, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(8, ClickAndCursorMode::ThousandFingersMult(20.0))))]
     QuintillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(9, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(9, ClickAndCursorMode::ThousandFingersMult(20.0))))]
     SextillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(10, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(10, ClickAndCursorMode::ThousandFingersMult(20.0))))]
     SeptillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(11, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(11, ClickAndCursorMode::ThousandFingersMult(20.0))))]
     OctillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(12, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(12, ClickAndCursorMode::ThousandFingersMult(20.0))))]
     NonillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(13, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(13, ClickAndCursorMode::ThousandFingersMult(20.0))))]
     DecillionFingers,
-    #[assoc(class = UpgradeClass::Tiered(Tiered::new(14, Building::Cursor)))]
+    #[assoc(class = UpgradeClass::ClickAndCursor(ClickAndCursor::new(14, ClickAndCursorMode::ThousandFingersMult(20.0))))]
     UndecillionFingers,
     /* -------------------------------------------------------------------------- */
     /*                               Tiered: Grandma                              */
@@ -899,6 +906,7 @@ impl Upgrade {
 
 enum UpgradeClass {
     Tiered(Tiered),
+    ClickAndCursor(ClickAndCursor),
     GrandmaJob(GrandmaJob),
     Kitten(Kitten),
     Research(Research),
@@ -908,6 +916,7 @@ impl UpgradeClass {
     fn cost(&self) -> Cost {
         match self {
             Self::Tiered(u) => u.cost(),
+            Self::ClickAndCursor(u) => u.cost(),
             Self::GrandmaJob(u) => u.cost(),
             Self::Kitten(u) => u.cost(),
             Self::Research(u) => u.cost(),
@@ -917,6 +926,7 @@ impl UpgradeClass {
     fn req(&self) -> Req {
         match self {
             Self::Tiered(u) => u.req(),
+            Self::ClickAndCursor(u) => u.req(),
             Self::GrandmaJob(u) => u.req(),
             Self::Kitten(u) => u.req(),
             Self::Research(u) => u.req(),
@@ -926,6 +936,7 @@ impl UpgradeClass {
     fn buy(&self, state: &mut State) {
         match self {
             Self::Tiered(u) => u.buy(state),
+            Self::ClickAndCursor(u) => u.buy(state),
             Self::GrandmaJob(u) => u.buy(state),
             Self::Kitten(u) => u.buy(state),
             Self::Research(u) => u.buy(state),
@@ -935,6 +946,7 @@ impl UpgradeClass {
     fn effect_info(&self) -> UpgradeEffectInfo {
         match self {
             Self::Tiered(u) => u.effect_info(),
+            Self::ClickAndCursor(u) => u.effect_info(),
             Self::GrandmaJob(u) => u.effect_info(),
             Self::Kitten(u) => u.effect_info(),
             Self::Research(u) => u.effect_info(),

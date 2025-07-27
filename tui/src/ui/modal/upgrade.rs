@@ -26,6 +26,17 @@ pub fn print_info(info: UpgradeEffectInfo, lines: &mut Vec<Line>) {
         UpgradeEffectInfo::Tiered(building) => {
             lines.push(line_2x_from_building(building));
         }
+        UpgradeEffectInfo::ThousandFingers => lines.push(Line::from(vec![
+            Span::raw("• clicking and cursors gain "),
+            Span::styled("+0.1", Modifier::BOLD),
+            Span::raw(" cookies per second from other buildings"),
+        ])),
+        UpgradeEffectInfo::ThousandFingersMult(mult) => lines.push(Line::from(vec![
+            Span::raw("• multiplies the gain from "),
+            Span::styled("thousand fingers", Modifier::BOLD),
+            Span::raw(" by "),
+            Span::styled(format!("{}", mult.print_float(0, 0)), Modifier::BOLD),
+        ])),
         UpgradeEffectInfo::Grandma {
             building,
             num_req_for_1p,

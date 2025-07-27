@@ -2,6 +2,8 @@ use crate::Building;
 
 pub enum UpgradeEffectInfo {
     Tiered(Building),
+    ThousandFingers,
+    ThousandFingersMult(f64),
     Grandma {
         building: Building,
         num_req_for_1p: u16,

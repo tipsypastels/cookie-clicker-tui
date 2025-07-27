@@ -43,6 +43,19 @@ pub fn kitten_cps_mult(milk_percentage: u16, kitten_factors: &[f64]) -> f64 {
     .calc()
 }
 
+pub fn cpc(thousand_fingers: Option<(u16, f64)>) -> f64 {
+    match thousand_fingers {
+        Some((buildings_count, mult)) => {
+            calc::cpc::Cpc::ThousandFingers(calc::thousand_fingers::ThousandFingers {
+                buildings_count,
+                mult,
+            })
+        }
+        None => calc::cpc::Cpc::Basic,
+    }
+    .calc()
+}
+
 pub fn building_cost(building: Building, count: u16) -> f64 {
     calc::cost::building(building.base_cost(), count)
 }

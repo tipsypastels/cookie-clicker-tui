@@ -1,6 +1,7 @@
 mod achievement;
 mod building;
 mod calc;
+mod click;
 mod cookies;
 mod cost;
 mod golden_cookie;
@@ -12,6 +13,7 @@ mod req;
 mod research;
 mod spawner;
 mod sugar_lumps;
+mod thousand_fingers;
 mod upgrade;
 
 pub use self::{
@@ -32,7 +34,9 @@ pub use self::{
 use self::{
     achievement::Achievements,
     building::Buildings,
+    click::Click,
     cookies::Cookies,
+    thousand_fingers::ThousandFingers,
     upgrade::{AvailableUpgrades, OwnedUpgrades},
 };
 use serde::{Deserialize, Serialize};
@@ -133,7 +137,9 @@ impl Core {
     }
 
     pub fn click_cookie(&mut self) {
-        self.state.cookies.gain_from_clicking(1.0);
+        self.state
+            .cookies
+            .gain_from_clicking(self.state.click.cpc());
     }
 
     pub fn click_golden_cookie(&mut self, ch: char) -> bool {
@@ -255,12 +261,20 @@ impl Core {
         self.state.buildings.debug_flags()
     }
 
+    pub fn debug_click(&self) -> impl fmt::Debug {
+        &self.state.click
+    }
+
     pub fn debug_available_upgrades(&self) -> impl fmt::Debug {
         &self.computed.available_upgrades
     }
 
     pub fn debug_achievements(&self) -> impl fmt::Debug {
         &self.state.achievements
+    }
+
+    pub fn debug_thousand_fingers(&self) -> impl fmt::Debug {
+        &self.state.thousand_fingers
     }
 }
 
@@ -279,12 +293,16 @@ struct State {
     cookies: Cookies,
     #[serde(default = "Buildings::new")]
     buildings: Buildings,
+    #[serde(default = "Click::new")]
+    click: Click,
     #[serde(default = "Milk::new")]
     milk: Milk,
     #[serde(default = "Achievements::new")]
     achievements: Achievements,
     #[serde(default = "OwnedUpgrades::new")]
     owned_upgrades: OwnedUpgrades,
+    #[serde(default = "ThousandFingers::new")]
+    thousand_fingers: ThousandFingers,
     #[serde(default = "SugarLumps::new")]
     sugar_lumps: SugarLumps,
     #[serde(default = "Research::new")]
@@ -300,9 +318,11 @@ impl State {
         Self {
             cookies: Cookies::new(),
             buildings: Buildings::new(),
+            click: Click::new(),
             milk: Milk::new(),
             achievements: Achievements::new(),
             owned_upgrades: OwnedUpgrades::new(),
+            thousand_fingers: ThousandFingers::new(),
             sugar_lumps: SugarLumps::new(),
             research: Research::new(),
             grandmapocalypse: Grandmapocalypse::new(),
@@ -311,6 +331,10 @@ impl State {
     }
 
     fn tick(&mut self, computed: &Computed) {
+        if self.buildings.total_count_just_changed() {
+            self.click.set_buildings_count(self.buildings.total_count());
+        }
+
         self.cookies.tick(computed.cps);
         self.buildings.tick();
         self.milk.tick(self.achievements.owned().len() as _);

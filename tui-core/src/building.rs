@@ -5,6 +5,150 @@ use enum_fun::{Name, Predicates, Variants};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+pub struct Buildings {
+    state: BuildingsState,
+    computed: BuildingsComputed,
+}
+
+impl Buildings {
+    pub fn new() -> Self {
+        Self::from_state(BuildingsState::default())
+    }
+
+    fn from_state(state: BuildingsState) -> Self {
+        let computed = BuildingsComputed::new(&state);
+        Self { state, computed }
+    }
+
+    pub fn tick(&mut self) {
+        for building in Building::variants() {
+            let cps = self.computed.buildings.get(building).cps;
+            let state = self.state.buildings.get_mut(building);
+            state.cookies_all_time += cps / FPS;
+        }
+
+        self.computed.buildings_count_just_changed = false;
+    }
+
+    pub fn infos(&self) -> impl Iterator<Item = BuildingInfo> {
+        Building::variants().map(|b| self.info(b))
+    }
+
+    pub fn info(&self, building: Building) -> BuildingInfo {
+        BuildingInfo {
+            building,
+            state: self.state.buildings.get(building),
+            computed: self.computed.buildings.get(building),
+        }
+    }
+
+    pub fn info_nth(&self, index: usize) -> BuildingInfo {
+        self.info(Building::VARIANTS[index])
+    }
+
+    pub fn count(&self, building: Building) -> u16 {
+        self.state(building).count
+    }
+
+    pub fn state(&self, building: Building) -> &BuildingState {
+        self.state.buildings.get(building)
+    }
+
+    pub fn total_count(&self) -> u16 {
+        self.computed.buildings_count
+    }
+
+    pub fn total_count_just_changed(&self) -> bool {
+        self.computed.buildings_count_just_changed
+    }
+
+    pub fn debug_flags(&self) -> impl fmt::Debug {
+        &self.state.flags
+    }
+
+    pub fn grandma_job_upgrade_count(&self) -> u16 {
+        self.state.buildings.grandma_job_upgrade_count()
+    }
+
+    pub fn has_sold_a_grandma(&self) -> bool {
+        self.state.flags.has_sold_a_grandma
+    }
+
+    pub fn modify(&mut self, building: Building, f: impl FnOnce(&mut BuildingState)) {
+        let state = self.state.buildings.get_mut(building);
+        let count = state.count;
+
+        f(state);
+
+        self.recompute(building);
+
+        if count != self.state.buildings.get(building).count {
+            self.computed.buildings_count = self.state.buildings.count();
+            self.computed.buildings_count_just_changed = true;
+        }
+    }
+
+    pub fn recompute(&mut self, building: Building) {
+        *self.computed.buildings.get_mut(building) =
+            BuildingComputed::new(&self.state.buildings, &self.state.flags, building);
+    }
+
+    pub fn set_thousand_fingers_mult(&mut self, mult: Option<f64>) {
+        self.state.flags.thousand_fingers_mult = mult;
+        self.recompute(Building::Cursor);
+    }
+
+    pub fn set_has_sold_a_grandma(&mut self, enable: bool) {
+        self.state.flags.has_sold_a_grandma = enable;
+    }
+
+    pub fn set_grandma_has_bingo_center_4x(&mut self, enable: bool) {
+        self.state.flags.grandma_has_bingo_center_4x = enable;
+        self.recompute(Building::Grandma);
+    }
+}
+
+impl fmt::Debug for Buildings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_list().entries(self.infos()).finish()
+    }
+}
+
+macros::serialize_via_state!(Buildings => BuildingsState as |b| b.state);
+macros::deserialize_via_state!(Buildings => BuildingsState as Buildings::from_state);
+
+#[derive(Serialize, Deserialize, Default)]
+struct BuildingsState {
+    #[serde(flatten)]
+    buildings: BuildingMap<BuildingState>,
+    flags: BuildingsFlags,
+}
+
+struct BuildingsComputed {
+    buildings: BuildingMap<BuildingComputed>,
+    buildings_count: u16,
+    buildings_count_just_changed: bool,
+}
+
+impl BuildingsComputed {
+    fn new(state: &BuildingsState) -> Self {
+        Self {
+            buildings: BuildingMap::new(|b| {
+                BuildingComputed::new(&state.buildings, &state.flags, b)
+            }),
+            buildings_count: state.buildings.count(),
+            buildings_count_just_changed: true,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+struct BuildingsFlags {
+    thousand_fingers_mult: Option<f64>,
+    grandma_has_bingo_center_4x: bool,
+    has_sold_a_grandma: bool,
+}
+
 #[derive(
     Assoc,
     Name,
@@ -78,125 +222,6 @@ impl Building {
     pub fn nth(index: usize) -> Option<Self> {
         Self::VARIANTS.get(index).copied()
     }
-}
-
-pub struct Buildings {
-    state: BuildingsState,
-    computed: BuildingsComputed,
-}
-
-impl Buildings {
-    pub fn new() -> Self {
-        Self::from_state(BuildingsState::default())
-    }
-
-    fn from_state(state: BuildingsState) -> Self {
-        let computed = BuildingsComputed::new(&state);
-        Self { state, computed }
-    }
-
-    pub fn tick(&mut self) {
-        for building in Building::variants() {
-            let cps = self.computed.buildings.get(building).cps;
-            let state = self.state.buildings.get_mut(building);
-            state.cookies_all_time += cps / FPS;
-        }
-    }
-
-    pub fn infos(&self) -> impl Iterator<Item = BuildingInfo> {
-        Building::variants().map(|b| self.info(b))
-    }
-
-    pub fn info(&self, building: Building) -> BuildingInfo {
-        BuildingInfo {
-            building,
-            state: self.state.buildings.get(building),
-            computed: self.computed.buildings.get(building),
-        }
-    }
-
-    pub fn info_nth(&self, index: usize) -> BuildingInfo {
-        self.info(Building::VARIANTS[index])
-    }
-
-    pub fn count(&self, building: Building) -> u16 {
-        self.state(building).count
-    }
-
-    pub fn state(&self, building: Building) -> &BuildingState {
-        self.state.buildings.get(building)
-    }
-
-    pub fn debug_flags(&self) -> impl fmt::Debug {
-        &self.state.flags
-    }
-
-    pub fn grandma_job_upgrade_count(&self) -> u16 {
-        self.state.buildings.grandma_job_upgrade_count()
-    }
-
-    pub fn has_sold_a_grandma(&self) -> bool {
-        self.state.flags.has_sold_a_grandma
-    }
-
-    pub fn modify(&mut self, building: Building, f: impl FnOnce(&mut BuildingState)) {
-        f(self.state.buildings.get_mut(building));
-        self.recompute(building);
-    }
-
-    pub fn recompute(&mut self, building: Building) {
-        *self.computed.buildings.get_mut(building) =
-            BuildingComputed::new(&self.state.buildings, &self.state.flags, building);
-        self.computed.buildings_count = self.state.buildings.count();
-    }
-
-    pub fn set_has_sold_a_grandma(&mut self, enable: bool) {
-        self.state.flags.has_sold_a_grandma = enable;
-    }
-
-    pub fn set_grandma_has_bingo_center_4x(&mut self, enable: bool) {
-        self.state.flags.grandma_has_bingo_center_4x = enable;
-        self.recompute(Building::Grandma);
-    }
-}
-
-impl fmt::Debug for Buildings {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_list().entries(self.infos()).finish()
-    }
-}
-
-macros::serialize_via_state!(Buildings => BuildingsState as |b| b.state);
-macros::deserialize_via_state!(Buildings => BuildingsState as Buildings::from_state);
-
-#[derive(Serialize, Deserialize, Default)]
-struct BuildingsState {
-    #[serde(flatten)]
-    buildings: BuildingMap<BuildingState>,
-    flags: BuildingsFlags,
-}
-
-struct BuildingsComputed {
-    buildings: BuildingMap<BuildingComputed>,
-    buildings_count: u16,
-}
-
-impl BuildingsComputed {
-    fn new(state: &BuildingsState) -> Self {
-        Self {
-            buildings: BuildingMap::new(|b| {
-                BuildingComputed::new(&state.buildings, &state.flags, b)
-            }),
-            buildings_count: state.buildings.count(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Default, Debug)]
-struct BuildingsFlags {
-    thousand_fingers_mult: Option<f64>,
-    grandma_has_bingo_center_4x: bool,
-    has_sold_a_grandma: bool,
 }
 
 pub struct BuildingInfo<'a> {
@@ -282,6 +307,7 @@ impl BuildingComputed {
         let sell_cost = calc::building_sell_cost(cost);
 
         let building_class = match building {
+            // TODO: Implement thousand fingers.
             Building::Cursor => calc::BuildingCpsClass::Cursor,
             Building::Grandma => calc::BuildingCpsClass::Grandma {
                 has_bingo_center_4x: flags.grandma_has_bingo_center_4x,
