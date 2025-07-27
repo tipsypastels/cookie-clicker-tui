@@ -1,5 +1,8 @@
 use super::effect_info::UpgradeEffectInfo;
-use crate::{Building, Cost, State, req::Req};
+use crate::{
+    Building, Cost, State,
+    req::{Cmp, Req},
+};
 
 const COST_MULT: f64 = 50.0;
 
@@ -19,8 +22,8 @@ impl GrandmaJob {
 
     pub fn req(&self) -> Req {
         Req::AllBox(Box::new([
-            Req::BuildingCountMin(self.building, 15),
-            Req::BuildingCountMin(Building::Grandma, 1),
+            Req::BuildingCount(self.building, Cmp::AboveOrEq(15)),
+            Req::BuildingCount(Building::Grandma, Cmp::AboveOrEq(1)),
         ]))
     }
 

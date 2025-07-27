@@ -44,7 +44,7 @@ impl Research {
         match self {
             Self::BingoCenterResearchFacility => Req::All(&[
                 Req::Achievement(Achievement::Elder),
-                Req::BuildingCountMin(Building::Grandma, 6),
+                Req::BuildingCount(Building::Grandma, Cmp::AboveOrEq(6)),
             ]),
             _ => Req::ResearchCompleted(Cmp::AboveOrEq(*self as u8)),
         }

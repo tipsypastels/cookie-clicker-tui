@@ -5,7 +5,7 @@ pub enum Req {
     Cookies(Cmp<f64>),
     CookiesAllTime(Cmp<f64>),
     CookiesAllTimeFromClicking(Cmp<f64>),
-    BuildingCountMin(Building, u16),
+    BuildingCount(Building, Cmp<u16>),
     ResearchCompleted(Cmp<u8>),
     Achievement(Achievement),
     AchievementCount(Cmp<usize>),
@@ -29,7 +29,7 @@ impl Req {
             Self::Cookies(c) => c.check(state.cookies.current()),
             Self::CookiesAllTime(c) => c.check(state.cookies.all_time()),
             Self::CookiesAllTimeFromClicking(c) => c.check(state.cookies.all_time_from_clicking()),
-            Self::BuildingCountMin(b, c) => state.buildings.count(*b) >= *c,
+            Self::BuildingCount(b, c) => c.check(state.buildings.count(*b)),
             Self::ResearchCompleted(c) => c.check(state.research.completed()),
             Self::Achievement(a) => state.achievements.owned().contains(a),
             Self::AchievementCount(c) => c.check(state.achievements.owned().len()),
@@ -77,7 +77,7 @@ impl LateReq {
         Cookies(c: Cmp<f64>);
         CookiesAllTime(c: Cmp<f64>);
         CookiesAllTimeFromClicking(c: Cmp<f64>);
-        BuildingCountMin(b: Building, c: u16);
+        BuildingCount(b: Building, c: Cmp<u16>);
         ResearchCompleted(c: Cmp<u8>);
         Achievement(a: Achievement);
         AchievementCount(c: Cmp<usize>);

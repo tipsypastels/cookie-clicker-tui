@@ -73,45 +73,45 @@ pub enum NewsEntry {
     /* -------------------------------------------------------------------------- */
     /*                               Building Based                               */
     /* -------------------------------------------------------------------------- */
-    #[assoc(req = Req::BuildingCountMin(Building::Grandma, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Grandma, Cmp::AboveOrEq(1)))]
     Building_Grandma_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Grandma, 50))]
+    #[assoc(req = Req::BuildingCount(Building::Grandma, Cmp::AboveOrEq(50)))]
     Building_Grandma_50,
-    #[assoc(req = Req::BuildingCountMin(Building::Farm, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Farm, Cmp::AboveOrEq(1)))]
     Building_Farm_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Mine, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Mine, Cmp::AboveOrEq(1)))]
     Building_Mine_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Factory, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Factory, Cmp::AboveOrEq(1)))]
     Building_Factory_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Bank, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Bank, Cmp::AboveOrEq(1)))]
     Building_Bank_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Temple, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Temple, Cmp::AboveOrEq(1)))]
     Building_Temple_1,
-    #[assoc(req = Req::BuildingCountMin(Building::WizardTower, 1))]
+    #[assoc(req = Req::BuildingCount(Building::WizardTower, Cmp::AboveOrEq(1)))]
     Building_WizardTower_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Shipment, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Shipment, Cmp::AboveOrEq(1)))]
     Building_Shipment_1,
-    #[assoc(req = Req::BuildingCountMin(Building::AlchemyLab, 1))]
+    #[assoc(req = Req::BuildingCount(Building::AlchemyLab, Cmp::AboveOrEq(1)))]
     Building_AlchemyLab_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Portal, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Portal, Cmp::AboveOrEq(1)))]
     Building_Portal_1,
-    #[assoc(req = Req::BuildingCountMin(Building::TimeMachine, 1))]
+    #[assoc(req = Req::BuildingCount(Building::TimeMachine, Cmp::AboveOrEq(1)))]
     Building_TimeMachine_1,
-    #[assoc(req = Req::BuildingCountMin(Building::AntimatterCondenser, 1))]
+    #[assoc(req = Req::BuildingCount(Building::AntimatterCondenser, Cmp::AboveOrEq(1)))]
     Building_AntimatterCondenser_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Prism, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Prism, Cmp::AboveOrEq(1)))]
     Building_Prism_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Chancemaker, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Chancemaker, Cmp::AboveOrEq(1)))]
     Building_Chancemaker_1,
-    #[assoc(req = Req::BuildingCountMin(Building::FractalEngine, 1))]
+    #[assoc(req = Req::BuildingCount(Building::FractalEngine, Cmp::AboveOrEq(1)))]
     Building_FractalEngine_1,
-    #[assoc(req = Req::BuildingCountMin(Building::RustPlayground, 1))]
+    #[assoc(req = Req::BuildingCount(Building::RustPlayground, Cmp::AboveOrEq(1)))]
     Building_RustPlayground_1,
-    #[assoc(req = Req::BuildingCountMin(Building::Idleverse, 1))]
+    #[assoc(req = Req::BuildingCount(Building::Idleverse, Cmp::AboveOrEq(1)))]
     Building_Idleverse_1,
-    #[assoc(req = Req::BuildingCountMin(Building::CortexBaker, 1))]
+    #[assoc(req = Req::BuildingCount(Building::CortexBaker, Cmp::AboveOrEq(1)))]
     Building_CortexBaker_1,
-    #[assoc(req = Req::BuildingCountMin(Building::You, 1))]
+    #[assoc(req = Req::BuildingCount(Building::You, Cmp::AboveOrEq(1)))]
     Building_You_1,
     /* -------------------------------------------------------------------------- */
     /*                           Grandmapocalypse Based                           */

@@ -1,5 +1,8 @@
 use super::effect_info::UpgradeEffectInfo;
-use crate::{Building, Cost, State, req::Req};
+use crate::{
+    Building, Cost, State,
+    req::{Cmp, Req},
+};
 use cookie_clicker_tui_utils::num;
 
 pub struct Tiered {
@@ -30,7 +33,7 @@ impl Tiered {
     }
 
     pub fn req(&self) -> Req {
-        Req::BuildingCountMin(self.building, self.building_req)
+        Req::BuildingCount(self.building, Cmp::AboveOrEq(self.building_req))
     }
 
     pub fn buy(&self, state: &mut State) {
