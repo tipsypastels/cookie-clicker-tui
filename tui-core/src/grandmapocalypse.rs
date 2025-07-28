@@ -81,13 +81,16 @@ impl Grandmapocalypse {
         &self.cps_mults
     }
 
-    pub(crate) fn set_phase(&mut self, phase: GrandmapocalypsePhase) {
-        let was_appeased = self.is_appeased();
-
-        self.current = Current::Phase(phase);
-
-        if was_appeased {
-            self.appeased_temporarily_times = self.appeased_temporarily_times.saturating_add(1);
+    pub(crate) fn advance_phase(&mut self) {
+        match &self.current {
+            Current::None => self.current = Current::Phase(GrandmapocalypsePhase::Awoken),
+            Current::Phase(GrandmapocalypsePhase::Awoken) => {
+                self.current = Current::Phase(GrandmapocalypsePhase::Displeased)
+            }
+            Current::Phase(GrandmapocalypsePhase::Displeased) => {
+                self.current = Current::Phase(GrandmapocalypsePhase::Angered)
+            }
+            _ => {}
         }
     }
 
@@ -99,6 +102,12 @@ impl Grandmapocalypse {
 
     pub(crate) fn appease_permanently(&mut self) {
         self.current = Current::AppeasedPermanently;
+    }
+
+    pub(crate) fn unappease(&mut self) {
+        if self.is_appeased() {
+            self.current = Current::Phase(GrandmapocalypsePhase::Angered);
+        }
     }
 
     pub(crate) fn modify_appeased_duration(&mut self, mut f: impl FnMut(&mut f64)) {

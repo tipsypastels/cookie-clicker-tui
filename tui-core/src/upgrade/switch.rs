@@ -48,9 +48,7 @@ impl Switch {
                 state.grandmapocalypse.appease_permanently();
             }
             Self::RevokeElderCovenant => {
-                state
-                    .grandmapocalypse
-                    .set_phase(GrandmapocalypsePhase::Angered);
+                state.grandmapocalypse.unappease();
             }
         }
     }
