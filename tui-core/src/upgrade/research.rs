@@ -2,7 +2,7 @@ use super::effect_info::{
     UpgradeEffectInfo, UpgradeInfoEffectResearch, UpgradeInfoEffectResearchWarning,
 };
 use crate::{
-    Achievement, Building, Cost, State,
+    Achievement, Building, Cost, GrandmapocalypsePhase, State,
     req::{Cmp, Req},
 };
 use cookie_clicker_tui_utils::num;
@@ -72,21 +72,27 @@ impl Research {
             }
             Self::OneMind => {
                 state.buildings.set_grandma_has_one_mind(true);
-                state.grandmapocalypse.advance_phase();
+                state
+                    .grandmapocalypse
+                    .set_phase(GrandmapocalypsePhase::Awoken);
             }
             Self::ExoticNuts => {
                 state.grandmapocalypse.add_cps_mult(1.04);
             }
             Self::CommunalBrainsweep => {
                 state.buildings.set_grandma_has_communal_brainsweep(true);
-                state.grandmapocalypse.advance_phase();
+                state
+                    .grandmapocalypse
+                    .set_phase(GrandmapocalypsePhase::Displeased);
             }
             Self::ArcaneSugar => {
                 state.grandmapocalypse.add_cps_mult(1.05);
             }
             Self::ElderPact => {
                 state.buildings.set_grandma_has_elder_pact(true);
-                state.grandmapocalypse.advance_phase();
+                state
+                    .grandmapocalypse
+                    .set_phase(GrandmapocalypsePhase::Angered);
             }
             Self::SacrificialRollingPins => {
                 state

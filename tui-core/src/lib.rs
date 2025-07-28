@@ -21,7 +21,7 @@ pub use self::{
     building::{Building, BuildingInfo},
     cost::{Cost, CostDyn, CostResolved},
     golden_cookie::{GoldenCookie, GoldenCookies},
-    grandmapocalypse::{Grandmapocalypse, GrandmapocalypseInfo, GrandmapocalypsePhase},
+    grandmapocalypse::{Grandmapocalypse, GrandmapocalypsePhase},
     milk::{Milk, MilkFlavor},
     news::NewsEntry,
     research::Research,
@@ -162,7 +162,17 @@ impl Core {
 
     pub fn take_building(&mut self, building: Building) {
         self.state.buildings.modify_count(building, |c| *c -= 1);
+
         self.computed.recalc_cps(&self.state);
+        // TODO: Grandmapocalypse adjusting to grandma changes
+        // happens too late for the upgrades to change eagerly,
+        // since it's called in tick, and therefore must wait
+        // for upgrades to refresh instead.
+        //
+        // Consider using an event queue that's only handled
+        // in tick instead of updating immediately.
+        // This would also require drawing frames after
+        // tick/events, maybe.
         self.computed.recalc_available_upgrades(&self.state);
     }
 
@@ -342,7 +352,8 @@ impl State {
         self.buildings.tick();
         self.milk.tick(self.achievements.owned().len() as _);
         self.research.tick();
-        self.grandmapocalypse.tick();
+        self.grandmapocalypse
+            .tick(self.buildings.count(Building::Grandma));
         self.golden_cookies.tick();
 
         achievement::tick(self, computed);

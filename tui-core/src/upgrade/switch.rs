@@ -32,6 +32,7 @@ impl Switch {
             Self::ElderCovenant => Req::Custom(|state| {
                 !state.grandmapocalypse.is_appeased_permanently()
                     && state.grandmapocalypse.appeased_temporarily_times() > 0
+                    && !state.grandmapocalypse.is_no_grandmas()
             }),
             Self::RevokeElderCovenant => {
                 Req::Custom(|state| state.grandmapocalypse.is_appeased_permanently())
