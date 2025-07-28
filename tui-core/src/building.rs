@@ -119,6 +119,11 @@ impl Buildings {
         self.recompute(Building::Grandma);
     }
 
+    pub fn set_grandma_has_ritual_rolling_pins(&mut self, enable: bool) {
+        self.state.flags.grandma_has_ritual_rolling_pins = enable;
+        self.recompute(Building::Grandma);
+    }
+
     pub fn set_grandma_has_one_mind(&mut self, enable: bool) {
         self.state.flags.grandma_has_one_mind = enable;
         self.recompute(Building::Grandma);
@@ -187,6 +192,7 @@ impl BuildingsComputed {
 struct BuildingsFlags {
     thousand_fingers_mult: Option<f64>,
     grandma_has_bingo_center: bool,
+    grandma_has_ritual_rolling_pins: bool,
     grandma_has_one_mind: bool,
     grandma_has_communal_brainsweep: bool,
     grandma_has_elder_pact: bool,
@@ -360,6 +366,7 @@ impl BuildingComputed {
             },
             Building::Grandma => calc::BuildingCpsClass::Grandma {
                 has_bingo_center: flags.grandma_has_bingo_center,
+                has_ritual_rolling_pins: flags.grandma_has_ritual_rolling_pins,
                 has_one_mind: flags.grandma_has_one_mind,
                 has_communal_brainsweep: flags.grandma_has_communal_brainsweep,
                 elder_pact_portal_count: flags

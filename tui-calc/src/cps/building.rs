@@ -14,6 +14,7 @@ pub enum CpsClass {
     },
     Grandma {
         has_bingo_center: bool,
+        has_ritual_rolling_pins: bool,
         has_one_mind: bool,
         has_communal_brainsweep: bool,
         elder_pact_portal_count: Option<u16>,
@@ -45,12 +46,14 @@ impl Cps {
             } => cps + thousand_fingers.calc(),
             CpsClass::Grandma {
                 has_bingo_center,
+                has_ritual_rolling_pins,
                 has_one_mind,
                 has_communal_brainsweep,
                 elder_pact_portal_count,
                 job_upgrade_count,
             } => {
                 cps * if has_bingo_center { 4.0 } else { 1.0 }
+                    * if has_ritual_rolling_pins { 2.0 } else { 1.0 }
                     * 2.0f64.powi(job_upgrade_count as i32)
                     + if has_one_mind {
                         0.02 * count as f64

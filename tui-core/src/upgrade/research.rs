@@ -65,7 +65,7 @@ impl Research {
                 state.grandmapocalypse.add_cps_mult(1.02);
             }
             Self::RitualRollingPins => {
-                // TODO
+                state.buildings.set_grandma_has_ritual_rolling_pins(true);
             }
             Self::UnderworldOvens => {
                 state.grandmapocalypse.add_cps_mult(1.03);
