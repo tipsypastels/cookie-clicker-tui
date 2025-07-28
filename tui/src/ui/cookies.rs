@@ -24,6 +24,8 @@ const LOGO: &str = r#"  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡴⠚⣉⡙⠲⠦⠤�
   ⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⣧⣄⡄⠴⣿⣶⣿⢀⣤⠶⣞⣋⣩⣵⠏⠀⠀⠀⠀⠀
   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⣿⢯⣭⣭⣯⣯⣥⡵⠿⠟⠛⠉⠉⠀⠀⠀⠀⠀⠀⠀"#;
 
+const TIMES: &str = "×";
+
 pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let mut lines = Vec::with_capacity(LOGO_HEIGHT + 3);
 
@@ -44,6 +46,7 @@ pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let block_area = block.inner(area);
 
     milk_wave(app, block_area, buf);
+    wrinklers(app, block_area, buf);
     sugar_lump(app, block_area, buf);
 
     Paragraph::new(Text::from(lines))
@@ -55,7 +58,7 @@ pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 fn cookie_count(app: &mut UiApp, lines: &mut Vec<Line>) {
     lines.push(Line::styled(
         format!("{}", app.core.cookies().print_float(0, 2)),
-        Modifier::BOLD,
+        Style::new().white().bold(),
     ));
 }
 
@@ -130,6 +133,22 @@ fn milk_style(flavor: MilkFlavor) -> Style {
     }
 }
 
+fn wrinklers(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
+    const EMOTE: &str = " [^ (▼▼▼) ^]";
+
+    let wrinklers = app.core.grandmapocalypse().wrinklers();
+
+    if wrinklers.is_empty() {
+        return;
+    }
+
+    Line::from(vec![
+        Span::styled(EMOTE, Color::Red),
+        Span::raw(format!(" {TIMES} {}", wrinklers.len())),
+    ])
+    .render(area, buf);
+}
+
 fn sugar_lump(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let sugar_lumps = app.core.sugar_lumps();
 
@@ -141,7 +160,7 @@ fn sugar_lump(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     let text: Cow<str> = if count == 0 {
         "𖧋  ".into() // spaces used as padding :(
     } else {
-        format!("{count} ●  ").into()
+        format!("{count} {TIMES} ●  ").into()
     };
 
     Line::raw(text).right_aligned().render(area, buf);

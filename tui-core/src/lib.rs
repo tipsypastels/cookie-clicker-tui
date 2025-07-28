@@ -21,7 +21,7 @@ pub use self::{
     building::{Building, BuildingInfo},
     cost::{Cost, CostDyn, CostResolved},
     golden_cookie::{GoldenCookie, GoldenCookies},
-    grandmapocalypse::{Grandmapocalypse, GrandmapocalypsePhase},
+    grandmapocalypse::{Grandmapocalypse, GrandmapocalypsePhase, Wrinkler, Wrinklers},
     milk::{Milk, MilkFlavor},
     news::NewsEntry,
     research::Research,

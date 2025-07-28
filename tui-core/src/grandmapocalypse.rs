@@ -1,3 +1,7 @@
+mod wrinkler;
+
+pub use self::wrinkler::{Wrinkler, Wrinklers};
+
 use self::Mode::*;
 use cookie_clicker_tui_utils::refresh::Refresh;
 use serde::{Deserialize, Serialize};
@@ -15,6 +19,7 @@ pub struct Grandmapocalypse {
     appeased_temporarily_times: usize,
     appeased_duration: f64,
     cps_mults: Vec<f64>,
+    wrinklers: Wrinklers,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -39,6 +44,7 @@ impl Grandmapocalypse {
             appeased_temporarily_times: 0,
             appeased_duration: DEFAULT_APPEASED_DURATION_SECS,
             cps_mults: Vec::new(),
+            wrinklers: Wrinklers::new(),
         }
     }
 
@@ -51,10 +57,14 @@ impl Grandmapocalypse {
                     return_to: phase, ..
                 },
             ) => {
+                self.wrinklers.pop_all();
                 self.mode = NoGrandmas { return_to: *phase };
             }
             (n, NoGrandmas { return_to: phase }) if n > 0 => {
                 self.mode = Phase(*phase);
+            }
+            (_, Phase(phase)) => {
+                self.wrinklers.tick(*phase);
             }
             (
                 _,
@@ -114,6 +124,10 @@ impl Grandmapocalypse {
         matches!(self.mode, NoGrandmas { .. })
     }
 
+    pub fn wrinklers(&self) -> &Wrinklers {
+        &self.wrinklers
+    }
+
     pub(crate) fn appeased_temporarily_times(&self) -> usize {
         self.appeased_temporarily_times
     }
@@ -139,6 +153,7 @@ impl Grandmapocalypse {
     pub(crate) fn appease_temporarily(&mut self) {
         match &mut self.mode {
             Phase(phase) => {
+                self.wrinklers.pop_all();
                 self.mode = Appeased {
                     return_to: *phase,
                     temporary: true,
@@ -158,6 +173,7 @@ impl Grandmapocalypse {
     pub(crate) fn appease_permanently(&mut self) {
         match &mut self.mode {
             Phase(phase) => {
+                self.wrinklers.pop_all();
                 self.mode = Appeased {
                     return_to: *phase,
                     temporary: false,
