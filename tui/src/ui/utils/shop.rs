@@ -1,5 +1,5 @@
 use super::{SELECTED_STYLE, num::PrintFloat, style::StyleExt};
-use cookie_clicker_tui_core::Cost;
+use cookie_clicker_tui_core::CostResolved;
 use ratatui::prelude::*;
 use std::borrow::Cow;
 
@@ -11,7 +11,7 @@ pub struct ShopItemWidget<T> {
 
 pub trait ShopItemRender {
     fn label(&self) -> Cow<'static, str>;
-    fn cost(&self) -> Cost;
+    fn cost(&self) -> CostResolved;
 
     fn emoji(&self) -> Option<(&str, Style)> {
         None
@@ -52,7 +52,7 @@ impl<T: ShopItemRender> ShopItemWidget<T> {
             format!(
                 "{} $c",
                 match self.item.cost() {
-                    Cost::Cookies(c) => c.print_float(0, 0),
+                    CostResolved::Cookies(c) => c.print_float(0, 0),
                 }
             ),
             Style::new()

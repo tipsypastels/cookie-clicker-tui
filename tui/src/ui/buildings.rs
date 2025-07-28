@@ -6,7 +6,7 @@ use super::{
     },
 };
 use crate::app::AppListPane;
-use cookie_clicker_tui_core::{Building, BuildingInfo, Cost, GrandmapocalypsePhase};
+use cookie_clicker_tui_core::{Building, BuildingInfo, Core, CostResolved, GrandmapocalypsePhase};
 use ratatui::{
     prelude::*,
     widgets::{Block, Padding},
@@ -33,6 +33,7 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
             .filter(|_| info.building().is_grandma());
 
         let item = BuildingInfoShopItem {
+            core: app.core,
             info,
             sell_mode,
             grandmapocalypse_phase,
@@ -76,6 +77,7 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 }
 
 struct BuildingInfoShopItem<'a> {
+    core: &'a Core,
     info: BuildingInfo<'a>,
     sell_mode: bool,
     grandmapocalypse_phase: Option<GrandmapocalypsePhase>,
@@ -91,11 +93,11 @@ impl ShopItemRender for BuildingInfoShopItem<'_> {
         .into()
     }
 
-    fn cost(&self) -> Cost {
+    fn cost(&self) -> CostResolved {
         if self.sell_mode {
-            self.info.sell_cost()
+            self.core.resolve_cost(self.info.sell_cost())
         } else {
-            self.info.cost()
+            self.core.resolve_cost(self.info.cost())
         }
     }
 

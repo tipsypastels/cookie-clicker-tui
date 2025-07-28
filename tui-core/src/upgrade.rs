@@ -49,13 +49,13 @@ pub struct AvailableUpgrades {
 }
 
 impl AvailableUpgrades {
-    pub fn new(state: &State) -> Self {
+    pub fn new(state: &State, cps: f64) -> Self {
         let mut v = Upgrade::variants()
             .filter(|u| !state.owned_upgrades.has(*u))
             .filter(|u| u.class().req().check(state))
             .collect::<Vec<_>>();
 
-        v.sort_by(|a, b| Cost::total_cmp(a.cost(), b.cost()));
+        v.sort_by(|a, b| Cost::total_cmp(a.cost(), b.cost(), state, cps));
 
         Self {
             list: v.into(),
@@ -63,9 +63,9 @@ impl AvailableUpgrades {
         }
     }
 
-    pub fn tick(&mut self, state: &State) {
+    pub fn tick(&mut self, state: &State, cps: f64) {
         if self.refresh.finish() {
-            *self = Self::new(state);
+            *self = Self::new(state, cps);
         }
     }
 }

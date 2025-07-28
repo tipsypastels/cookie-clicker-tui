@@ -19,7 +19,7 @@ mod upgrade;
 pub use self::{
     achievement::{Achievement, AchievementReq},
     building::{Building, BuildingInfo},
-    cost::Cost,
+    cost::{Cost, CostDyn, CostResolved},
     golden_cookie::{GoldenCookie, GoldenCookies},
     grandmapocalypse::{Grandmapocalypse, GrandmapocalypseInfo, GrandmapocalypsePhase},
     milk::{Milk, MilkFlavor},
@@ -133,7 +133,15 @@ impl Core {
     }
 
     pub fn affordable(&self, cost: Cost) -> bool {
+        self.everything_free || cost.affordable(&self.state, self.computed.cps)
+    }
+
+    pub fn affordable_resolved(&self, cost: CostResolved) -> bool {
         self.everything_free || cost.affordable(&self.state)
+    }
+
+    pub fn resolve_cost(&self, cost: Cost) -> CostResolved {
+        cost.resolve(&self.state, self.computed.cps)
     }
 
     pub fn click_cookie(&mut self) {
@@ -159,15 +167,15 @@ impl Core {
     }
 
     pub fn buy_building(&mut self, building: Building) -> bool {
-        let cost = self.building_info(building).cost();
+        let cost = self.resolve_cost(self.building_info(building).cost());
 
-        if !self.affordable(cost) {
+        if !self.affordable_resolved(cost) {
             return false;
         }
 
         if !self.everything_free {
             match cost {
-                Cost::Cookies(cookies) => {
+                CostResolved::Cookies(cookies) => {
                     self.state.cookies.lose(cookies);
                 }
             }
@@ -185,8 +193,8 @@ impl Core {
         };
 
         if !self.everything_free {
-            match info.sell_cost() {
-                Cost::Cookies(cookies) => {
+            match self.resolve_cost(info.sell_cost()) {
+                CostResolved::Cookies(cookies) => {
                     self.state.cookies.gain(cookies);
                 }
             }
@@ -211,15 +219,15 @@ impl Core {
             return false;
         }
 
-        let cost = upgrade.cost();
+        let cost = self.resolve_cost(upgrade.cost());
 
-        if !self.affordable(cost) {
+        if !self.affordable_resolved(cost) {
             return false;
         }
 
         if !self.everything_free {
             match cost {
-                Cost::Cookies(cookies) => {
+                CostResolved::Cookies(cookies) => {
                     self.state.cookies.lose(cookies);
                 }
             }
@@ -349,7 +357,7 @@ struct Computed {
 impl Computed {
     fn new(state: &State) -> Self {
         let cps = self::calc::cps(state);
-        let available_upgrades = AvailableUpgrades::new(state);
+        let available_upgrades = AvailableUpgrades::new(state, cps);
 
         Self {
             cps,
@@ -358,7 +366,7 @@ impl Computed {
     }
 
     fn tick(&mut self, state: &State) {
-        self.available_upgrades.tick(state);
+        self.available_upgrades.tick(state, self.cps);
 
         if state.research.just_completed() {
             self.recalc_available_upgrades(state);
@@ -370,6 +378,6 @@ impl Computed {
     }
 
     fn recalc_available_upgrades(&mut self, state: &State) {
-        self.available_upgrades = AvailableUpgrades::new(state);
+        self.available_upgrades = AvailableUpgrades::new(state, self.cps);
     }
 }

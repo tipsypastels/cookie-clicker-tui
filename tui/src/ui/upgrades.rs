@@ -6,7 +6,7 @@ use super::{
     },
 };
 use crate::app::AppListPane;
-use cookie_clicker_tui_core::{Cost, Upgrade};
+use cookie_clicker_tui_core::{Core, CostResolved, Upgrade};
 use ratatui::{
     prelude::*,
     widgets::{Block, Padding},
@@ -20,10 +20,16 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         let selected = ctx.is_selected;
         let upgrade = upgrades[ctx.index];
         let affordable = app.core.affordable(upgrade.cost());
+
+        let item = UpgradeShopItem {
+            core: app.core,
+            upgrade,
+        };
+
         let widget = ShopItemWidget {
             selected,
             affordable,
-            item: upgrade,
+            item,
         };
 
         (widget, ShopItemWidget::HEIGHT)
@@ -52,12 +58,17 @@ pub fn upgrades(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         .render_stateful_or_default_state(area, buf, list_state);
 }
 
-impl ShopItemRender for Upgrade {
+struct UpgradeShopItem<'a> {
+    core: &'a Core,
+    upgrade: Upgrade,
+}
+
+impl ShopItemRender for UpgradeShopItem<'_> {
     fn label(&self) -> Cow<'static, str> {
-        self.name().into()
+        self.upgrade.name().into()
     }
 
-    fn cost(&self) -> Cost {
-        self.cost()
+    fn cost(&self) -> CostResolved {
+        self.core.resolve_cost(self.upgrade.cost())
     }
 }
