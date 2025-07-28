@@ -59,6 +59,10 @@ pub fn building_sell_cost(cost: f64) -> f64 {
     calc::cost::building_sell(cost)
 }
 
+pub fn elder_pledge_cost(appeased_times: usize) -> f64 {
+    calc::cost::elder_pledge(appeased_times)
+}
+
 pub fn grandma_job_upgrade_num_req_for_1p(building: Building) -> u16 {
     calc::upgrade::grandma_job_num_req_for_1p(building as u16)
 }

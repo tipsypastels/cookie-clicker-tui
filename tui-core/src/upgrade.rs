@@ -3,6 +3,7 @@ mod effect_info;
 mod grandma_job;
 mod kitten;
 mod research;
+mod switch;
 mod tiered;
 
 pub use effect_info::*;
@@ -12,6 +13,7 @@ use self::{
     grandma_job::GrandmaJob,
     kitten::Kitten,
     research::Research,
+    switch::Switch,
     tiered::Tiered,
 };
 use crate::{Building, Cost, State, req::Req};
@@ -888,6 +890,15 @@ pub enum Upgrade {
     ElderPact,
     #[assoc(class = UpgradeClass::Research(Research::SacrificialRollingPins))]
     SacrificialRollingPins,
+    /* -------------------------------------------------------------------------- */
+    /*                                  Switches                                  */
+    /* -------------------------------------------------------------------------- */
+    #[assoc(class = UpgradeClass::Switch(Switch::ElderPledge))]
+    ElderPledge,
+    #[assoc(class = UpgradeClass::Switch(Switch::ElderCovenant))]
+    ElderCovenant,
+    #[assoc(class = UpgradeClass::Switch(Switch::RevokeElderCovenant))]
+    RevokeElderCovenant,
 }
 
 impl Upgrade {
@@ -902,6 +913,10 @@ impl Upgrade {
     pub fn effect_info(&self) -> UpgradeEffectInfo {
         self.class().effect_info()
     }
+
+    pub fn should_add_to_owned(&self) -> bool {
+        !matches!(self.class(), UpgradeClass::Switch(_))
+    }
 }
 
 enum UpgradeClass {
@@ -910,6 +925,7 @@ enum UpgradeClass {
     GrandmaJob(GrandmaJob),
     Kitten(Kitten),
     Research(Research),
+    Switch(Switch),
 }
 
 impl UpgradeClass {
@@ -920,6 +936,7 @@ impl UpgradeClass {
             Self::GrandmaJob(u) => u.cost(),
             Self::Kitten(u) => u.cost(),
             Self::Research(u) => u.cost(),
+            Self::Switch(u) => u.cost(),
         }
     }
 
@@ -930,6 +947,7 @@ impl UpgradeClass {
             Self::GrandmaJob(u) => u.req(),
             Self::Kitten(u) => u.req(),
             Self::Research(u) => u.req(),
+            Self::Switch(u) => u.req(),
         }
     }
 
@@ -940,6 +958,7 @@ impl UpgradeClass {
             Self::GrandmaJob(u) => u.buy(state),
             Self::Kitten(u) => u.buy(state),
             Self::Research(u) => u.buy(state),
+            Self::Switch(u) => u.buy(state),
         }
     }
 
@@ -950,6 +969,7 @@ impl UpgradeClass {
             Self::GrandmaJob(u) => u.effect_info(),
             Self::Kitten(u) => u.effect_info(),
             Self::Research(u) => u.effect_info(),
+            Self::Switch(u) => u.effect_info(),
         }
     }
 }

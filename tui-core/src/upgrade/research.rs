@@ -46,6 +46,9 @@ impl Research {
                 Req::Achievement(Achievement::Elder),
                 Req::BuildingCount(Building::Grandma, Cmp::AboveOrEq(6)),
             ]),
+            Self::SacrificialRollingPins => {
+                Req::Custom(|state| state.grandmapocalypse.appeased_temporarily_times() > 10)
+            }
             _ => Req::ResearchCompleted(Cmp::AboveOrEq(*self as u8)),
         }
     }
@@ -61,7 +64,9 @@ impl Research {
             Self::DesignerCocoaBeans => {
                 state.grandmapocalypse.add_cps_mult(1.02);
             }
-            Self::RitualRollingPins => {}
+            Self::RitualRollingPins => {
+                // TODO
+            }
             Self::UnderworldOvens => {
                 state.grandmapocalypse.add_cps_mult(1.03);
             }
@@ -89,7 +94,11 @@ impl Research {
                     .grandmapocalypse
                     .set_phase(GrandmapocalypsePhase::Angered);
             }
-            Self::SacrificialRollingPins => {}
+            Self::SacrificialRollingPins => {
+                state
+                    .grandmapocalypse
+                    .modify_appeased_duration(|d| *d *= 2.0);
+            }
         }
 
         if !matches!(self, Self::SacrificialRollingPins) {

@@ -128,6 +128,24 @@ pub fn print_info(info: UpgradeEffectInfo, lines: &mut Vec<Line>) {
                 ]));
             }
         }
+        UpgradeEffectInfo::ElderPledge => {
+            lines.push(Line::raw("• contains the wrath of the elders for a while"));
+        }
+        UpgradeEffectInfo::ElderCovenant { revoke: false } => {
+            lines.push(Line::raw("• contains the wrath of the elders permanently"));
+            lines.push(Line::from(vec![
+                Span::raw("• reduces your cookies per second by "),
+                Span::styled("5%", Modifier::BOLD),
+            ]));
+        }
+        UpgradeEffectInfo::ElderCovenant { revoke: true } => {
+            lines.push(Line::raw("• releases the wrath of the elders"));
+            lines.push(Line::from(vec![
+                Span::raw("• gives back your "),
+                Span::styled("5%", Modifier::BOLD),
+                Span::raw(" cookies per second"),
+            ]));
+        }
     }
 }
 

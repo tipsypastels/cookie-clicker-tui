@@ -13,6 +13,10 @@ pub enum UpgradeEffectInfo {
         effect: UpgradeInfoEffectResearch,
         warning: Option<UpgradeInfoEffectResearchWarning>,
     },
+    ElderPledge,
+    ElderCovenant {
+        revoke: bool,
+    },
 }
 
 pub enum UpgradeInfoEffectResearch {

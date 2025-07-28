@@ -233,8 +233,9 @@ impl Core {
             }
         }
 
-        // If this is not a switch.
-        self.state.owned_upgrades.add(upgrade);
+        if upgrade.should_add_to_owned() {
+            self.state.owned_upgrades.add(upgrade);
+        }
 
         upgrade.buy(&mut self.state);
 
