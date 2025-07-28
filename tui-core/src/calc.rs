@@ -10,6 +10,7 @@ pub fn cps(state: &State) -> f64 {
     let addl = calc::cps::addl::Cps {
         grandmapocalypse_mults: state.grandmapocalypse.cps_mults().iter().copied(),
         kitten_mult: state.milk.cps_mult(),
+        has_elder_covenant: state.grandmapocalypse.is_appeased_permanently(),
     };
     calc::cps::Cps::new(base, addl).total
 }

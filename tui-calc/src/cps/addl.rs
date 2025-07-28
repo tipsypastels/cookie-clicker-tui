@@ -1,6 +1,7 @@
 pub struct Cps<GrandmapocalypseMults> {
     pub grandmapocalypse_mults: GrandmapocalypseMults,
     pub kitten_mult: f64,
+    pub has_elder_covenant: bool,
 }
 
 impl<GrandmapocalypseMults> Cps<GrandmapocalypseMults>
@@ -18,6 +19,10 @@ where
 
         // The kitten mult is pre-calculated.
         cps *= self.kitten_mult;
+
+        if self.has_elder_covenant {
+            cps *= 0.95;
+        }
 
         cps
     }
