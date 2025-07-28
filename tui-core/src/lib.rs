@@ -21,7 +21,7 @@ pub use self::{
     building::{Building, BuildingInfo},
     cost::Cost,
     golden_cookie::{GoldenCookie, GoldenCookies},
-    grandmapocalypse::{Grandmapocalypse, GrandmapocalypsePhase},
+    grandmapocalypse::{Grandmapocalypse, GrandmapocalypseInfo, GrandmapocalypsePhase},
     milk::{Milk, MilkFlavor},
     news::NewsEntry,
     research::Research,
@@ -225,6 +225,7 @@ impl Core {
             }
         }
 
+        // If this is not a switch.
         self.state.owned_upgrades.add(upgrade);
 
         upgrade.buy(&mut self.state);
@@ -332,6 +333,7 @@ impl State {
         self.buildings.tick();
         self.milk.tick(self.achievements.owned().len() as _);
         self.research.tick();
+        self.grandmapocalypse.tick();
         self.golden_cookies.tick();
 
         achievement::tick(self, computed);
