@@ -38,8 +38,8 @@ impl ModalImpl<'_> {
     fn render(self, f: impl FnOnce(Rect, &mut Buffer, Block)) {
         let area = self.split_area();
         let block = Block::bordered()
-            .style(Style::new().on_dark_gray())
-            .border_style(Style::new().black())
+            .style(Style::new().white().on_black())
+            .border_style(Style::new().white())
             .title(Line::styled(self.title, Modifier::BOLD))
             .title_bottom(Line::styled(self.title_bottom, Modifier::BOLD).right_aligned());
 
