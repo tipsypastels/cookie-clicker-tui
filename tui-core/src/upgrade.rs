@@ -16,7 +16,7 @@ use self::{
     switch::Switch,
     tiered::Tiered,
 };
-use crate::{Building, Cost, State, req::Req};
+use crate::{Building, Cost, State, cps::Cps, req::Req};
 use cookie_clicker_tui_utils::{num, refresh::Refresh};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
@@ -51,7 +51,7 @@ pub struct AvailableUpgrades {
 }
 
 impl AvailableUpgrades {
-    pub fn new(state: &State, cps: f64) -> Self {
+    pub fn new(state: &State, cps: &Cps) -> Self {
         let mut v = Upgrade::variants()
             .filter(|u| !state.owned_upgrades.has(*u))
             .filter(|u| u.class().req().check(state))
@@ -65,7 +65,7 @@ impl AvailableUpgrades {
         }
     }
 
-    pub fn tick(&mut self, state: &State, cps: f64) {
+    pub fn tick(&mut self, state: &State, cps: &Cps) {
         if self.refresh.finish() {
             *self = Self::new(state, cps);
         }

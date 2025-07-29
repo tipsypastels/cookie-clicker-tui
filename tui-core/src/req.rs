@@ -98,7 +98,7 @@ impl LateReq {
     pub fn check(&self, state: &State, computed: &Computed) -> bool {
         match self {
             Self::Req(req) => req.check(state),
-            Self::Cps(c) => c.check(computed.cps),
+            Self::Cps(c) => c.check(computed.cps.total),
             Self::Custom(f) => f(state, computed),
             Self::CustomBox(f) => f(state, computed),
             Self::Any(reqs) => reqs.iter().any(|r| r.check(state, computed)),

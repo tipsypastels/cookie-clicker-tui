@@ -1,3 +1,4 @@
+use crate::cps::Cps;
 use cookie_clicker_tui_utils::frames::FPS;
 use serde::{Deserialize, Serialize};
 
@@ -43,7 +44,7 @@ impl Cookies {
         self.current -= amount;
     }
 
-    pub fn tick(&mut self, cps: f64) {
-        self.gain(cps / FPS);
+    pub fn tick(&mut self, cps: &Cps) {
+        self.gain(cps.total / FPS);
     }
 }

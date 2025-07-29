@@ -1,9 +1,9 @@
-use crate::{State, building::Building};
+use crate::{State, building::Building, cps::Cps};
 use cookie_clicker_tui_calc as calc;
 
 pub use calc::{cps::building::CpsClass as BuildingCpsClass, thousand_fingers::ThousandFingers};
 
-pub fn cps(state: &State) -> f64 {
+pub fn cps(state: &State) -> Cps {
     let base = calc::cps::base::Cps {
         building_cpses: state.buildings.infos().map(|i| i.cps()),
     };
@@ -12,7 +12,12 @@ pub fn cps(state: &State) -> f64 {
         kitten_mult: state.milk.cps_mult(),
         has_elder_covenant: state.grandmapocalypse.is_appeased_permanently(),
     };
-    calc::cps::Cps::new(base, addl).total
+    let res = calc::cps::Cps::new(base, addl);
+
+    Cps {
+        base: res.base,
+        total: res.total,
+    }
 }
 
 pub fn building_cps(

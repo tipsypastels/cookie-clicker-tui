@@ -11,7 +11,7 @@ pub fn debug(app: &mut UiApp, view: AppDebugView, area: Rect, buf: &mut Buffer) 
     let title = format!(" Debug - {} ", view.name());
     let text = match view {
         AppDebugView::Cookies => format!("{:?}", core.debug_cookies()),
-        AppDebugView::Cps => format!("{:?}", core.cps()),
+        AppDebugView::Cps => format!("{:?}", core.debug_cps()),
         AppDebugView::Buildings => format!("{:?}", core.debug_buildings()),
         AppDebugView::BuildingsFlags => format!("{:?}", core.debug_buildings_flags()),
         AppDebugView::Click => format!("{:?}", core.debug_click()),

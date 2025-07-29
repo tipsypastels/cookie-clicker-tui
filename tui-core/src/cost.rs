@@ -1,4 +1,4 @@
-use crate::State;
+use crate::{State, cps::Cps};
 use std::cmp::Ordering;
 
 #[derive(Debug, Copy, Clone)]
@@ -8,18 +8,18 @@ pub enum Cost {
 }
 
 impl Cost {
-    pub(crate) fn resolve(self, state: &State, cps: f64) -> CostResolved {
+    pub(crate) fn resolve(self, state: &State, cps: &Cps) -> CostResolved {
         match self {
             Self::Cookies(c) => CostResolved::Cookies(c),
             Self::Dyn(c) => (c.f)(state, cps),
         }
     }
 
-    pub(crate) fn affordable(self, state: &State, cps: f64) -> bool {
+    pub(crate) fn affordable(self, state: &State, cps: &Cps) -> bool {
         self.resolve(state, cps).affordable(state)
     }
 
-    pub(crate) fn total_cmp(a: Self, b: Self, state: &State, cps: f64) -> Ordering {
+    pub(crate) fn total_cmp(a: Self, b: Self, state: &State, cps: &Cps) -> Ordering {
         CostResolved::total_cmp(a.resolve(state, cps), b.resolve(state, cps))
     }
 }
@@ -60,11 +60,11 @@ impl CostResolved {
 
 #[derive(Debug, Copy, Clone)]
 pub struct CostDyn {
-    f: fn(&State, f64) -> CostResolved,
+    f: fn(&State, &Cps) -> CostResolved,
 }
 
 impl CostDyn {
-    pub(crate) fn new(f: fn(&State, f64) -> CostResolved) -> Self {
+    pub(crate) fn new(f: fn(&State, &Cps) -> CostResolved) -> Self {
         Self { f }
     }
 }

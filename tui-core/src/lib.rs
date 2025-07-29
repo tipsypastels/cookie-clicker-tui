@@ -4,6 +4,7 @@ mod calc;
 mod click;
 mod cookies;
 mod cost;
+mod cps;
 mod golden_cookie;
 mod grandmapocalypse;
 mod macros;
@@ -36,6 +37,7 @@ use self::{
     building::Buildings,
     click::Click,
     cookies::Cookies,
+    cps::Cps,
     thousand_fingers::ThousandFingers,
     upgrade::{AvailableUpgrades, OwnedUpgrades},
 };
@@ -77,7 +79,7 @@ impl Core {
     }
 
     pub fn cps(&self) -> f64 {
-        self.computed.cps
+        self.computed.cps.total
     }
 
     pub fn milk(&self) -> &Milk {
@@ -133,7 +135,7 @@ impl Core {
     }
 
     pub fn affordable(&self, cost: Cost) -> bool {
-        self.everything_free || cost.affordable(&self.state, self.computed.cps)
+        self.everything_free || cost.affordable(&self.state, &self.computed.cps)
     }
 
     pub fn affordable_resolved(&self, cost: CostResolved) -> bool {
@@ -141,7 +143,7 @@ impl Core {
     }
 
     pub fn resolve_cost(&self, cost: Cost) -> CostResolved {
-        cost.resolve(&self.state, self.computed.cps)
+        cost.resolve(&self.state, &self.computed.cps)
     }
 
     pub fn click_cookie(&mut self) {
@@ -275,6 +277,10 @@ impl Core {
         &self.state.cookies
     }
 
+    pub fn debug_cps(&self) -> impl fmt::Debug {
+        &self.computed.cps
+    }
+
     pub fn debug_buildings(&self) -> impl fmt::Debug {
         &self.state.buildings
     }
@@ -348,7 +354,7 @@ impl State {
             );
         }
 
-        self.cookies.tick(computed.cps);
+        self.cookies.tick(&computed.cps);
         self.buildings.tick();
         self.milk.tick(self.achievements.owned().len() as _);
         self.research.tick();
@@ -362,14 +368,14 @@ impl State {
 }
 
 struct Computed {
-    cps: f64,
+    cps: Cps,
     available_upgrades: AvailableUpgrades,
 }
 
 impl Computed {
     fn new(state: &State) -> Self {
         let cps = self::calc::cps(state);
-        let available_upgrades = AvailableUpgrades::new(state, cps);
+        let available_upgrades = AvailableUpgrades::new(state, &cps);
 
         Self {
             cps,
@@ -378,7 +384,7 @@ impl Computed {
     }
 
     fn tick(&mut self, state: &State) {
-        self.available_upgrades.tick(state, self.cps);
+        self.available_upgrades.tick(state, &self.cps);
 
         if state.research.just_completed() {
             self.recalc_available_upgrades(state);
@@ -390,6 +396,6 @@ impl Computed {
     }
 
     fn recalc_available_upgrades(&mut self, state: &State) {
-        self.available_upgrades = AvailableUpgrades::new(state, self.cps);
+        self.available_upgrades = AvailableUpgrades::new(state, &self.cps);
     }
 }
