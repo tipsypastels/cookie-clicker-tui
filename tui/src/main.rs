@@ -11,7 +11,7 @@ use self::{
 };
 use anyhow::Result;
 use clap::Parser;
-use cookie_clicker_tui_core::Building;
+use cookie_clicker_tui_core::{Building, GrandmapocalypsePhase};
 use std::path::Path;
 
 #[derive(Parser)]
@@ -34,6 +34,9 @@ struct Cli {
     /// Give a free "You" building to start with
     #[clap(long, requires = "dry_run")]
     free_you: bool,
+
+    #[clap(long, requires = "dry_run")]
+    free_grandmapocalypse: bool,
 
     /// Greatly speeds up golden cookie spawning
     #[clap(long, requires = "dry_run")]
@@ -65,6 +68,11 @@ async fn main() -> Result<()> {
 
     if cli.free_you {
         core.give_building(Building::You);
+    }
+
+    if cli.free_grandmapocalypse {
+        core.give_building(Building::Grandma);
+        core.cheat_set_grandmapocalypse_phase(GrandmapocalypsePhase::Angered);
     }
 
     if cli.fast_golden_cookies {

@@ -272,6 +272,10 @@ impl Core {
         self.everything_free = true;
     }
 
+    pub fn cheat_set_grandmapocalypse_phase(&mut self, phase: GrandmapocalypsePhase) {
+        self.state.grandmapocalypse.set_phase(phase);
+    }
+
     pub fn cheat_spawn_golden_cookies_fast(&mut self) {
         self.state.golden_cookies.modify_spawning(|min, max| {
             *min = 5.0;
