@@ -1,7 +1,10 @@
-use crate::{State, building::Building, cps::Cps};
+use crate::{State, building::Building};
 use cookie_clicker_tui_calc as calc;
 
-pub use calc::{cps::building::CpsClass as BuildingCpsClass, thousand_fingers::ThousandFingers};
+pub use calc::{
+    cps::{Cps, building::CpsClass as BuildingCpsClass},
+    thousand_fingers::ThousandFingers,
+};
 
 pub fn cps(state: &State) -> Cps {
     let base = calc::cps::base::Cps {
@@ -10,14 +13,10 @@ pub fn cps(state: &State) -> Cps {
     let addl = calc::cps::addl::Cps {
         grandmapocalypse_mults: state.grandmapocalypse.cps_mults().iter().copied(),
         kitten_mult: state.milk.cps_mult(),
+        wrinkler_count: state.grandmapocalypse.wrinklers().len(),
         has_elder_covenant: state.grandmapocalypse.is_appeased_permanently(),
     };
-    let res = calc::cps::Cps::new(base, addl);
-
-    Cps {
-        base: res.base,
-        total: res.total,
-    }
+    calc::cps::Cps::new(base, addl)
 }
 
 pub fn building_cps(

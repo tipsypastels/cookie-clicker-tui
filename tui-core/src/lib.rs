@@ -359,7 +359,7 @@ impl State {
         self.milk.tick(self.achievements.owned().len() as _);
         self.research.tick();
         self.grandmapocalypse
-            .tick(self.buildings.count(Building::Grandma));
+            .tick(self.buildings.count(Building::Grandma), &computed.cps);
         self.golden_cookies.tick();
 
         achievement::tick(self, computed);
@@ -374,7 +374,7 @@ struct Computed {
 
 impl Computed {
     fn new(state: &State) -> Self {
-        let cps = self::calc::cps(state);
+        let cps = Cps::new(state);
         let available_upgrades = AvailableUpgrades::new(state, &cps);
 
         Self {
@@ -386,13 +386,17 @@ impl Computed {
     fn tick(&mut self, state: &State) {
         self.available_upgrades.tick(state, &self.cps);
 
+        if state.grandmapocalypse.wrinklers().count_just_changed() {
+            self.recalc_cps(state);
+        }
+
         if state.research.just_completed() {
             self.recalc_available_upgrades(state);
         }
     }
 
     fn recalc_cps(&mut self, state: &State) {
-        self.cps = self::calc::cps(state);
+        self.cps.recalc(state);
     }
 
     fn recalc_available_upgrades(&mut self, state: &State) {

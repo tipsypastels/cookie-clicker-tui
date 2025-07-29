@@ -101,7 +101,7 @@ impl Research {
             }
         }
 
-        if !matches!(self, Self::SacrificialRollingPins) {
+        if !matches!(self, Self::ElderPact | Self::SacrificialRollingPins) {
             state.research.start();
         }
     }

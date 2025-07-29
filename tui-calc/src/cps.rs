@@ -7,6 +7,7 @@ pub mod kittens;
 pub struct Cps {
     pub base: f64,
     pub total: f64,
+    pub wrinkled: f64,
 }
 
 impl Cps {
@@ -19,8 +20,12 @@ impl Cps {
         GrandmapocalypseMults: Iterator<Item = f64>,
     {
         let base = base.calc();
-        let total = addl.calc(base);
+        let (total, wrinkled) = addl.calc(base);
 
-        Self { base, total }
+        Self {
+            base,
+            total,
+            wrinkled,
+        }
     }
 }

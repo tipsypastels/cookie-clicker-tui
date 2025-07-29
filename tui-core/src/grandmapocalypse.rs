@@ -1,5 +1,7 @@
 mod wrinkler;
 
+use crate::cps::Cps;
+
 pub use self::wrinkler::{Wrinkler, Wrinklers};
 
 use self::Mode::*;
@@ -48,7 +50,7 @@ impl Grandmapocalypse {
         }
     }
 
-    pub(crate) fn tick(&mut self, grandma_count: u16) {
+    pub(crate) fn tick(&mut self, grandma_count: u16, cps: &Cps) {
         match (grandma_count, &mut self.mode) {
             (
                 0,
@@ -64,7 +66,7 @@ impl Grandmapocalypse {
                 self.mode = Phase(*phase);
             }
             (_, Phase(phase)) => {
-                self.wrinklers.tick(*phase);
+                self.wrinklers.tick(*phase, cps);
             }
             (
                 _,
