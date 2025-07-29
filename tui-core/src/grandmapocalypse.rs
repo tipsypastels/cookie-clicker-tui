@@ -110,7 +110,6 @@ impl Grandmapocalypse {
         )
     }
 
-    // TODO: This should affect CPS (0.95x).
     pub fn is_appeased_permanently(&self) -> bool {
         matches!(
             self.mode,
