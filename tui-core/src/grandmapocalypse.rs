@@ -215,3 +215,9 @@ pub enum GrandmapocalypsePhase {
     Displeased,
     Angered,
 }
+
+impl GrandmapocalypsePhase {
+    fn wrinkler_spawn_mult(self) -> f64 {
+        (self as u8 + 1) as f64
+    }
+}

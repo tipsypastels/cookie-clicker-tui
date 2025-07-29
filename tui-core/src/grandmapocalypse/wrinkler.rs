@@ -4,7 +4,7 @@ use std::ops::Deref;
 
 const DEFAULT_MAX_SIZE: usize = 10;
 #[cfg(debug_assertions)]
-const DEFAULT_ODDS_PER_SPOT_PER_PHASE: f64 = 0.001;
+const DEFAULT_ODDS_PER_SPOT_PER_PHASE: f64 = 0.0001;
 #[cfg(not(debug_assertions))]
 const DEFAULT_ODDS_PER_SPOT_PER_PHASE: f64 = 0.00001;
 
@@ -28,7 +28,7 @@ impl Wrinklers {
         let available = self.available_size();
         if available > 0
             && rand::random::<f64>()
-                <= self.odds_per_spot_per_phase * available as f64 * phase as u8 as f64
+                <= self.odds_per_spot_per_phase * available as f64 * phase.wrinkler_spawn_mult()
         {
             self.list.push(Wrinkler {});
         }
