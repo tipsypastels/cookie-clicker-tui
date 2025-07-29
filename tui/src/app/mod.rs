@@ -160,7 +160,7 @@ impl App {
             {
                 #[allow(clippy::collapsible_else_if)]
                 match self.list.pointee(&self.core) {
-                    Some((_, AppListPointee::Building(building))) => {
+                    Some(AppListPointee::Building(building)) => {
                         if self.iface.sell_mode() {
                             if !self.core.sell_building(building) {
                                 self.iface
@@ -172,7 +172,7 @@ impl App {
                             }
                         }
                     }
-                    Some((_, AppListPointee::Upgrade(upgrade))) => {
+                    Some(AppListPointee::Upgrade(upgrade)) => {
                         if !self.core.buy_upgrade(upgrade) {
                             self.iface.add_flash(AppFlash::CantAffordUpgrade(upgrade));
                         }

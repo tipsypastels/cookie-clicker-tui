@@ -1,9 +1,6 @@
 use super::{
     UiApp,
-    utils::{
-        shop::{ShopItemRender, ShopItemWidget},
-        widget::*,
-    },
+    utils::shop::{ShopItemRender, ShopItemWidget},
 };
 use crate::app::AppListPane;
 use cookie_clicker_tui_core::{Building, BuildingInfo, Core, CostResolved, GrandmapocalypsePhase};
@@ -15,8 +12,9 @@ use std::borrow::Cow;
 use tui_widget_list::{ListBuilder, ListView};
 
 pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
+    let (list_selected, list_state) = app.list.get_for_render(AppListPane::Buildings, app.core);
     let builder = ListBuilder::new(|ctx| {
-        let selected = ctx.is_selected;
+        let selected = list_selected && ctx.is_selected;
         let info = app.core.building_info_nth(ctx.index);
 
         let sell_mode = app.iface.sell_mode();
@@ -49,7 +47,6 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     });
 
     let list_view = ListView::new(builder, Building::VARIANT_COUNT);
-    let list_state = app.list.state_matching_mut(AppListPane::Buildings);
 
     let (title, controls, border_style) = if app.iface.sell_mode() {
         (
@@ -71,9 +68,7 @@ pub fn buildings(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         .padding(Padding::uniform(1))
         .border_style(border_style);
 
-    list_view
-        .block(block)
-        .render_stateful_or_default_state(area, buf, list_state);
+    list_view.block(block).render(area, buf, list_state);
 }
 
 struct BuildingInfoShopItem<'a> {

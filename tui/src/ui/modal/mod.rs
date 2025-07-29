@@ -15,10 +15,10 @@ pub fn modal(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
     match app.modal {
         AppModalState::None => {}
         AppModalState::ListItem => match app.list.pointee(app.core) {
-            Some((_, AppListPointee::Building(building))) => {
+            Some(AppListPointee::Building(building)) => {
                 building::building(app, building, area, buf)
             }
-            Some((_, AppListPointee::Upgrade(upgrade))) => upgrade::upgrade(upgrade, area, buf),
+            Some(AppListPointee::Upgrade(upgrade)) => upgrade::upgrade(upgrade, area, buf),
             None => {}
         },
         AppModalState::RenamingBakery(name) => rename_bakery::rename_bakery(name, area, buf),
