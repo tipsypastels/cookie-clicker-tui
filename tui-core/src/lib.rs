@@ -78,6 +78,10 @@ impl Core {
         self.state.cookies.all_time_from_clicking()
     }
 
+    pub fn cookies_enqueued_gain_bulk(&self) -> Option<f64> {
+        self.state.cookies.enqueued_gain_bulk()
+    }
+
     pub fn cps(&self) -> f64 {
         self.computed.cps.total
     }
@@ -257,6 +261,13 @@ impl Core {
         true
     }
 
+    pub fn pop_wrinkler(&mut self, index: usize) {
+        self.state
+            .grandmapocalypse
+            .wrinklers_mut()
+            .pop(index, &mut self.state.cookies);
+    }
+
     pub fn cheat_make_everything_free(&mut self) {
         self.everything_free = true;
     }
@@ -358,8 +369,11 @@ impl State {
         self.buildings.tick();
         self.milk.tick(self.achievements.owned().len() as _);
         self.research.tick();
-        self.grandmapocalypse
-            .tick(self.buildings.count(Building::Grandma), &computed.cps);
+        self.grandmapocalypse.tick(
+            self.buildings.count(Building::Grandma),
+            &computed.cps,
+            &mut self.cookies,
+        );
         self.golden_cookies.tick();
 
         achievement::tick(self, computed);

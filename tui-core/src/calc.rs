@@ -71,3 +71,7 @@ pub fn elder_pledge_cost(appeased_times: usize) -> f64 {
 pub fn grandma_job_upgrade_num_req_for_1p(building: Building) -> u16 {
     calc::upgrade::grandma_job_num_req_for_1p(building as u16)
 }
+
+pub fn wrinkler_pop_cookies(eaten: f64) -> f64 {
+    calc::wrinkler::pop_cookies(eaten)
+}

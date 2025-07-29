@@ -1,10 +1,9 @@
 mod wrinkler;
 
-use crate::cps::Cps;
-
 pub use self::wrinkler::{Wrinkler, Wrinklers};
 
 use self::Mode::*;
+use crate::{cookies::Cookies, cps::Cps};
 use cookie_clicker_tui_utils::refresh::Refresh;
 use serde::{Deserialize, Serialize};
 
@@ -50,7 +49,7 @@ impl Grandmapocalypse {
         }
     }
 
-    pub(crate) fn tick(&mut self, grandma_count: u16, cps: &Cps) {
+    pub(crate) fn tick(&mut self, grandma_count: u16, cps: &Cps, cookies: &mut Cookies) {
         match (grandma_count, &mut self.mode) {
             (
                 0,
@@ -59,7 +58,7 @@ impl Grandmapocalypse {
                     return_to: phase, ..
                 },
             ) => {
-                self.wrinklers.pop_all();
+                self.wrinklers.pop_all(cookies);
                 self.mode = NoGrandmas { return_to: *phase };
             }
             (n, NoGrandmas { return_to: phase }) if n > 0 => {
@@ -130,6 +129,10 @@ impl Grandmapocalypse {
         &self.wrinklers
     }
 
+    pub(crate) fn wrinklers_mut(&mut self) -> &mut Wrinklers {
+        &mut self.wrinklers
+    }
+
     pub(crate) fn appeased_temporarily_times(&self) -> usize {
         self.appeased_temporarily_times
     }
@@ -152,10 +155,10 @@ impl Grandmapocalypse {
         }
     }
 
-    pub(crate) fn appease_temporarily(&mut self) {
+    pub(crate) fn appease_temporarily(&mut self, cookies: &mut Cookies) {
         match &mut self.mode {
             Phase(phase) => {
-                self.wrinklers.pop_all();
+                self.wrinklers.pop_all(cookies);
                 self.mode = Appeased {
                     return_to: *phase,
                     temporary: true,
@@ -172,10 +175,10 @@ impl Grandmapocalypse {
         }
     }
 
-    pub(crate) fn appease_permanently(&mut self) {
+    pub(crate) fn appease_permanently(&mut self, cookies: &mut Cookies) {
         match &mut self.mode {
             Phase(phase) => {
-                self.wrinklers.pop_all();
+                self.wrinklers.pop_all(cookies);
                 self.mode = Appeased {
                     return_to: *phase,
                     temporary: false,

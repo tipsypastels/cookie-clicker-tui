@@ -1,6 +1,5 @@
-use crate::cps::Cps;
-
 use super::GrandmapocalypsePhase;
+use crate::{calc, cookies::Cookies, cps::Cps};
 use cookie_clicker_tui_utils::frames::FPS;
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
@@ -50,7 +49,22 @@ impl Wrinklers {
         self.count_just_changed
     }
 
-    pub(crate) fn pop_all(&mut self) {
+    pub(crate) fn pop(&mut self, index: usize, cookies: &mut Cookies) {
+        if let Some(wrinkler) = self.get(index) {
+            let gain = calc::wrinkler_pop_cookies(wrinkler.eaten);
+            cookies.gain_bulk(gain);
+            self.list.remove(index);
+        }
+    }
+
+    pub(crate) fn pop_all(&mut self, cookies: &mut Cookies) {
+        let gain = self
+            .list
+            .iter()
+            .map(|w| calc::wrinkler_pop_cookies(w.eaten))
+            .sum();
+
+        cookies.gain_bulk(gain);
         self.list.clear();
     }
 

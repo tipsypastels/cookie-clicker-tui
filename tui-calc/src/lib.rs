@@ -5,3 +5,4 @@ pub mod cpc;
 pub mod cps;
 pub mod thousand_fingers;
 pub mod upgrade;
+pub mod wrinkler;

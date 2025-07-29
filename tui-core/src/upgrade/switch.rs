@@ -43,10 +43,14 @@ impl Switch {
     pub fn buy(&self, state: &mut State) {
         match self {
             Self::ElderPledge => {
-                state.grandmapocalypse.appease_temporarily();
+                state
+                    .grandmapocalypse
+                    .appease_temporarily(&mut state.cookies);
             }
             Self::ElderCovenant => {
-                state.grandmapocalypse.appease_permanently();
+                state
+                    .grandmapocalypse
+                    .appease_permanently(&mut state.cookies);
             }
             Self::RevokeElderCovenant => {
                 state.grandmapocalypse.unappease();

@@ -130,6 +130,14 @@ impl App {
             KeyCode::Down => {
                 state.next();
             }
+            KeyCode::Char('p') => {
+                if let Some(selected) = state.selected {
+                    self.core.pop_wrinkler(selected);
+                }
+                if self.core.grandmapocalypse().wrinklers().is_empty() {
+                    self.modal.close();
+                }
+            }
             _ => {}
         }
     }

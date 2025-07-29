@@ -64,10 +64,28 @@ pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
 }
 
 fn cookie_count(app: &mut UiApp, lines: &mut Vec<Line>) {
-    lines.push(Line::styled(
-        format!("{}", app.core.cookies().print_float(0, 2)),
+    let (cookies, gain_bulk) = if let Some(gain_bulk) = app.core.cookies_enqueued_gain_bulk() {
+        (app.core.cookies() - gain_bulk, Some(gain_bulk))
+    } else {
+        (app.core.cookies(), None)
+    };
+
+    let mut spans = vec![Span::styled(
+        format!("{}", cookies.print_float(0, 2),),
         Style::new().white().bold(),
-    ));
+    )];
+
+    if let Some(gain_bulk) = gain_bulk {
+        spans.extend([
+            Span::raw(" "),
+            Span::styled(
+                format!("+ {}", gain_bulk.print_float(0, 2),),
+                Style::new().yellow().bold(),
+            ),
+        ]);
+    }
+
+    lines.push(Line::from(spans));
 }
 
 fn cps_count(app: &mut UiApp, lines: &mut Vec<Line>) {
