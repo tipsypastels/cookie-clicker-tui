@@ -3,7 +3,7 @@ use crate::{
     app::AppModalState,
     ui::{
         UiApp,
-        utils::{SELECTED_STYLE, num::PrintFloat, style::StyleExt},
+        utils::{num::PrintFloat, style::StyleExt},
     },
 };
 use cookie_clicker_tui_core::Wrinkler;
@@ -74,7 +74,7 @@ impl WrinklerWidget<'_> {
     fn name_line(&self) -> Line {
         Line::styled(
             format!("[^ (▼▼▼) ^] # {}", self.i + 1),
-            Style::new().patch_if(self.selected, SELECTED_STYLE),
+            Style::new().selected_if(self.selected),
         )
     }
 
@@ -82,8 +82,7 @@ impl WrinklerWidget<'_> {
     fn eaten_line(&self) -> Line {
         Line::styled(
             format!("{} cookies", self.wrinkler.eaten().print_float(2, 2)),
-            // TODO: selected_if().
-            Style::new().patch_if(self.selected, SELECTED_STYLE),
+            Style::new().selected_if(self.selected),
         )
         .right_aligned()
     }

@@ -1,4 +1,4 @@
-use super::{SELECTED_STYLE, num::PrintFloat, style::StyleExt};
+use super::{num::PrintFloat, style::StyleExt};
 use cookie_clicker_tui_core::CostResolved;
 use ratatui::prelude::*;
 use std::borrow::Cow;
@@ -42,7 +42,7 @@ impl<T: ShopItemRender> ShopItemWidget<T> {
 
         Line::from(v).style(
             Style::new()
-                .patch_if(self.selected, SELECTED_STYLE)
+                .selected_if(self.selected)
                 .fg_if(!self.affordable, Color::DarkGray),
         )
     }
@@ -56,7 +56,7 @@ impl<T: ShopItemRender> ShopItemWidget<T> {
                 }
             ),
             Style::new()
-                .patch_if(self.selected, SELECTED_STYLE)
+                .selected_if(self.selected)
                 .fg_if(!self.affordable, Color::DarkGray)
                 .add_modifier(Modifier::ITALIC),
         )
