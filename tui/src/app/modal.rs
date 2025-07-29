@@ -1,8 +1,13 @@
+use tui_widget_list::ListState;
+
 #[derive(Default)]
 pub enum AppModalState {
     #[default]
     None,
     ListItem,
+    Wrinklers {
+        state: ListState,
+    },
     RenamingBakery(String),
 }
 
@@ -25,6 +30,12 @@ impl AppModalState {
 
     pub(super) fn set_renaming_bakery(&mut self) {
         *self = Self::RenamingBakery(String::new());
+    }
+
+    pub(super) fn set_wrinklers(&mut self) {
+        *self = Self::Wrinklers {
+            state: ListState::default(),
+        };
     }
 
     pub(super) fn close(&mut self) {

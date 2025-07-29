@@ -71,10 +71,16 @@ impl App {
                 Event::Term(crossterm::event::Event::Key(event)) if event.is_press() => {
                     self.debug.set_latest_key_event(event);
 
-                    if let AppModalState::RenamingBakery(_) = self.modal {
-                        self.handle_renaming_bakery_key_event(event);
-                    } else {
-                        self.handle_key_event(event).await?;
+                    match self.modal {
+                        AppModalState::RenamingBakery(_) => {
+                            self.handle_renaming_bakery_key_event(event);
+                        }
+                        AppModalState::Wrinklers { .. } => {
+                            self.handle_wrinklers_key_event(event);
+                        }
+                        _ => {
+                            self.handle_key_event(event).await?;
+                        }
                     }
                 }
                 _ => {}
@@ -103,6 +109,26 @@ impl App {
             }
             KeyCode::Char(char) => {
                 name.push(char);
+            }
+            _ => {}
+        }
+    }
+
+    fn handle_wrinklers_key_event(&mut self, event: KeyEvent) {
+        let state = match &mut self.modal {
+            AppModalState::Wrinklers { state } => state,
+            _ => unreachable!(),
+        };
+
+        match event.code {
+            KeyCode::Esc | KeyCode::Char('q') | KeyCode::Char('w') => {
+                self.modal.close();
+            }
+            KeyCode::Up => {
+                state.previous();
+            }
+            KeyCode::Down => {
+                state.next();
             }
             _ => {}
         }
@@ -178,6 +204,11 @@ impl App {
                     self.iface.toggle_sell_mode();
                 }
             }
+            KeyCode::Char('w') => {
+                if !self.core.grandmapocalypse().wrinklers().is_empty() {
+                    self.modal.set_wrinklers();
+                }
+            }
             KeyCode::Char('.') => {
                 self.debug.backward();
             }
@@ -198,7 +229,7 @@ impl App {
                 tick: &self.tick,
                 list: &mut self.list,
                 iface: &self.iface,
-                modal: &self.modal,
+                modal: &mut self.modal,
                 news: &mut self.news,
                 debug: &self.debug,
                 bakery: &self.bakery,

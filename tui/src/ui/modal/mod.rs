@@ -1,6 +1,7 @@
 mod building;
 mod rename_bakery;
 mod upgrade;
+mod wrinklers;
 
 use super::UiApp;
 use crate::app::{AppListPointee, AppModalState};
@@ -21,6 +22,7 @@ pub fn modal(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
             None => {}
         },
         AppModalState::RenamingBakery(name) => rename_bakery::rename_bakery(name, area, buf),
+        AppModalState::Wrinklers { .. } => wrinklers::wrinklers(app, area, buf),
     }
 }
 

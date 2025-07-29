@@ -25,7 +25,7 @@ pub struct UiApp<'a> {
     pub tick: &'a AppTickState,
     pub list: &'a mut AppListState,
     pub iface: &'a AppInterfaceState,
-    pub modal: &'a AppModalState,
+    pub modal: &'a mut AppModalState,
     pub news: &'a mut AppNewsState,
     pub debug: &'a AppDebugState,
     pub bakery: &'a AppBakery,

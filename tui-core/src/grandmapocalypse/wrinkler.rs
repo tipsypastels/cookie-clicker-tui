@@ -80,4 +80,8 @@ impl Wrinkler {
     fn eat(&mut self, cps: &Cps) {
         self.eaten += cps.wrinkled / FPS;
     }
+
+    pub fn eaten(&self) -> f64 {
+        self.eaten
+    }
 }

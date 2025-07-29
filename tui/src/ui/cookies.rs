@@ -39,9 +39,17 @@ pub fn cookies(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         None => " Cookies ".into(),
     };
 
+    let controls = {
+        let mut controls = Cow::Borrowed(" Click <Space> Rename <R> ");
+        if !app.core.grandmapocalypse().wrinklers().is_empty() {
+            controls.to_mut().push_str("Wrinklers <W> ");
+        }
+        controls
+    };
+
     let block = Block::bordered()
         .title(Line::styled(title, Modifier::BOLD).centered())
-        .title_bottom(Line::styled(" Click <Space> Rename <R> ", Modifier::BOLD).centered());
+        .title_bottom(Line::styled(controls, Modifier::BOLD).centered());
 
     let block_area = block.inner(area);
 
