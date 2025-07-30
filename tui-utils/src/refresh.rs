@@ -1,7 +1,8 @@
 use crate::frames::FPS;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 pub struct Refresh {
     cur: f64,
     max: f64,
@@ -60,6 +61,12 @@ impl Refresh {
 
     pub fn modify(&mut self, f: impl FnOnce(&mut f64)) {
         f(&mut self.max);
+    }
+}
+
+impl fmt::Debug for Refresh {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}..={}", self.cur, self.max)
     }
 }
 
