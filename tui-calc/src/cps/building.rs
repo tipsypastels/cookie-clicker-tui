@@ -21,7 +21,7 @@ pub enum CpsClass {
         job_upgrade_count: u16,
     },
     Other {
-        grandma_count: Option<u16>,
+        grandmas_count: Option<u16>,
     },
 }
 
@@ -72,15 +72,15 @@ impl Cps {
                     }
             }
             CpsClass::Other {
-                grandma_count: None,
+                grandmas_count: None,
             } => cps,
             CpsClass::Other {
-                grandma_count: Some(grandma_count),
+                grandmas_count: Some(grandmas_count),
             } => {
                 let num_req_for_1p_increase = grandma_job_num_req_for_1p(building_no);
 
-                if grandma_count > num_req_for_1p_increase {
-                    let ratio = grandma_count / num_req_for_1p_increase;
+                if grandmas_count > num_req_for_1p_increase {
+                    let ratio = grandmas_count / num_req_for_1p_increase;
                     let addl = ratio as f64 * 0.01;
                     cps + addl
                 } else {

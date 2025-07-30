@@ -1,6 +1,6 @@
 use super::effect_info::UpgradeEffectInfo;
 use crate::{
-    Cost, State,
+    Changeset, Cost, State,
     req::{Cmp, Req},
 };
 
@@ -27,8 +27,8 @@ impl Kitten {
         Req::AchievementCount(Cmp::AboveOrEq(self.achievement_req))
     }
 
-    pub fn buy(&self, state: &mut State) {
-        state.milk.add_kitten_factor(self.mult);
+    pub fn buy(&self, state: &mut State, changeset: &mut Changeset) {
+        state.milk.add_kitten_factor(self.mult, changeset);
     }
 
     pub fn effect_info(&self) -> UpgradeEffectInfo {

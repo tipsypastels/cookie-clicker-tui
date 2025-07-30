@@ -28,6 +28,7 @@ pub enum AppDebugView {
     News,
     List,
     Interface,
+    Changeset,
     Keypress,
     Save,
 }

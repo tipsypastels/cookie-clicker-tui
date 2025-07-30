@@ -3,7 +3,7 @@ mod wrinkler;
 pub use self::wrinkler::{Wrinkler, Wrinklers};
 
 use self::Mode::*;
-use crate::{cookies::Cookies, cps::Cps};
+use crate::{Changeset, cookies::Cookies, cps::Cps};
 use cookie_clicker_tui_utils::refresh::Refresh;
 use serde::{Deserialize, Serialize};
 
@@ -49,23 +49,29 @@ impl Grandmapocalypse {
         }
     }
 
-    pub(crate) fn tick(&mut self, grandma_count: u16, cps: &Cps, cookies: &mut Cookies) {
-        match (grandma_count, &mut self.mode) {
+    pub(crate) fn tick(
+        &mut self,
+        grandmas_count: u16,
+        cps: &Cps,
+        cookies: &mut Cookies,
+        changeset: &mut Changeset,
+    ) {
+        match (grandmas_count, &mut self.mode) {
             (
                 0,
                 Phase(phase)
                 | Appeased {
                     return_to: phase, ..
                 },
-            ) => {
-                self.wrinklers.pop_all(cookies);
+            ) if changeset.grandmas_count => {
+                self.wrinklers.pop_all(cookies, changeset);
                 self.mode = NoGrandmas { return_to: *phase };
             }
-            (n, NoGrandmas { return_to: phase }) if n > 0 => {
+            (n, NoGrandmas { return_to: phase }) if n > 0 && changeset.grandmas_count => {
                 self.mode = Phase(*phase);
             }
             (_, Phase(phase)) => {
-                self.wrinklers.tick(*phase, cps);
+                self.wrinklers.tick(*phase, cps, changeset);
             }
             (
                 _,
@@ -154,10 +160,10 @@ impl Grandmapocalypse {
         }
     }
 
-    pub(crate) fn appease_temporarily(&mut self, cookies: &mut Cookies) {
+    pub(crate) fn appease_temporarily(&mut self, cookies: &mut Cookies, changeset: &mut Changeset) {
         match &mut self.mode {
             Phase(phase) => {
-                self.wrinklers.pop_all(cookies);
+                self.wrinklers.pop_all(cookies, changeset);
                 self.mode = Appeased {
                     return_to: *phase,
                     temporary: true,
@@ -174,10 +180,10 @@ impl Grandmapocalypse {
         }
     }
 
-    pub(crate) fn appease_permanently(&mut self, cookies: &mut Cookies) {
+    pub(crate) fn appease_permanently(&mut self, cookies: &mut Cookies, changeset: &mut Changeset) {
         match &mut self.mode {
             Phase(phase) => {
-                self.wrinklers.pop_all(cookies);
+                self.wrinklers.pop_all(cookies, changeset);
                 self.mode = Appeased {
                     return_to: *phase,
                     temporary: false,
@@ -194,9 +200,10 @@ impl Grandmapocalypse {
         }
     }
 
-    pub(crate) fn unappease(&mut self) {
+    pub(crate) fn unappease(&mut self, changeset: &mut Changeset) {
         if let Mode::Appeased { return_to, .. } = self.mode {
             self.mode = Phase(return_to);
+            changeset.cps = true;
         }
     }
 
@@ -208,8 +215,9 @@ impl Grandmapocalypse {
         }
     }
 
-    pub(crate) fn add_cps_mult(&mut self, mult: f64) {
+    pub(crate) fn add_cps_mult(&mut self, mult: f64, changeset: &mut Changeset) {
         self.cps_mults.push(mult);
+        changeset.cps = true;
     }
 }
 

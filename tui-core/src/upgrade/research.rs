@@ -2,7 +2,7 @@ use super::effect_info::{
     UpgradeEffectInfo, UpgradeInfoEffectResearch, UpgradeInfoEffectResearchWarning,
 };
 use crate::{
-    Achievement, Building, Cost, GrandmapocalypsePhase, State,
+    Achievement, Building, Changeset, Cost, GrandmapocalypsePhase, State,
     req::{Cmp, Req},
 };
 use cookie_clicker_tui_utils::num;
@@ -53,43 +53,49 @@ impl Research {
         }
     }
 
-    pub fn buy(&self, state: &mut State) {
+    pub fn buy(&self, state: &mut State, changeset: &mut Changeset) {
         match self {
             Self::BingoCenterResearchFacility => {
-                state.buildings.set_grandma_has_bingo_center(true);
+                state
+                    .buildings
+                    .set_grandma_has_bingo_center(true, changeset);
             }
             Self::SpecializedChocolateChips => {
-                state.grandmapocalypse.add_cps_mult(1.01);
+                state.grandmapocalypse.add_cps_mult(1.01, changeset);
             }
             Self::DesignerCocoaBeans => {
-                state.grandmapocalypse.add_cps_mult(1.02);
+                state.grandmapocalypse.add_cps_mult(1.02, changeset);
             }
             Self::RitualRollingPins => {
-                state.buildings.set_grandma_has_ritual_rolling_pins(true);
+                state
+                    .buildings
+                    .set_grandma_has_ritual_rolling_pins(true, changeset);
             }
             Self::UnderworldOvens => {
-                state.grandmapocalypse.add_cps_mult(1.03);
+                state.grandmapocalypse.add_cps_mult(1.03, changeset);
             }
             Self::OneMind => {
-                state.buildings.set_grandma_has_one_mind(true);
+                state.buildings.set_grandma_has_one_mind(true, changeset);
                 state
                     .grandmapocalypse
                     .set_phase(GrandmapocalypsePhase::Awoken);
             }
             Self::ExoticNuts => {
-                state.grandmapocalypse.add_cps_mult(1.04);
+                state.grandmapocalypse.add_cps_mult(1.04, changeset);
             }
             Self::CommunalBrainsweep => {
-                state.buildings.set_grandma_has_communal_brainsweep(true);
+                state
+                    .buildings
+                    .set_grandma_has_communal_brainsweep(true, changeset);
                 state
                     .grandmapocalypse
                     .set_phase(GrandmapocalypsePhase::Displeased);
             }
             Self::ArcaneSugar => {
-                state.grandmapocalypse.add_cps_mult(1.05);
+                state.grandmapocalypse.add_cps_mult(1.05, changeset);
             }
             Self::ElderPact => {
-                state.buildings.set_grandma_has_elder_pact(true);
+                state.buildings.set_grandma_has_elder_pact(true, changeset);
                 state
                     .grandmapocalypse
                     .set_phase(GrandmapocalypsePhase::Angered);

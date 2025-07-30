@@ -1,6 +1,6 @@
 use super::effect_info::UpgradeEffectInfo;
 use crate::{
-    Building, Cost, State,
+    Building, Changeset, Cost, State,
     req::{Cmp, Req},
 };
 use cookie_clicker_tui_utils::num;
@@ -34,22 +34,27 @@ impl ClickAndCursor {
         Req::BuildingCount(Building::Cursor, Cmp::AboveOrEq(self.building_req))
     }
 
-    pub fn buy(&self, state: &mut State) {
+    pub fn buy(&self, state: &mut State, changeset: &mut Changeset) {
         match self.mode {
             ClickAndCursorMode::Double => {
-                state
-                    .buildings
-                    .modify_tiered_upgrade_count(Building::Cursor, |c| *c += 1);
+                state.buildings.modify_tiered_upgrade_count(
+                    Building::Cursor,
+                    |c| *c += 1,
+                    changeset,
+                );
             }
             ClickAndCursorMode::ThousandFingers => {
                 state
                     .thousand_fingers
-                    .enable(&mut state.buildings, &mut state.click);
+                    .enable(&mut state.buildings, &mut state.click, changeset);
             }
             ClickAndCursorMode::ThousandFingersMult(mult) => {
-                state
-                    .thousand_fingers
-                    .multiply(mult, &mut state.buildings, &mut state.click);
+                state.thousand_fingers.multiply(
+                    mult,
+                    &mut state.buildings,
+                    &mut state.click,
+                    changeset,
+                );
             }
         }
     }

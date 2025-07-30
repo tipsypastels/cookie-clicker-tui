@@ -1,5 +1,5 @@
 use super::effect_info::UpgradeEffectInfo;
-use crate::{Cost, CostDyn, CostResolved, GrandmapocalypsePhase, State, calc, req::Req};
+use crate::{Changeset, Cost, CostDyn, CostResolved, GrandmapocalypsePhase, State, calc, req::Req};
 use cookie_clicker_tui_utils::num;
 
 #[derive(Copy, Clone)]
@@ -40,20 +40,20 @@ impl Switch {
         }
     }
 
-    pub fn buy(&self, state: &mut State) {
+    pub fn buy(&self, state: &mut State, changeset: &mut Changeset) {
         match self {
             Self::ElderPledge => {
                 state
                     .grandmapocalypse
-                    .appease_temporarily(&mut state.cookies);
+                    .appease_temporarily(&mut state.cookies, changeset);
             }
             Self::ElderCovenant => {
                 state
                     .grandmapocalypse
-                    .appease_permanently(&mut state.cookies);
+                    .appease_permanently(&mut state.cookies, changeset);
             }
             Self::RevokeElderCovenant => {
-                state.grandmapocalypse.unappease();
+                state.grandmapocalypse.unappease(changeset);
             }
         }
     }
