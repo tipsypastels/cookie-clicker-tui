@@ -17,6 +17,8 @@ pub struct Wrinklers {
     list: Vec<Wrinkler>,
     max_size: usize,
     odds_per_spot_per_phase: f64,
+    pop_count: usize,
+    popped_shiny_ever: bool,
 }
 
 impl Wrinklers {
@@ -25,6 +27,8 @@ impl Wrinklers {
             list: Vec::new(),
             max_size: DEFAULT_MAX_SIZE,
             odds_per_spot_per_phase: DEFAULT_ODDS_PER_SPOT_PER_PHASE,
+            pop_count: 0,
+            popped_shiny_ever: false,
         }
     }
 
@@ -48,6 +52,14 @@ impl Wrinklers {
         }
     }
 
+    pub(crate) fn pop_count(&self) -> usize {
+        self.pop_count
+    }
+
+    pub(crate) fn popped_shiny_ever(&self) -> bool {
+        self.popped_shiny_ever
+    }
+
     pub(crate) fn pop(&mut self, index: usize, cookies: &mut Cookies, changeset: &mut Changeset) {
         if let Some(wrinkler) = self.get(index) {
             let gain = calc::wrinkler_pop_cookies(wrinkler.eaten, wrinkler.shiny);
@@ -55,20 +67,26 @@ impl Wrinklers {
             cookies.gain_bulk(gain);
             changeset.cps = true;
 
+            self.popped_shiny_ever |= wrinkler.shiny;
+            self.pop_count = self.pop_count.saturating_add(1);
             self.list.remove(index);
         }
     }
 
     pub(crate) fn pop_all(&mut self, cookies: &mut Cookies, changeset: &mut Changeset) {
-        let gain = self
-            .list
-            .iter()
-            .map(|w| calc::wrinkler_pop_cookies(w.eaten, w.shiny))
-            .sum();
+        let mut gain = 0.0;
+        let mut shiny = false;
+
+        for wrinkler in self.list.iter() {
+            gain += calc::wrinkler_pop_cookies(wrinkler.eaten, wrinkler.shiny);
+            shiny |= wrinkler.shiny;
+        }
 
         cookies.gain_bulk(gain);
         changeset.cps = true;
 
+        self.popped_shiny_ever |= shiny;
+        self.pop_count = self.pop_count.saturating_add(1);
         self.list.clear();
     }
 

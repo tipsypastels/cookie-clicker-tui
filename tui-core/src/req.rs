@@ -12,7 +12,11 @@ pub enum Req {
     AchievementCount(Cmp<usize>),
     GrandmaJobUpgradeCount(Cmp<u16>),
     GrandmapocalypsePhase(GrandmapocalypsePhase),
+    GrandmapocalypsePhaseAny(),
     GrandmapocalypseAppeased(),
+    GrandmapocalypseTemporarilyAppeasedTimes(Cmp<usize>),
+    GrandmapocalypsePermanentlyAppeasedEver(),
+    WrinklersPopped(Cmp<usize>),
     GoldenCookieClicked(Cmp<usize>),
     GoldenCookieClickedAtMost1sAfterSpawn(),
     GoldenCookieClickedAtMost1sBeforeDespawn(),
@@ -39,7 +43,15 @@ impl Req {
             Self::AchievementCount(c) => c.check(state.achievements.owned().len()),
             Self::GrandmaJobUpgradeCount(c) => c.check(state.buildings.grandma_job_upgrade_count()),
             Self::GrandmapocalypsePhase(p) => state.grandmapocalypse.is_phase(*p),
+            Self::GrandmapocalypsePhaseAny() => state.grandmapocalypse.phase().is_some(),
             Self::GrandmapocalypseAppeased() => state.grandmapocalypse.is_appeased(),
+            Self::GrandmapocalypseTemporarilyAppeasedTimes(c) => {
+                c.check(state.grandmapocalypse.appeased_temporarily_times())
+            }
+            Self::GrandmapocalypsePermanentlyAppeasedEver() => {
+                state.grandmapocalypse.appeased_permanently_ever()
+            }
+            Self::WrinklersPopped(c) => c.check(state.grandmapocalypse.wrinklers().pop_count()),
             Self::GoldenCookieClicked(c) => c.check(state.golden_cookies.click_count()),
             Self::GoldenCookieClickedAtMost1sAfterSpawn() => {
                 state.golden_cookies.clicked_one_at_most_1s_after_spawn()
@@ -89,7 +101,11 @@ impl LateReq {
         AchievementCount(c: Cmp<usize>);
         GrandmaJobUpgradeCount(c: Cmp<u16>);
         GrandmapocalypsePhase(p: GrandmapocalypsePhase);
+        GrandmapocalypsePhaseAny();
         GrandmapocalypseAppeased();
+        GrandmapocalypseTemporarilyAppeasedTimes(c: Cmp<usize>);
+        GrandmapocalypsePermanentlyAppeasedEver();
+        WrinklersPopped(c: Cmp<usize>);
         GoldenCookieClicked(c: Cmp<usize>);
         GoldenCookieClickedAtMost1sAfterSpawn();
         GoldenCookieClickedAtMost1sBeforeDespawn();

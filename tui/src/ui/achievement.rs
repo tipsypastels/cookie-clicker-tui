@@ -48,6 +48,7 @@ pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
             b.name_lower_plural()
         )
         .into(),
+        AchievementReq::SellAGrandma => "• sell a grandma".into(),
         AchievementReq::Cps(n) => format!(
             "• bake {} {} per second",
             n.print_float(0, 0),
@@ -68,7 +69,19 @@ pub fn achievement(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         AchievementReq::GoldenCookieClickedAtMost1sBeforeDespawn => {
             "• click a golden cookie at the last second".into()
         }
-        AchievementReq::SellAGrandma => "• sell a grandma".into(),
+        AchievementReq::GrandmapocalypseStarted => "• trigger the grandmapocalypse".into(),
+        AchievementReq::GrandmapocalypseTemporarilyAppeasedTimes(n) => format!(
+            "• appease the grandmatriarchs {n} {}",
+            pluralized(n, "time", "times")
+        )
+        .into(),
+        AchievementReq::GrandmapocalypsePermanentlyAppeasedEver => {
+            "• declare a covenant with the grandmatriarchs".into()
+        }
+        AchievementReq::WrinklersPopped(n) => {
+            format!("• pop {n} {}", pluralized(n, "wrinkler", "wrinklers")).into()
+        }
+        AchievementReq::ShinyWrinklerPopped => "• pop the near-extinct shiny wrinkler".into(),
     };
 
     let area = split_area(area);

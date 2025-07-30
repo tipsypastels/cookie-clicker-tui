@@ -18,6 +18,7 @@ pub struct Grandmapocalypse {
     #[serde(flatten)]
     mode: Mode,
     appeased_temporarily_times: usize,
+    appeased_permanently_ever: bool,
     appeased_duration: f64,
     cps_mults: Vec<f64>,
     wrinklers: Wrinklers,
@@ -43,6 +44,7 @@ impl Grandmapocalypse {
         Self {
             mode: Off,
             appeased_temporarily_times: 0,
+            appeased_permanently_ever: false,
             appeased_duration: DEFAULT_APPEASED_DURATION_SECS,
             cps_mults: Vec::new(),
             wrinklers: Wrinklers::new(),
@@ -142,6 +144,10 @@ impl Grandmapocalypse {
         self.appeased_temporarily_times
     }
 
+    pub(crate) fn appeased_permanently_ever(&self) -> bool {
+        self.appeased_permanently_ever
+    }
+
     pub(crate) fn cps_mults(&self) -> &[f64] {
         &self.cps_mults
     }
@@ -196,8 +202,9 @@ impl Grandmapocalypse {
             } => {
                 *temporary = false;
             }
-            _ => {}
+            _ => return,
         }
+        self.appeased_permanently_ever = true;
     }
 
     pub(crate) fn unappease(&mut self, changeset: &mut Changeset) {

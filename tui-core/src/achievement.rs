@@ -706,6 +706,27 @@ pub enum Achievement {
     EarlyBird,
     #[assoc(req = AchievementReq::GoldenCookieClickedAtMost1sBeforeDespawn)]
     FadingLuck,
+    /* -------------------------------------------------------------------------- */
+    /*                              Grandmapocalypse                              */
+    /* -------------------------------------------------------------------------- */
+    #[assoc(req = AchievementReq::GrandmapocalypseStarted)]
+    Grandmapocalypse,
+    // WrathCookie // TODO
+    #[assoc(req = AchievementReq::GrandmapocalypseTemporarilyAppeasedTimes(1))]
+    ElderNap,
+    #[assoc(req = AchievementReq::GrandmapocalypseTemporarilyAppeasedTimes(5))]
+    ElderSlumber,
+    #[assoc(req = AchievementReq::GrandmapocalypsePermanentlyAppeasedEver)]
+    ElderCalm,
+    // WrinklerPoker NOT IMPLEMENTABLE, no wrinkler poking.
+    #[assoc(req = AchievementReq::WrinklersPopped(1))]
+    Itchscratcher,
+    #[assoc(req = AchievementReq::WrinklersPopped(50))]
+    Wrinklesquisher,
+    #[assoc(req = AchievementReq::WrinklersPopped(200))]
+    Moistburster,
+    #[assoc(req = AchievementReq::ShinyWrinklerPopped)]
+    LastChanceToSee,
 }
 
 pub enum AchievementReq {
@@ -714,12 +735,17 @@ pub enum AchievementReq {
     BuildingCount(Building, u16),
     BuildingCombinedCount(Building, Building, u16),
     BuildingCookiesBaked(Building, f64),
+    SellAGrandma,
     Cps(f64),
     GrandmaJobCount(u16),
     GoldenCookieClickedCount(usize),
     GoldenCookieClickedAtMost1sAfterSpawn,
     GoldenCookieClickedAtMost1sBeforeDespawn,
-    SellAGrandma,
+    GrandmapocalypseStarted,
+    GrandmapocalypseTemporarilyAppeasedTimes(usize),
+    GrandmapocalypsePermanentlyAppeasedEver,
+    WrinklersPopped(usize),
+    ShinyWrinklerPopped,
 }
 
 impl AchievementReq {
@@ -738,6 +764,7 @@ impl AchievementReq {
             Self::BuildingCookiesBaked(b, v) => {
                 LateReq::BuildingCookiesAllTime(b, Cmp::AboveOrEq(v))
             }
+            Self::SellAGrandma => LateReq::Custom(|state, _| state.buildings.grandma_been_sold()),
             Self::Cps(v) => LateReq::Cps(Cmp::AboveOrEq(v)),
             Self::GrandmaJobCount(v) => LateReq::GrandmaJobUpgradeCount(Cmp::AboveOrEq(v)),
             Self::GoldenCookieClickedCount(v) => LateReq::GoldenCookieClicked(Cmp::AboveOrEq(v)),
@@ -747,7 +774,17 @@ impl AchievementReq {
             Self::GoldenCookieClickedAtMost1sBeforeDespawn => {
                 LateReq::GoldenCookieClickedAtMost1sBeforeDespawn()
             }
-            Self::SellAGrandma => LateReq::Custom(|state, _| state.buildings.grandma_been_sold()),
+            Self::GrandmapocalypseStarted => LateReq::GrandmapocalypsePhaseAny(),
+            Self::GrandmapocalypseTemporarilyAppeasedTimes(v) => {
+                LateReq::GrandmapocalypseTemporarilyAppeasedTimes(Cmp::AboveOrEq(v))
+            }
+            Self::GrandmapocalypsePermanentlyAppeasedEver => {
+                LateReq::GrandmapocalypsePermanentlyAppeasedEver()
+            }
+            Self::WrinklersPopped(v) => LateReq::WrinklersPopped(Cmp::AboveOrEq(v)),
+            Self::ShinyWrinklerPopped => {
+                LateReq::Custom(|state, _| state.grandmapocalypse.wrinklers().popped_shiny_ever())
+            }
         }
     }
 }
