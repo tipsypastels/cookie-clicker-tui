@@ -259,6 +259,13 @@ impl Core {
         );
     }
 
+    pub fn pop_all_wrinklers(&mut self) {
+        self.state
+            .grandmapocalypse
+            .wrinklers_mut()
+            .pop_all(&mut self.state.cookies, &mut self.changeset);
+    }
+
     pub fn cheat_make_everything_free(&mut self) {
         self.everything_free = true;
     }

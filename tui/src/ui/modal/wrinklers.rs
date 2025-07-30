@@ -15,7 +15,7 @@ pub fn wrinklers(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         area,
         buf,
         title: " Wrinklers ".into(),
-        title_bottom: " Pop <P> Close <Esc> ".into(),
+        title_bottom: " Pop <P> Pop All <A> Close <Esc> ".into(),
         screen_percent: (30, 50),
     };
 

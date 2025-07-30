@@ -142,6 +142,10 @@ impl App {
                     self.modal.close();
                 }
             }
+            KeyCode::Char('a') => {
+                self.core.pop_all_wrinklers();
+                self.modal.close();
+            }
             _ => {}
         }
     }
