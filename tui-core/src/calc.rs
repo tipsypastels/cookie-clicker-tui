@@ -1,12 +1,9 @@
-use crate::{State, building::Building};
+use crate::{BuildingInfo, State, building::Building, cps::Cps};
 use cookie_clicker_tui_calc as calc;
 
-pub use calc::{
-    cps::{Cps, building::CpsClass as BuildingCpsClass},
-    thousand_fingers::ThousandFingers,
-};
+pub use calc::{cps::building::CpsClass as BuildingCpsClass, thousand_fingers::ThousandFingers};
 
-pub fn cps(state: &State) -> Cps {
+pub fn cps(state: &State) -> calc::cps::Cps {
     let base = calc::cps::base::Cps {
         building_cpses: state.buildings.infos().map(|i| i.cps()),
     };
@@ -74,4 +71,8 @@ pub fn grandma_job_upgrade_num_req_for_1p(building: Building) -> u16 {
 
 pub fn wrinkler_pop_cookies(eaten: f64) -> f64 {
     calc::wrinkler::pop_cookies(eaten)
+}
+
+pub fn building_display_final_cps(info: BuildingInfo, cps: &Cps) -> f64 {
+    info.cps() - (info.cps() * cps.debuff_ratio)
 }

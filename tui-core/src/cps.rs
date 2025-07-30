@@ -8,6 +8,7 @@ pub struct Cps {
     pub total: f64,
     #[allow(unused)]
     pub wrinkled: f64,
+    pub debuff_ratio: f64,
     refresh: Refresh,
 }
 
@@ -18,6 +19,7 @@ impl Cps {
             base: calc.base,
             total: calc.total,
             wrinkled: calc.wrinkled,
+            debuff_ratio: calc.debuff_ratio,
             refresh: Refresh::new(3.0),
         }
     }

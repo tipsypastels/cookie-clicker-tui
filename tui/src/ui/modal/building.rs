@@ -20,7 +20,7 @@ pub fn building(app: &mut UiApp, building: Building, area: Rect, buf: &mut Buffe
     };
 
     modal.render(|area, buf, block| {
-        let cps = info.cps();
+        let cps = app.core.building_display_final_cps(building);
         let cps_per = if count == 0 { 0.0 } else { cps / count as f64 };
         let cps_percent = if cps == 0.0 {
             0.0

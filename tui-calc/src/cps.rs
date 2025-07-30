@@ -8,6 +8,7 @@ pub struct Cps {
     pub base: f64,
     pub total: f64,
     pub wrinkled: f64,
+    pub debuff_ratio: f64,
 }
 
 impl Cps {
@@ -20,12 +21,17 @@ impl Cps {
         GrandmapocalypseMults: Iterator<Item = f64>,
     {
         let base = base.calc();
-        let (total, wrinkled) = addl.calc(base);
+        let addl::Calced {
+            cps: total,
+            wrinkled,
+            debuff_ratio,
+        } = addl.calc(base);
 
         Self {
             base,
             total,
             wrinkled,
+            debuff_ratio,
         }
     }
 }

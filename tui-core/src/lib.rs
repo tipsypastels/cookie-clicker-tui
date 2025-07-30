@@ -111,6 +111,10 @@ impl Core {
         self.state.buildings.info_nth(index)
     }
 
+    pub fn building_display_final_cps(&self, building: Building) -> f64 {
+        calc::building_display_final_cps(self.building_info(building), &self.computed.cps)
+    }
+
     pub fn owned_upgrades(&self) -> &BTreeSet<Upgrade> {
         self.state.owned_upgrades.as_set()
     }
