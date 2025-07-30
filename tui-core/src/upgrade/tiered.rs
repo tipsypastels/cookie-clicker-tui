@@ -1,6 +1,6 @@
 use super::effect_info::UpgradeEffectInfo;
 use crate::{
-    Building, Cost, State,
+    Building, Changeset, Cost, State,
     req::{Cmp, Req},
 };
 use cookie_clicker_tui_utils::num;
@@ -31,10 +31,10 @@ impl Tiered {
         Req::BuildingCount(self.building, Cmp::AboveOrEq(self.building_req))
     }
 
-    pub fn buy(&self, state: &mut State) {
+    pub fn buy(&self, state: &mut State, changeset: &mut Changeset) {
         state
             .buildings
-            .modify_tiered_upgrade_count(self.building, |c| *c += 1);
+            .modify_tiered_upgrade_count(self.building, |c| *c += 1, changeset);
     }
 
     pub fn effect_info(&self) -> UpgradeEffectInfo {

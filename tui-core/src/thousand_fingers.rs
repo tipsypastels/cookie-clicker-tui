@@ -1,4 +1,4 @@
-use crate::{building::Buildings, click::Click};
+use crate::{Changeset, building::Buildings, click::Click};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -19,18 +19,29 @@ impl ThousandFingers {
         self.enabled.then_some(self.mult)
     }
 
-    pub fn enable(&mut self, buildings: &mut Buildings, click: &mut Click) {
+    pub fn enable(
+        &mut self,
+        buildings: &mut Buildings,
+        click: &mut Click,
+        changeset: &mut Changeset,
+    ) {
         self.enabled = true;
-        self.apply(buildings, click);
+        self.apply(buildings, click, changeset);
     }
 
-    pub fn multiply(&mut self, mult: f64, buildings: &mut Buildings, click: &mut Click) {
+    pub fn multiply(
+        &mut self,
+        mult: f64,
+        buildings: &mut Buildings,
+        click: &mut Click,
+        changeset: &mut Changeset,
+    ) {
         self.mult *= mult;
-        self.apply(buildings, click);
+        self.apply(buildings, click, changeset);
     }
 
-    fn apply(&self, buildings: &mut Buildings, click: &mut Click) {
-        buildings.set_thousand_fingers_mult(self.mult());
+    fn apply(&self, buildings: &mut Buildings, click: &mut Click, changeset: &mut Changeset) {
+        buildings.set_thousand_fingers_mult(self.mult(), changeset);
         click.set_thousand_fingers_mult(self.mult());
     }
 }

@@ -1,4 +1,5 @@
-use crate::{State, calc};
+use crate::{Changeset, State, calc};
+use cookie_clicker_tui_utils::refresh::Refresh;
 
 #[derive(Debug)]
 pub struct Cps {
@@ -7,6 +8,7 @@ pub struct Cps {
     pub total: f64,
     #[allow(unused)]
     pub wrinkled: f64,
+    refresh: Refresh,
 }
 
 impl Cps {
@@ -16,10 +18,13 @@ impl Cps {
             base: calc.base,
             total: calc.total,
             wrinkled: calc.wrinkled,
+            refresh: Refresh::new(3.0),
         }
     }
 
-    pub fn recalc(&mut self, state: &State) {
-        *self = Self::new(state);
+    pub fn tick(&mut self, state: &State, changeset: &Changeset) {
+        if self.refresh.finish() || changeset.cps {
+            *self = Self::new(state);
+        }
     }
 }

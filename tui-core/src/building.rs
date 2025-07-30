@@ -1,4 +1,4 @@
-use crate::{Cost, calc, macros};
+use crate::{Changeset, Cost, calc, macros};
 use cookie_clicker_tui_utils::{enum_map, frames::FPS, num};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Predicates, Variants};
@@ -26,8 +26,6 @@ impl Buildings {
             let state = self.state.buildings.get_mut(building);
             state.cookies_all_time += cps / FPS;
         }
-
-        self.computed.total_count_just_changed = false;
     }
 
     pub fn infos(&self) -> impl Iterator<Item = BuildingInfo> {
@@ -58,10 +56,6 @@ impl Buildings {
         self.computed.total_count
     }
 
-    pub fn total_count_just_changed(&self) -> bool {
-        self.computed.total_count_just_changed
-    }
-
     pub fn debug_flags(&self) -> impl fmt::Debug {
         &self.state.flags
     }
@@ -74,10 +68,20 @@ impl Buildings {
         self.state.flags.grandma_been_sold
     }
 
-    pub fn modify_count(&mut self, building: Building, f: impl FnOnce(&mut u16)) {
+    pub fn modify_count(
+        &mut self,
+        building: Building,
+        f: impl FnOnce(&mut u16),
+        changeset: &mut Changeset,
+    ) {
+        let prev = self.count(building);
+
         self.modify(building, |state| f(&mut state.count));
         self.computed.total_count = self.state.buildings.count();
-        self.computed.total_count_just_changed = true;
+
+        changeset.cps = true;
+        changeset.buildings_count = true;
+        changeset.available_upgrades = true;
 
         if self.state.flags.thousand_fingers_mult.is_some() && !building.is_cursor() {
             self.recompute(Building::Cursor);
@@ -88,6 +92,12 @@ impl Buildings {
         }
 
         if building.is_grandma() {
+            changeset.grandmas_count = true;
+
+            if prev > self.count(building) {
+                self.state.flags.grandma_been_sold = true;
+            }
+
             for building in Building::variants() {
                 if self.state.buildings.get(building).has_grandma_job_upgrade {
                     self.recompute(building);
@@ -96,51 +106,61 @@ impl Buildings {
         }
     }
 
-    pub fn modify_tiered_upgrade_count(&mut self, building: Building, f: impl FnOnce(&mut u16)) {
+    pub fn modify_tiered_upgrade_count(
+        &mut self,
+        building: Building,
+        f: impl FnOnce(&mut u16),
+        changeset: &mut Changeset,
+    ) {
         self.modify(building, |state| f(&mut state.tiered_upgrade_count));
+        changeset.cps = true;
     }
 
     pub fn modify_has_grandma_job_upgrade(
         &mut self,
         building: Building,
         f: impl FnOnce(&mut bool),
+        changeset: &mut Changeset,
     ) {
         self.modify(building, |state| f(&mut state.has_grandma_job_upgrade));
         self.recompute(Building::Grandma);
+        changeset.cps = true;
     }
 
-    pub fn set_thousand_fingers_mult(&mut self, mult: Option<f64>) {
+    pub fn set_thousand_fingers_mult(&mut self, mult: Option<f64>, changeset: &mut Changeset) {
         self.state.flags.thousand_fingers_mult = mult;
         self.recompute(Building::Cursor);
+        changeset.cps = true;
     }
 
-    pub fn set_grandma_has_bingo_center(&mut self, enable: bool) {
+    pub fn set_grandma_has_bingo_center(&mut self, enable: bool, changeset: &mut Changeset) {
         self.state.flags.grandma_has_bingo_center = enable;
         self.recompute(Building::Grandma);
+        changeset.cps = true;
     }
 
-    pub fn set_grandma_has_ritual_rolling_pins(&mut self, enable: bool) {
+    pub fn set_grandma_has_ritual_rolling_pins(&mut self, enable: bool, changeset: &mut Changeset) {
         self.state.flags.grandma_has_ritual_rolling_pins = enable;
         self.recompute(Building::Grandma);
+        changeset.cps = true;
     }
 
-    pub fn set_grandma_has_one_mind(&mut self, enable: bool) {
+    pub fn set_grandma_has_one_mind(&mut self, enable: bool, changeset: &mut Changeset) {
         self.state.flags.grandma_has_one_mind = enable;
         self.recompute(Building::Grandma);
+        changeset.cps = true;
     }
 
-    pub fn set_grandma_has_communal_brainsweep(&mut self, enable: bool) {
+    pub fn set_grandma_has_communal_brainsweep(&mut self, enable: bool, changeset: &mut Changeset) {
         self.state.flags.grandma_has_communal_brainsweep = enable;
         self.recompute(Building::Grandma);
+        changeset.cps = true;
     }
 
-    pub fn set_grandma_has_elder_pact(&mut self, enable: bool) {
+    pub fn set_grandma_has_elder_pact(&mut self, enable: bool, changeset: &mut Changeset) {
         self.state.flags.grandma_has_elder_pact = enable;
         self.recompute(Building::Grandma);
-    }
-
-    pub fn set_grandma_been_sold(&mut self, enable: bool) {
-        self.state.flags.grandma_been_sold = enable;
+        changeset.cps = true;
     }
 
     fn modify(&mut self, building: Building, f: impl FnOnce(&mut BuildingState)) {
@@ -173,7 +193,6 @@ struct BuildingsState {
 struct BuildingsComputed {
     buildings: BuildingMap<BuildingComputed>,
     total_count: u16,
-    total_count_just_changed: bool,
 }
 
 impl BuildingsComputed {
@@ -183,7 +202,6 @@ impl BuildingsComputed {
                 BuildingComputed::new(&state.buildings, &state.flags, b)
             }),
             total_count: state.buildings.count(),
-            total_count_just_changed: true,
         }
     }
 }
@@ -375,7 +393,7 @@ impl BuildingComputed {
                 job_upgrade_count: buildings.grandma_job_upgrade_count(),
             },
             _ => calc::BuildingCpsClass::Other {
-                grandma_count: state
+                grandmas_count: state
                     .has_grandma_job_upgrade
                     .then_some(buildings.grandma.count),
             },

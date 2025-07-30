@@ -1,6 +1,7 @@
 mod achievement;
 mod building;
 mod calc;
+mod changeset;
 mod click;
 mod cookies;
 mod cost;
@@ -20,6 +21,7 @@ mod upgrade;
 pub use self::{
     achievement::{Achievement, AchievementReq},
     building::{Building, BuildingInfo},
+    changeset::Changeset,
     cost::{Cost, CostDyn, CostResolved},
     golden_cookie::{GoldenCookie, GoldenCookies},
     grandmapocalypse::{Grandmapocalypse, GrandmapocalypsePhase, Wrinkler, Wrinklers},
@@ -47,6 +49,7 @@ use std::{collections::BTreeSet, fmt};
 pub struct Core {
     state: State,
     computed: Computed,
+    changeset: Changeset,
     everything_free: bool,
 }
 
@@ -57,11 +60,13 @@ impl Core {
 
     fn from_state(state: State) -> Self {
         let computed = Computed::new(&state);
+        let changeset = Changeset::default();
         let everything_free = false;
 
         Self {
             state,
             computed,
+            changeset,
             everything_free,
         }
     }
@@ -161,25 +166,15 @@ impl Core {
     }
 
     pub fn give_building(&mut self, building: Building) {
-        self.state.buildings.modify_count(building, |c| *c += 1);
-        self.computed.recalc_cps(&self.state);
-        self.computed.recalc_available_upgrades(&self.state);
+        self.state
+            .buildings
+            .modify_count(building, |c| *c += 1, &mut self.changeset);
     }
 
     pub fn take_building(&mut self, building: Building) {
-        self.state.buildings.modify_count(building, |c| *c -= 1);
-
-        self.computed.recalc_cps(&self.state);
-        // TODO: Grandmapocalypse adjusting to grandma changes
-        // happens too late for the upgrades to change eagerly,
-        // since it's called in tick, and therefore must wait
-        // for upgrades to refresh instead.
-        //
-        // Consider using an event queue that's only handled
-        // in tick instead of updating immediately.
-        // This would also require drawing frames after
-        // tick/events, maybe.
-        self.computed.recalc_available_upgrades(&self.state);
+        self.state
+            .buildings
+            .modify_count(building, |c| *c -= 1, &mut self.changeset);
     }
 
     pub fn buy_building(&mut self, building: Building) -> bool {
@@ -216,12 +211,6 @@ impl Core {
             }
         }
 
-        // TODO: Consider implementing this into `modify_count`
-        // unless there are other ways to lose a grandma.
-        if building.is_grandma() {
-            self.state.buildings.set_grandma_been_sold(true);
-        }
-
         self.take_building(building);
         true
     }
@@ -253,19 +242,17 @@ impl Core {
             self.state.owned_upgrades.add(upgrade);
         }
 
-        upgrade.buy(&mut self.state);
-
-        self.computed.recalc_cps(&self.state);
-        self.computed.recalc_available_upgrades(&self.state);
+        upgrade.buy(&mut self.state, &mut self.changeset);
 
         true
     }
 
     pub fn pop_wrinkler(&mut self, index: usize) {
-        self.state
-            .grandmapocalypse
-            .wrinklers_mut()
-            .pop(index, &mut self.state.cookies);
+        self.state.grandmapocalypse.wrinklers_mut().pop(
+            index,
+            &mut self.state.cookies,
+            &mut self.changeset,
+        );
     }
 
     pub fn cheat_make_everything_free(&mut self) {
@@ -283,9 +270,12 @@ impl Core {
         });
     }
 
-    pub fn tick(&mut self) {
-        self.state.tick(&self.computed);
-        self.computed.tick(&self.state);
+    #[must_use]
+    pub fn tick(&mut self) -> Changeset {
+        self.state.tick(&self.computed, &mut self.changeset);
+        self.computed.tick(&self.state, &self.changeset);
+
+        std::mem::take(&mut self.changeset)
     }
 
     pub fn debug_cookies(&self) -> impl fmt::Debug {
@@ -362,26 +352,23 @@ impl State {
         }
     }
 
-    fn tick(&mut self, computed: &Computed) {
-        if self.buildings.total_count_just_changed() {
-            self.click.set_non_cursor_buildings_count(
-                self.buildings.total_count() - self.buildings.count(Building::Cursor),
-            );
-        }
-
+    fn tick(&mut self, computed: &Computed, changeset: &mut Changeset) {
         self.cookies.tick(&computed.cps);
         self.buildings.tick();
-        self.milk.tick(self.achievements.owned().len() as _);
-        self.research.tick();
+        self.click.tick(&self.buildings, changeset);
+        self.milk
+            .tick(self.achievements.owned().len() as _, changeset);
+        self.research.tick(changeset);
         self.grandmapocalypse.tick(
             self.buildings.count(Building::Grandma),
             &computed.cps,
             &mut self.cookies,
+            changeset,
         );
         self.golden_cookies.tick();
 
         achievement::tick(self, computed);
-        sugar_lumps::tick(self);
+        sugar_lumps::tick(self, changeset);
     }
 }
 
@@ -401,23 +388,8 @@ impl Computed {
         }
     }
 
-    fn tick(&mut self, state: &State) {
-        self.available_upgrades.tick(state, &self.cps);
-
-        if state.grandmapocalypse.wrinklers().count_just_changed() {
-            self.recalc_cps(state);
-        }
-
-        if state.research.just_completed() {
-            self.recalc_available_upgrades(state);
-        }
-    }
-
-    fn recalc_cps(&mut self, state: &State) {
-        self.cps.recalc(state);
-    }
-
-    fn recalc_available_upgrades(&mut self, state: &State) {
-        self.available_upgrades = AvailableUpgrades::new(state, &self.cps);
+    fn tick(&mut self, state: &State, changeset: &Changeset) {
+        self.cps.tick(state, changeset);
+        self.available_upgrades.tick(state, &self.cps, changeset);
     }
 }

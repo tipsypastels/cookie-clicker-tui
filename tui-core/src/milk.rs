@@ -1,4 +1,4 @@
-use crate::{Achievement, calc, macros};
+use crate::{Achievement, Changeset, calc, macros};
 use cookie_clicker_tui_utils::refresh::Refresh;
 use enum_fun::{Name, Variants};
 use serde::{Deserialize, Serialize};
@@ -28,11 +28,12 @@ impl Milk {
         }
     }
 
-    pub(crate) fn tick(&mut self, achievements: u16) {
+    pub(crate) fn tick(&mut self, achievements: u16, changeset: &mut Changeset) {
         if self.refresh.finish() {
             if achievements > self.state.achievements {
                 self.state.achievements = achievements;
                 self.computed = MilkComputed::new(&self.state);
+                changeset.cps = true;
             }
             self.refresh.reset();
         }
@@ -58,9 +59,10 @@ impl Milk {
         self.computed.flavor
     }
 
-    pub(crate) fn add_kitten_factor(&mut self, factor: f64) {
+    pub(crate) fn add_kitten_factor(&mut self, factor: f64, changeset: &mut Changeset) {
         self.state.kitten_factors.push(factor);
         self.computed = MilkComputed::new(&self.state);
+        changeset.cps = true;
     }
 }
 

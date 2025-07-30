@@ -1,6 +1,6 @@
 use super::effect_info::UpgradeEffectInfo;
 use crate::{
-    Building, Cost, State,
+    Building, Changeset, Cost, State,
     req::{Cmp, Req},
 };
 
@@ -27,10 +27,10 @@ impl GrandmaJob {
         ]))
     }
 
-    pub fn buy(&self, state: &mut State) {
+    pub fn buy(&self, state: &mut State, changeset: &mut Changeset) {
         state
             .buildings
-            .modify_has_grandma_job_upgrade(self.building, |b| *b = true);
+            .modify_has_grandma_job_upgrade(self.building, |b| *b = true, changeset);
     }
 
     pub fn effect_info(&self) -> UpgradeEffectInfo {

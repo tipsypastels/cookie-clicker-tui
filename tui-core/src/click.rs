@@ -1,4 +1,4 @@
-use crate::{calc, macros};
+use crate::{Building, Changeset, building::Buildings, calc, macros};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -21,13 +21,15 @@ impl Click {
         }
     }
 
-    pub fn cpc(&self) -> f64 {
-        self.cpc
+    pub fn tick(&mut self, buildings: &Buildings, changeset: &Changeset) {
+        if changeset.buildings_count || self.non_cursor_buildings_count.is_none() {
+            self.non_cursor_buildings_count =
+                Some(buildings.total_count() - buildings.count(Building::Cursor));
+        }
     }
 
-    pub fn set_non_cursor_buildings_count(&mut self, count: u16) {
-        self.non_cursor_buildings_count = Some(count);
-        self.recalc_cpc();
+    pub fn cpc(&self) -> f64 {
+        self.cpc
     }
 
     pub fn set_thousand_fingers_mult(&mut self, mult: Option<f64>) {

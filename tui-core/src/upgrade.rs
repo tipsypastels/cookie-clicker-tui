@@ -16,7 +16,7 @@ use self::{
     switch::Switch,
     tiered::Tiered,
 };
-use crate::{Building, Cost, State, cps::Cps, req::Req};
+use crate::{Building, Changeset, Cost, State, cps::Cps, req::Req};
 use cookie_clicker_tui_utils::{num, refresh::Refresh};
 use enum_assoc::Assoc;
 use enum_fun::{Name, Variants};
@@ -65,8 +65,8 @@ impl AvailableUpgrades {
         }
     }
 
-    pub fn tick(&mut self, state: &State, cps: &Cps) {
-        if self.refresh.finish() {
+    pub fn tick(&mut self, state: &State, cps: &Cps, changeset: &Changeset) {
+        if self.refresh.finish() || changeset.available_upgrades {
             *self = Self::new(state, cps);
         }
     }
@@ -906,8 +906,9 @@ impl Upgrade {
         self.class().cost()
     }
 
-    pub(crate) fn buy(&self, state: &mut State) {
-        self.class().buy(state);
+    pub(crate) fn buy(&self, state: &mut State, changeset: &mut Changeset) {
+        self.class().buy(state, changeset);
+        changeset.available_upgrades = true;
     }
 
     pub fn effect_info(&self) -> UpgradeEffectInfo {
@@ -951,14 +952,14 @@ impl UpgradeClass {
         }
     }
 
-    fn buy(&self, state: &mut State) {
+    fn buy(&self, state: &mut State, changeset: &mut Changeset) {
         match self {
-            Self::Tiered(u) => u.buy(state),
-            Self::ClickAndCursor(u) => u.buy(state),
-            Self::GrandmaJob(u) => u.buy(state),
-            Self::Kitten(u) => u.buy(state),
-            Self::Research(u) => u.buy(state),
-            Self::Switch(u) => u.buy(state),
+            Self::Tiered(u) => u.buy(state, changeset),
+            Self::ClickAndCursor(u) => u.buy(state, changeset),
+            Self::GrandmaJob(u) => u.buy(state, changeset),
+            Self::Kitten(u) => u.buy(state, changeset),
+            Self::Research(u) => u.buy(state, changeset),
+            Self::Switch(u) => u.buy(state, changeset),
         }
     }
 
