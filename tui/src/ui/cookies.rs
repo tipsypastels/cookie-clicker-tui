@@ -168,8 +168,14 @@ fn wrinklers(app: &mut UiApp, area: Rect, buf: &mut Buffer) {
         return;
     }
 
+    let color = if wrinklers.iter().any(|w| w.shiny()) {
+        Color::Yellow
+    } else {
+        Color::Red
+    };
+
     Line::from(vec![
-        Span::styled(EMOTE, Color::Red),
+        Span::styled(EMOTE, color),
         Span::raw(format!(" {TIMES} {}", wrinklers.len())),
     ])
     .render(area, buf);

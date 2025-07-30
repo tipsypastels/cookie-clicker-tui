@@ -4,6 +4,8 @@ use cookie_clicker_tui_utils::frames::FPS;
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 
+const SHINY_ODDS: f64 = 0.0001;
+
 const DEFAULT_MAX_SIZE: usize = 10;
 #[cfg(debug_assertions)]
 const DEFAULT_ODDS_PER_SPOT_PER_PHASE: f64 = 0.0001;
@@ -48,7 +50,7 @@ impl Wrinklers {
 
     pub(crate) fn pop(&mut self, index: usize, cookies: &mut Cookies, changeset: &mut Changeset) {
         if let Some(wrinkler) = self.get(index) {
-            let gain = calc::wrinkler_pop_cookies(wrinkler.eaten);
+            let gain = calc::wrinkler_pop_cookies(wrinkler.eaten, wrinkler.shiny);
 
             cookies.gain_bulk(gain);
             changeset.cps = true;
@@ -61,7 +63,7 @@ impl Wrinklers {
         let gain = self
             .list
             .iter()
-            .map(|w| calc::wrinkler_pop_cookies(w.eaten))
+            .map(|w| calc::wrinkler_pop_cookies(w.eaten, w.shiny))
             .sum();
 
         cookies.gain_bulk(gain);
@@ -86,11 +88,15 @@ impl Deref for Wrinklers {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Wrinkler {
     eaten: f64,
+    shiny: bool,
 }
 
 impl Wrinkler {
     fn new() -> Self {
-        Self { eaten: 0.0 }
+        Self {
+            eaten: 0.0,
+            shiny: rand::random::<f64>() <= SHINY_ODDS,
+        }
     }
 
     fn eat(&mut self, cps: &Cps) {
@@ -99,5 +105,9 @@ impl Wrinkler {
 
     pub fn eaten(&self) -> f64 {
         self.eaten
+    }
+
+    pub fn shiny(&self) -> bool {
+        self.shiny
     }
 }

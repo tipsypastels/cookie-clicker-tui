@@ -74,7 +74,9 @@ impl WrinklerWidget<'_> {
     fn name_line(&self) -> Line {
         Line::styled(
             format!("[^ (▼▼▼) ^] # {}", self.i + 1),
-            Style::new().selected_if(self.selected),
+            Style::new()
+                .fg_if(self.wrinkler.shiny(), Color::Yellow)
+                .selected_if(self.selected),
         )
     }
 
