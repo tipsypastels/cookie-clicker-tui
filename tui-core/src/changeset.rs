@@ -1,4 +1,4 @@
-#[derive(Default, Debug)]
+#[derive(Default, Debug, PartialEq)]
 #[non_exhaustive]
 pub struct Changeset {
     pub cps: bool,

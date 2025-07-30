@@ -11,8 +11,8 @@ mod utils;
 
 use crate::{
     app::{
-        AppBakery, AppDebugState, AppInterfaceState, AppListState, AppModalState, AppNewsState,
-        AppTickState,
+        AppBakery, AppChangesetState, AppDebugState, AppInterfaceState, AppListState,
+        AppModalState, AppNewsState, AppTickState,
     },
     save::Save,
 };
@@ -25,6 +25,7 @@ pub struct UiApp<'a> {
     pub tick: &'a AppTickState,
     pub list: &'a mut AppListState,
     pub iface: &'a AppInterfaceState,
+    pub changeset: &'a AppChangesetState,
     pub modal: &'a mut AppModalState,
     pub news: &'a mut AppNewsState,
     pub debug: &'a AppDebugState,

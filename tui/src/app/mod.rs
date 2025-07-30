@@ -1,4 +1,5 @@
 mod bakery;
+mod changeset;
 mod debug;
 mod interface;
 mod list;
@@ -8,6 +9,7 @@ mod tick;
 
 pub use self::{
     bakery::AppBakery,
+    changeset::AppChangesetState,
     debug::{AppDebugState, AppDebugView},
     interface::{AppFlash, AppInterfaceState},
     list::{AppListPane, AppListPointee, AppListState},
@@ -34,6 +36,7 @@ pub struct App {
     list: AppListState,
     modal: AppModalState,
     iface: AppInterfaceState,
+    changeset: AppChangesetState,
     debug: AppDebugState,
     news: AppNewsState,
     bakery: AppBakery,
@@ -52,6 +55,7 @@ impl App {
             list: AppListState::default(),
             modal: AppModalState::default(),
             iface: AppInterfaceState::default(),
+            changeset: AppChangesetState::default(),
             debug: AppDebugState::default(),
             news,
             bakery: AppBakery::new(name),
@@ -237,6 +241,7 @@ impl App {
                 tick: &self.tick,
                 list: &mut self.list,
                 iface: &self.iface,
+                changeset: &self.changeset,
                 modal: &mut self.modal,
                 news: &mut self.news,
                 debug: &self.debug,
@@ -249,16 +254,17 @@ impl App {
     }
 
     async fn tick(&mut self) -> Result<()> {
-        self.core.tick();
+        let changeset = self.core.tick();
+
         self.iface.tick();
         self.news.tick(&self.core);
         self.save.tick(&self.core, self.bakery.name()).await?;
 
-        if self.core.sugar_lumps().just_unlocked() {
+        if changeset.sugar_lumps_unlocked {
             self.iface.add_flash(AppFlash::SugarLumpsUnlocked);
         }
 
-        if self.core.research().just_completed() {
+        if changeset.research_completed {
             self.iface.add_flash(AppFlash::ResearchCompleted);
         }
 
@@ -271,6 +277,7 @@ impl App {
         }
 
         self.tick.tick();
+        self.changeset.tick(changeset);
 
         Ok(())
     }
