@@ -43,7 +43,7 @@ fn main() -> std::io::Result<()> {
 
         world.flush();
 
-        if event::is_quitting() {
+        if world.is_resource_added::<event::Quitting>() {
             render::Terminal::restore();
             break Ok(());
         }

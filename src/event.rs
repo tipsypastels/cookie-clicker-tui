@@ -1,6 +1,5 @@
 use bevy_ecs::prelude::*;
 use crossterm::event::KeyCode;
-use std::sync::atomic::{AtomicBool, Ordering};
 
 #[derive(Event)]
 pub struct KeyEvent(crossterm::event::KeyEvent);
@@ -11,17 +10,14 @@ impl KeyEvent {
     }
 }
 
-pub fn handler(event: On<KeyEvent>) {
+#[derive(Resource)]
+pub struct Quitting;
+
+pub fn handler(event: On<KeyEvent>, mut commands: Commands) {
     match event.0.code {
         KeyCode::Char('q') => {
-            QUITTING.store(true, Ordering::Relaxed);
+            commands.insert_resource(Quitting);
         }
         _ => {}
     }
-}
-
-static QUITTING: AtomicBool = AtomicBool::new(false);
-
-pub fn is_quitting() -> bool {
-    QUITTING.load(Ordering::Relaxed)
 }
