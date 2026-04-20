@@ -1,4 +1,4 @@
-use crate::{BuildingInfo, State, building::Building, cps::Cps};
+use crate::{BuildingInfo, State, building::Building, cookies::Cookies, cps::Cps};
 use cookie_clicker_tui_calc as calc;
 
 pub use calc::{cps::building::CpsClass as BuildingCpsClass, thousand_fingers::ThousandFingers};
@@ -75,4 +75,8 @@ pub fn wrinkler_pop_cookies(eaten: f64, shiny: bool) -> f64 {
 
 pub fn building_display_final_cps(info: BuildingInfo, cps: &Cps) -> f64 {
     info.cps() - (info.cps() * cps.debuff_ratio)
+}
+
+pub fn golden_cookie_lucky_gain(cps: &Cps, cookies: &Cookies) -> f64 {
+    calc::golden_cookie::lucky_gain(cps.total + cps.wrinkled, cookies.current())
 }

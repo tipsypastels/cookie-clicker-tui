@@ -1,27 +1,30 @@
+mod effect;
+mod input;
+mod list;
+mod spawn;
+mod stats;
+
+use self::{input::InputChar, list::List, spawn::SpawningMode, stats::Stats};
 use crate::{macros, spawner::Spawner};
 use cookie_clicker_tui_utils::refresh::Refresh;
-use enum_assoc::Assoc;
-use enum_fun::Variants;
 use rand::seq::IndexedRandom;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-const DEFAULT_TMIN_SECS: f64 = 300.0;
-const DEFAULT_TMAX_SECS: f64 = 900.0;
 const DEFAULT_DURATION_SECS: f64 = 13.0;
 
 #[derive(Debug)]
 pub struct GoldenCookies {
-    state: GoldenCookieState,
-    list: GoldenCookieList,
+    state: State,
+    list: List,
 }
 
 impl GoldenCookies {
     pub(crate) fn new() -> Self {
-        Self::from_state(GoldenCookieState::new())
+        Self::from_state(State::new())
     }
 
-    fn from_state(state: GoldenCookieState) -> Self {
+    fn from_state(state: State) -> Self {
         Self {
             state,
             list: GoldenCookieList::new(),
@@ -38,7 +41,7 @@ impl GoldenCookies {
     }
 
     pub(crate) fn click(&mut self, ch: char) -> bool {
-        let Some(ch) = GoldenCookieInputChar::from_char(ch) else {
+        let Some(ch) = InputChar::from_char(ch) else {
             return false;
         };
         let Some(cookie) = self.list.map.remove(&ch) else {
@@ -82,71 +85,33 @@ impl GoldenCookies {
 }
 
 macros::serialize_via_state!(GoldenCookies => GoldenCookieState as |gc| gc.state);
-macros::deserialize_via_state!(GoldenCookies => GoldenCookieState as GoldenCookies::from_state);
+macros::deserialize_via_state!(GoldenCookies => State as GoldenCookies::from_state);
 
 #[derive(Serialize, Deserialize, Debug)]
-struct GoldenCookieState {
-    click_count: usize,
-    click_miss_count: usize,
-    clicked_one_at_most_1s_after_spawn: bool,
-    clicked_one_at_most_1s_before_despawn: bool,
-    cookie_duration_secs: f64,
-    spawner: Spawner,
+struct State {
+    stats: Stats,
+    mode: SpawningMode,
 }
 
-impl GoldenCookieState {
+impl State {
     fn new() -> Self {
         Self {
-            click_count: 0,
-            click_miss_count: 0,
-            clicked_one_at_most_1s_after_spawn: false,
-            clicked_one_at_most_1s_before_despawn: false,
-            cookie_duration_secs: DEFAULT_DURATION_SECS,
-            spawner: Spawner::new(DEFAULT_TMIN_SECS, DEFAULT_TMAX_SECS),
+            stats: Stats::default(),
+            mode: SpawningMode::default(),
         }
-    }
-}
-
-#[derive(Debug)]
-struct GoldenCookieList {
-    map: HashMap<GoldenCookieInputChar, GoldenCookie>,
-}
-
-impl GoldenCookieList {
-    fn new() -> Self {
-        Self {
-            map: HashMap::new(),
-        }
-    }
-
-    fn spawn(&mut self, duration_secs: f64) {
-        let available = GoldenCookieInputChar::variants()
-            .filter(|ch| !self.map.contains_key(ch))
-            .collect::<Vec<_>>();
-
-        let Some(ch) = available.choose(&mut rand::rng()).copied() else {
-            return;
-        };
-        self.map.insert(ch, GoldenCookie::new(ch, duration_secs));
-    }
-
-    fn remove_and_count_missed(&mut self) -> usize {
-        self.map
-            .extract_if(|_, cookie| cookie.refresh.finish())
-            .count()
     }
 }
 
 #[derive(Debug)]
 pub struct GoldenCookie {
-    ch: GoldenCookieInputChar,
+    ch: InputChar,
     x: f64,
     y: f64,
     refresh: Refresh,
 }
 
 impl GoldenCookie {
-    fn new(ch: GoldenCookieInputChar, duration_secs: f64) -> Self {
+    fn new(ch: InputChar, duration_secs: f64) -> Self {
         Self {
             ch,
             x: rand::random(),
@@ -166,28 +131,4 @@ impl GoldenCookie {
     pub fn y(&self) -> f64 {
         self.y
     }
-}
-
-#[derive(Assoc, Variants, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[func(const fn char(self) -> char)]
-#[func(const fn from_char(ch: char) -> Option<Self>)]
-enum GoldenCookieInputChar {
-    #[assoc(char = '1', from_char = '1')]
-    One,
-    #[assoc(char = '2', from_char = '2')]
-    Two,
-    #[assoc(char = '3', from_char = '3')]
-    Three,
-    #[assoc(char = '4', from_char = '4')]
-    Four,
-    #[assoc(char = '5', from_char = '5')]
-    Five,
-    #[assoc(char = '6', from_char = '6')]
-    Six,
-    #[assoc(char = '7', from_char = '7')]
-    Seven,
-    #[assoc(char = '8', from_char = '8')]
-    Eight,
-    #[assoc(char = '9', from_char = '9')]
-    Nine,
 }
